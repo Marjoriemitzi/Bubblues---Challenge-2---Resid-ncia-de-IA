@@ -932,3 +932,18 @@ const consolidatedResults = {
 const outputPath = path.join(__dirname, '..', 'docs', 'avaliacao', 'resultados_avaliacao.json');
 fs.writeFileSync(outputPath, JSON.stringify(consolidatedResults, null, 2), 'utf8');
 console.log(`Resultados gravados com sucesso em: ${outputPath}`);
+
+// Verificação de asserção de metas de qualidade (CI/CD)
+const meetsGoals = 
+  fullModelResult.metrics.locais_citados_existem === 1.0 &&
+  fullModelResult.metrics.fundamentacao === 1.0 &&
+  fullModelResult.metrics.abstencao_correta === 1.0 &&
+  fullModelResult.metrics.precision_at_3 >= 0.60;
+
+if (!meetsGoals) {
+  console.error("❌ FALHA: O modelo não atingiu as metas mínimas estabelecidas!");
+  process.exit(1);
+} else {
+  console.log("✅ SUCESSO: Todas as metas de avaliação foram estritamente cumpridas!");
+}
+
