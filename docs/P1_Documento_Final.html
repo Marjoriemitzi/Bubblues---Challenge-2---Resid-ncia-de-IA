@@ -47,6 +47,11 @@
       color: var(--primary);
     }
 
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+    }
+
     .btn {
       background: var(--accent);
       color: white;
@@ -64,10 +69,10 @@
 
     .btn:hover { background: #1d4ed8; }
     .btn-secondary {
-      background: #e5e7eb;
-      color: #374151;
+      background: #10b981;
+      color: white;
     }
-    .btn-secondary:hover { background: #d1d5db; }
+    .btn-secondary:hover { background: #059669; }
 
     .doc-container {
       max-width: 900px;
@@ -116,7 +121,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
     }
 
     h3 {
@@ -192,27 +197,49 @@
     }
 
     .copy-btn {
-      font-size: 0.75rem;
-      padding: 4px 8px;
+      font-size: 0.8rem;
+      padding: 5px 10px;
       background: #f1f5f9;
       border: 1px solid #cbd5e1;
       border-radius: 4px;
       cursor: pointer;
-      font-weight: 500;
-      color: #334155;
+      font-weight: 600;
+      color: #1e3a8a;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    .copy-btn:hover { background: #e2e8f0; }
+    .copy-btn:hover { background: #e2e8f0; color: #1d4ed8; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e293b;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      font-weight: 500;
+      display: none;
+      z-index: 2000;
+      animation: fadeIn 0.3s;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     @media print {
       body { background: white; }
-      .toolbar { display: none; }
+      .toolbar, .toast, .copy-btn { display: none !important; }
       .doc-container {
         margin: 0;
         padding: 0;
         box-shadow: none;
         max-width: 100%;
       }
-      .copy-btn { display: none; }
       h2 { page-break-before: auto; }
       pre, table { page-break-inside: avoid; }
       @page {
@@ -224,14 +251,16 @@
 </head>
 <body>
 
-  <!-- BARRA DE FERRAMENTAS SUPERIOR -->
+  <!-- BARRA DE FERRAMENTAS -->
   <div class="toolbar">
-    <h2>📄 Bubbles — Documento Oficial de Entrega do Pacote 1 (P1)</h2>
-    <div>
-      <button class="btn btn-secondary" onclick="copyFullDocument()">📋 Copiar Todo o Texto</button>
+    <h2>📄 Bubbles — Entrega Oficial do Pacote 1 (P1)</h2>
+    <div class="toolbar-actions">
+      <button class="btn btn-secondary" onclick="copyRichText('printable-content')">📋 Copiar com Formatação (Word/Docs)</button>
       <button class="btn" onclick="window.print()">🖨️ Salvar como PDF / Imprimir</button>
     </div>
   </div>
+
+  <div id="toast" class="toast">Texto formatado copiado! Basta colar (Ctrl+V) no Word ou Docs.</div>
 
   <div class="doc-container" id="printable-content">
     
@@ -254,13 +283,13 @@
     <div class="alert alert-success">
       <strong>Critério de Conclusão ("Pronto Quando"):</strong><br>
       <em>"Um pedido vira JSON e a resposta cita apenas locais recuperados."</em><br>
-      👉 <strong>Status: HOMOLOGADO com 100% de precisão e conformidade nos 3 casos de teste.</strong>
+      👉 <strong>Status: HOMOLOGADO com 100% de conformidade nos 3 casos de teste.</strong>
     </div>
 
     <!-- SEÇÃO 1: OS QUATRO FORMATOS -->
     <h2>
-      1. Definição Formal dos Quatro Formatos (Contratos de Dados)
-      <button class="copy-btn" onclick="copySection('sec1')">Copiar Seção</button>
+      <span>1. Definição Formal dos Quatro Formatos (Contratos de Dados)</span>
+      <button class="copy-btn" onclick="copyRichText('sec1')">📋 Copiar Seção</button>
     </h2>
     <div id="sec1">
       <p>Para desacoplar a interface, a inteligência artificial e o banco de dados relacional e geo-vetorial (PostGIS + pgvector), foram definidos quatro contratos formais com esquemas estritos de validação:</p>
@@ -331,7 +360,7 @@
           <tr><td><code>out_of_scope</code></td><td>boolean</td><td>Sim</td><td><code>true</code> se for serviço de frete, carona, comércio ilegal ou fins não-sociais.</td></tr>
           <tr><td><code>out_of_scope_reason</code></td><td>string/null</td><td>Não</td><td>Justificativa quando fora de escopo.</td></tr>
           <tr><td><code>impossible_criteria</code></td><td>boolean</td><td>Sim</td><td><code>true</code> se solicitar critérios mutuamente excludentes ou inexistentes na cidade.</td></tr>
-          <tr><td><code>activity</code></td><td>string</td><td>Sim</td><td>Atividade social pretendida (ex: <code>"leitura de livros em grupo"</code>).</td></tr>
+          <tr><td><code>activity</code></td><td>string</td><td>Sim</td><td>Atividade social pretendida (ex: <code>"conversa sobre livros e literatura em grupo calmo"</code>).</td></tr>
           <tr><td><code>target_amenities</code></td><td>list[str]</td><td>Sim</td><td>Amenidades desejadas (ex: <code>["cafe", "library"]</code>).</td></tr>
           <tr><td><code>vibe</code></td><td>string</td><td>Sim</td><td>Atmosfera solicitada (ex: <code>"tranquilo"</code>, <code>"ar_livre"</code>).</td></tr>
           <tr><td><code>noise_tolerance</code></td><td>enum</td><td>Sim</td><td>Tolerância a barulho: <code>"baixo"</code>, <code>"moderado"</code>, <code>"indiferente"</code>.</td></tr>
@@ -459,8 +488,8 @@
 
     <!-- SEÇÃO 2: INTERPRETAÇÃO E RETRY -->
     <h2>
-      2. Interpretação do Pedido e Mecanismo de Retry Automático
-      <button class="copy-btn" onclick="copySection('sec2')">Copiar Seção</button>
+      <span>2. Interpretação do Pedido e Mecanismo de Retry Automático</span>
+      <button class="copy-btn" onclick="copyRichText('sec2')">📋 Copiar Seção</button>
     </h2>
     <div id="sec2">
       <p>A etapa de NLU processa a entrada do usuário através de um <strong>System Prompt</strong> com diretrizes rígidas de validação de escopo e tipagem de campos.</p>
@@ -485,8 +514,8 @@ Regras de Negócio e Guardrails:
 
     <!-- SEÇÃO 3: GERADOR GROUNDED E AUDITORIA PÓS-GERAÇÃO -->
     <h2>
-      3. Gerador Grounded e Validador Determinístico Pós-Geração
-      <button class="copy-btn" onclick="copySection('sec3')">Copiar Seção</button>
+      <span>3. Gerador Grounded e Validador Determinístico Pós-Geração</span>
+      <button class="copy-btn" onclick="copyRichText('sec3')">📋 Copiar Seção</button>
     </h2>
     <div id="sec3">
       <p>O gerador de linguagem natural recebe estritamente a lista <code>retorno_busca</code> e os <code>evidence_record</code>. O System Prompt proíbe terminantemente qualquer alucinação:</p>
@@ -511,8 +540,8 @@ Diretrizes Rigorosas de Fundamentação (Zero-Hallucination Guardrail):
 
     <!-- SEÇÃO 4: DEMONSTRAÇÃO E CASOS DE TESTE -->
     <h2>
-      4. Demonstração dos Três Casos de Teste (Execução Real)
-      <button class="copy-btn" onclick="copySection('sec4')">Copiar Seção</button>
+      <span>4. Demonstração dos Três Casos de Teste (Execução Real)</span>
+      <button class="copy-btn" onclick="copyRichText('sec4')">📋 Copiar Seção</button>
     </h2>
     <div id="sec4">
       <p>Os testes foram executados via script automatizado <code>scripts/p1_demo.py</code>, demonstrando os 3 fluxos fundamentais:</p>
@@ -574,8 +603,8 @@ Diretrizes Rigorosas de Fundamentação (Zero-Hallucination Guardrail):
 
     <!-- SEÇÃO 5: RUNBOOK OPERACIONAL -->
     <h2>
-      5. RUNBOOK: Guia de Execução e Integração
-      <button class="copy-btn" onclick="copySection('sec5')">Copiar Seção</button>
+      <span>5. RUNBOOK: Guia de Execução e Integração</span>
+      <button class="copy-btn" onclick="copyRichText('sec5')">📋 Copiar Seção</button>
     </h2>
     <div id="sec5">
       <h3>Como Executar a Demonstração</h3>
@@ -592,33 +621,46 @@ Diretrizes Rigorosas de Fundamentação (Zero-Hallucination Guardrail):
       <h3>Mapeamento de Integração com os Demais Pacotes</h3>
       <ul>
         <li><strong>Integração com P2 (Dados OSM / Base Curada):</strong> A tabela <code>places</code> deve expor os campos definidos no contrato <code>place_record</code>, garantindo <code>is_public_verified = true</code>.</li>
-        <li><strong>Integração com P3 (Dimensões e Vetores):** O vetor denso normalizado de 16 dimensões do P3 é consumido pelo campo <code>vector</code> de <code>place_record</code> e <code>search_vector_focus</code> de <code>structured_request</code>.</li>
-        <li><strong>Integração com P4 (Banco, Busca e Evidência):** A função de busca SQL devolve o formato <code>search_response</code> com decomposição de score e os <code>evidence_record</code> associados.</li>
-        <li><strong>Integração com P5 (Avaliação e Métricas):** As métricas de *Locais Citados que Existem (Meta: 100%)* e *Abstenção Correta* utilizam diretamente a lógica do validador determinístico do P1.</li>
+        <li><strong>Integração com P3 (Dimensões e Vetores):</strong> O vetor denso normalizado de 16 dimensões do P3 é consumido pelo campo <code>vector</code> de <code>place_record</code> e <code>search_vector_focus</code> de <code>structured_request</code>.</li>
+        <li><strong>Integração com P4 (Banco, Busca e Evidência):</strong> A função de busca SQL devolve o formato <code>search_response</code> com decomposição de score e os <code>evidence_record</code> associados.</li>
+        <li><strong>Integração com P5 (Avaliação e Métricas):</strong> As métricas de *Locais Citados que Existem (Meta: 100%)* e *Abstenção Correta* utilizam diretamente a lógica do validador determinístico do P1.</li>
       </ul>
     </div>
 
   </div>
 
   <script>
-    function copySection(sectionId) {
-      const el = document.getElementById(sectionId);
-      if (!el) return;
-      navigator.clipboard.writeText(el.innerText).then(() => {
-        alert("Conteúdo da seção copiado para a área de transferência!");
-      }).catch(err => {
-        alert("Erro ao copiar: " + err);
-      });
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      toast.innerText = msg;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3500);
     }
 
-    function copyFullDocument() {
-      const el = document.getElementById('printable-content');
+    async function copyRichText(elementId) {
+      const el = document.getElementById(elementId);
       if (!el) return;
-      navigator.clipboard.writeText(el.innerText).then(() => {
-        alert("Todo o documento copiado para a área de transferência!");
-      }).catch(err => {
-        alert("Erro ao copiar: " + err);
-      });
+
+      try {
+        // Copia como HTML formatado para o Word/Docs receber como tabela e texto rico
+        const htmlBlob = new Blob([el.innerHTML], { type: 'text/html' });
+        const textBlob = new Blob([el.innerText], { type: 'text/plain' });
+        const item = new ClipboardItem({
+          'text/html': htmlBlob,
+          'text/plain': textBlob
+        });
+        await navigator.clipboard.write([item]);
+        showToast("✅ Conteúdo formatado copiado! Basta dar Ctrl+V no Word ou Google Docs.");
+      } catch (err) {
+        // Fallback para seleção padrão do navegador
+        const range = document.createRange();
+        range.selectNode(el);
+        window.getSelection().removeAllRanges();
+        window.getSelection().addRange(range);
+        document.execCommand('copy');
+        window.getSelection().removeAllRanges();
+        showToast("✅ Conteúdo formatado copiado! Basta dar Ctrl+V no Word ou Google Docs.");
+      }
     }
   </script>
 </body>
