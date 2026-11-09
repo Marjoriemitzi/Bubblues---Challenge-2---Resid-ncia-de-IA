@@ -75,7 +75,8 @@ for elemento in elementos:
         "categoria": categoria,
         "latitude": latitude,
         "longitude": longitude,
-        "cidade": "Brasília"
+        "cidade": "Brasília",
+        "tags": json.dumps(tags, ensure_ascii=False)
     }
 
     registros.append(registro)
@@ -126,7 +127,8 @@ df = df[
         "categoria",
         "latitude",
         "longitude",
-        "cidade"
+        "cidade",
+        "tags"
     ]
 ]
 

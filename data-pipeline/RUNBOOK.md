@@ -36,6 +36,12 @@ pipeline do google/
 ├── transform.py
 ├── load.py
 ├── search_places.py
+├── busca.py
+├── score.py
+├── gerar_embeddings.py
+├── docker-compose.yml
+├── db/
+├── tests/
 ├── validar_limite.py
 ├── curadoria.sql
 └── RUNBOOK.md
@@ -91,39 +97,33 @@ pip install -r requirements.txt
 
 ## 5. Configuração do banco de dados
 
-O projeto utiliza PostgreSQL com a extensão PostGIS para armazenar informações geográficas.
+O projeto utiliza PostgreSQL com as extensões PostGIS (dados geográficos) e pgvector (embeddings). O esquema completo está em `db/schema.sql`.
 
-### 5.1. Criar o banco
+### 5.1. Subir o banco com Docker (recomendado)
 
-No pgAdmin, criar um banco de dados com o nome:
+Depois de criar o `.env` (seção 5.4), executar em `data-pipeline/`:
 
-`pipeline_brasilia`
-
-### 5.2. Habilitar o PostGIS
-
-Conectar-se ao banco `pipeline_brasilia` e executar:
-
-```sql
-CREATE EXTENSION IF NOT EXISTS postgis;
+```bash
+docker compose up -d --build
 ```
 
-### 5.3. Criar a tabela original
+A imagem definida em `db/Dockerfile` traz PostGIS e pgvector. O `db/schema.sql` é aplicado automaticamente apenas na criação do volume. Para atualizar um volume já existente, executar:
 
-Executar no Query Tool do pgAdmin:
-
-```sql
-CREATE TABLE estabelecimentos (
-    osm_id BIGINT,
-    osm_type VARCHAR(20),
-    nome TEXT,
-    tipo_categoria VARCHAR(50),
-    categoria VARCHAR(50),
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
-    cidade VARCHAR(100),
-    geom GEOMETRY(Point, 4326)
-);
+```bash
+docker compose exec -T db sh -c 'psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"' < db/schema.sql
 ```
+
+### 5.2. Banco instalado localmente
+
+É necessário ter PostGIS e pgvector instalados no servidor. Criar o banco `pipeline_brasilia` e executar `db/schema.sql` no Query Tool do pgAdmin.
+
+O script pode ser executado novamente com segurança e atualiza bancos criados por versões anteriores deste documento.
+
+### 5.3. Tabelas
+
+- `estabelecimentos`: registros originais da carga, incluindo as etiquetas OSM em `tags`.
+- `places`: lugares após a curadoria, com identificadores de origem, `tags`, `embedding` (768 dimensões) e as notas opcionais `nota_google` e `nota_app`.
+- `evidencias_busca`: um registro por consulta executada.
 
 ### 5.4. Configuração de conexão
 
@@ -142,39 +142,6 @@ DB_PASSWORD=
 Para executar o projeto, cada usuário deve criar seu próprio arquivo `.env`, preencher as configurações locais e informar a senha do PostgreSQL.
 
 O arquivo `.env` verdadeiro não deve ser compartilhado nem enviado ao GitHub.
-
-### 5.5. Criar a tabela curada
-
-Após criar a tabela `estabelecimentos`, executar:
-
-```sql
-CREATE TABLE places (
-    place_id BIGSERIAL PRIMARY KEY,
-    nome TEXT NOT NULL,
-    categoria VARCHAR(50),
-    tipo_categoria VARCHAR(50),
-    cidade VARCHAR(100),
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL,
-    geom GEOMETRY(Point, 4326) NOT NULL,
-    osm_id BIGINT NOT NULL,
-    osm_type VARCHAR(20) NOT NULL,
-    osm_ids_origem JSONB NOT NULL,
-    quantidade_origens INTEGER NOT NULL
-);
-```
-
-A tabela `places` armazena os lugares após a curadoria, incluindo identificadores de origem, quantidade de registros unificados e informações geográficas.
-
-### 5.6. Criar índice espacial
-
-```sql
-CREATE INDEX idx_places_geom
-ON places
-USING GIST (geom);
-```
-
-O índice GiST auxilia na otimização das consultas espaciais.
 
 ## 6. Execução do pipeline
 
@@ -243,6 +210,17 @@ Resultado esperado:
 - 4.533 registros de origem preservados.
 - 7 lugares resultantes da unificação de pares de registros.
 
+### 6.5. Geração dos embeddings
+
+A curadoria recria a tabela `places` e apaga os embeddings, portanto esta etapa deve ser repetida depois de cada curadoria.
+
+```bash
+pip install -r requirements-embeddings.txt
+python gerar_embeddings.py
+```
+
+O modelo local `paraphrase-multilingual-mpnet-base-v2` (768 dimensões) é baixado na primeira execução. Somente lugares com embedding são considerados pela busca.
+
 ## 7. Validação geográfica
 
 O projeto utiliza o limite geográfico do Distrito Federal obtido no OpenStreetMap.
@@ -301,7 +279,7 @@ Dessa forma, mesmo após a unificação, é possível identificar os registros q
 
 ## 9. Índice espacial
 
-Foi criado um índice espacial GiST na coluna `geom` da tabela `places`, conforme descrito na seção 5.6.
+O arquivo `db/schema.sql` cria um índice espacial GiST sobre `geom::geography` na tabela `places`.
 
 Esse índice auxilia na eficiência das consultas espaciais, especialmente na busca de lugares próximos a uma coordenada.
 
@@ -325,6 +303,39 @@ A consulta utiliza funções do PostGIS:
 Os resultados são ordenados pela distância.
 
 As consultas são realizadas sobre a tabela curada `places`, utilizando os registros após o processo de unificação.
+
+### 10.1. Busca híbrida com evidência
+
+O arquivo `busca.py` devolve o top-k com a decomposição do score e grava um registro em `evidencias_busca`.
+
+```bash
+python busca.py "café calmo e acessível" --lat -15.7942 --lon -47.8825 --raio 2000 --tipo cafe -k 3 --etiqueta wheelchair=yes
+```
+
+Em código, `buscar(conexao, latitude, longitude, embedding_consulta, raio_m, tipos, k, etiquetas_desejadas, texto_consulta)` recebe o vetor da consulta já calculado.
+
+| Fator | Peso | Valor (entre 0 e 1) |
+|---|---:|---|
+| `similaridade` | 0,40 | Cosseno entre consulta e lugar; negativos viram 0 |
+| `distancia` | 0,25 | `1 / (1 + km / 5)` |
+| `reputacao` | 0,15 | `(0,4 × Google + 0,6 × App) / 5` |
+| `compatibilidade` | 0,20 | Média das etiquetas pedidas: atende = 1, contraria = 0, ausente = 0,5 |
+
+- **Sem dado:** o fator vale 0,5 e o registro traz `"origem": "sem_dado"`.
+- **Ordenação:** maior score, depois menor distância, depois `osm_type` e `osm_id`.
+- **Ampliação:** com menos de k candidatos, o raio é dobrado uma única vez. O registro informa `solicitado_m`, `final_m` e `ampliado`.
+- **Status:** `completo`, `parcial` ou `sem_resultado`.
+
+Cada resultado do registro contém o local, o link do OSM, as etiquetas usadas e os fatores com valor, peso, contribuição e origem.
+
+### 10.2. Testes
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+`tests/test_score.py` não precisa de banco. `tests/test_busca.py` precisa do banco no ar, usa um schema temporário em cada teste e é pulado quando não há conexão.
 
 ## 11. Validação da base curada
 
