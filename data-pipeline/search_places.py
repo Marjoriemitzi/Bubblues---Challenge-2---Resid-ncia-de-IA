@@ -1,14 +1,23 @@
 
-
 import os
 import psycopg
 from dotenv import load_dotenv
 
-# Carrega as configurações do arquivo .env
+# Carregar configurações do arquivo .env
 load_dotenv()
 
 
 def buscar_lugares(latitude, longitude, raio=1000, categorias=None):
+
+    # Validar parâmetros
+    if not -90 <= latitude <= 90:
+        raise ValueError("Latitude inválida.")
+
+    if not -180 <= longitude <= 180:
+        raise ValueError("Longitude inválida.")
+
+    if raio <= 0:
+        raise ValueError("O raio deve ser maior que zero.")
 
     senha = os.getenv("DB_PASSWORD")
 
@@ -66,17 +75,19 @@ def buscar_lugares(latitude, longitude, raio=1000, categorias=None):
 
             resultados = cursor.fetchall()
 
-        return resultados
+    return resultados
 
 
-# TESTE: buscar lugares próximos
-lugares = buscar_lugares(
-    -15.7942,
-    -47.8825,
-    1000
-)
+# Executar teste somente quando este arquivo for executado diretamente
+if __name__ == "__main__":
 
-print(f"Total de lugares encontrados: {len(lugares)}")
+    lugares = buscar_lugares(
+        -15.7942,
+        -47.8825,
+        1000
+    )
 
-for lugar in lugares[:10]:
-    print(lugar)
+    print(f"Total de lugares encontrados: {len(lugares)}")
+
+    for lugar in lugares[:10]:
+        print(lugar)

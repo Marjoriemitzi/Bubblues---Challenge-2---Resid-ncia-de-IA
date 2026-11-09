@@ -1,22 +1,34 @@
 
-
 import os
+from pathlib import Path
+
 import pandas as pd
 import psycopg
 from dotenv import load_dotenv
 
-# Carrega as configurações do arquivo .env
+# 1. Carregar configurações do arquivo .env
 load_dotenv()
 
-arquivo = "data/processed/estabelecimentos.csv"
+# 2. Localizar arquivo processado
+arquivo = Path("data/processed/estabelecimentos.csv")
+
+if not arquivo.exists():
+    raise FileNotFoundError(
+        "Arquivo CSV não encontrado. Execute primeiro o transform.py."
+    )
 
 df = pd.read_csv(arquivo)
 
+if df.empty:
+    raise ValueError("O arquivo CSV está vazio.")
+
+# 3. Obter senha do banco
 senha = os.getenv("DB_PASSWORD")
 
 if not senha:
     raise RuntimeError("Configure DB_PASSWORD no arquivo .env")
 
+# 4. Conectar ao PostgreSQL e carregar os dados
 with psycopg.connect(
     host=os.getenv("DB_HOST", "localhost"),
     port=os.getenv("DB_PORT", "5432"),
@@ -27,14 +39,21 @@ with psycopg.connect(
 
     with conexao.cursor() as cursor:
 
-        # Limpa os dados anteriores antes de uma nova carga
+        # Limpar dados anteriores
         cursor.execute("TRUNCATE TABLE estabelecimentos;")
 
-        # Insere os registros em lote
+        # Inserir registros em lote
         cursor.executemany("""
             INSERT INTO estabelecimentos (
-                osm_id, osm_type, nome, tipo_categoria,
-                categoria, latitude, longitude, cidade, geom
+                osm_id,
+                osm_type,
+                nome,
+                tipo_categoria,
+                categoria,
+                latitude,
+                longitude,
+                cidade,
+                geom
             )
             VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s,
@@ -47,13 +66,14 @@ with psycopg.connect(
                 linha["nome"],
                 linha["tipo_categoria"],
                 linha["categoria"],
-                linha["latitude"],
-                linha["longitude"],
+                float(linha["latitude"]),
+                float(linha["longitude"]),
                 linha["cidade"],
-                linha["longitude"],
-                linha["latitude"]
+                float(linha["longitude"]),
+                float(linha["latitude"])
             )
             for _, linha in df.iterrows()
         ])
 
-print(f"Importação concluída! {len(df)} estabelecimentos enviados.")
+print("Importação concluída!")
+print(f"Total de estabelecimentos enviados: {len(df)}")

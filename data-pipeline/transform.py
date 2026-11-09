@@ -1,4 +1,5 @@
 
+
 import json
 import pandas as pd
 from pathlib import Path
@@ -6,11 +7,17 @@ from pathlib import Path
 # 1. Caminho dos dados brutos
 arquivo_entrada = Path("data/raw/estabelecimentos.json")
 
+if not arquivo_entrada.exists():
+    raise FileNotFoundError(
+        f"Arquivo não encontrado: {arquivo_entrada}. "
+        "Execute primeiro o extract.py."
+    )
+
 # 2. Carregar os dados
 with open(arquivo_entrada, "r", encoding="utf-8") as arquivo:
     dados = json.load(arquivo)
 
-elementos = dados["elements"]
+elementos = dados.get("elements", [])
 
 print(f"Registros recebidos: {len(elementos)}")
 
@@ -38,7 +45,6 @@ categorias_permitidas = {
 registros = []
 
 for elemento in elementos:
-
     tags = elemento.get("tags", {})
 
     # Identificar coordenadas
@@ -77,6 +83,9 @@ for elemento in elementos:
 # 5. Criar DataFrame
 df = pd.DataFrame(registros)
 
+if df.empty:
+    raise ValueError("Nenhum estabelecimento foi encontrado na coleta.")
+
 # 6. Verificar qualidade dos dados
 print("Registros duplicados:",
       df.duplicated(subset=["osm_type", "osm_id"]).sum())
@@ -90,9 +99,11 @@ df = df.drop_duplicates(subset=["osm_type", "osm_id"])
 
 df["nome"] = df["nome"].fillna("Sem nome")
 
+df["latitude"] = pd.to_numeric(df["latitude"], errors="coerce")
+df["longitude"] = pd.to_numeric(df["longitude"], errors="coerce")
+
 df = df.dropna(subset=["latitude", "longitude"])
 
-# Manter apenas categorias permitidas
 df = df[df["tipo_categoria"] != "outro"]
 
 # 8. Padronizar categorias
