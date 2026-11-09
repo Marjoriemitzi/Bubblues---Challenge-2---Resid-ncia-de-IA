@@ -1,0 +1,20 @@
+{
+  "name": "bubblues-challenge-2",
+  "version": "1.0.0",
+  "description": "Sistema de recomendação e matching de encontros em grupo para combate à solidão via IA (LLM, pgvector, PostGIS)",
+  "main": "scripts/eval_benchmark.js",
+  "scripts": {
+    "test": "node scripts/eval_benchmark.js",
+    "benchmark": "node scripts/eval_benchmark.js"
+  },
+  "keywords": [
+    "ai",
+    "rag",
+    "pgvector",
+    "postgis",
+    "social-connection",
+    "recommendation-system"
+  ],
+  "author": "Grupo 10 - Residência em IA (TIC-IA)",
+  "license": "MIT"
+}

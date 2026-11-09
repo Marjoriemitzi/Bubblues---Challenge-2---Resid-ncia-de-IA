@@ -1,0 +1,1786 @@
+{
+  "timestamp": "2026-11-09T00:40:39.052Z",
+  "total_test_cases": 18,
+  "comparison_table": [
+    {
+      "Cenário": "Linha de Base: Só Tipo e Distância",
+      "Precision@3": "75.0%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "0.0%"
+    },
+    {
+      "Cenário": "Modelo Completo: Similaridade Vetorial + Híbrido",
+      "Precision@3": "64.6%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "100.0%"
+    },
+    {
+      "Cenário": "Ablação A: Sem Vetores (wv=0)",
+      "Precision@3": "33.3%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "100.0%"
+    },
+    {
+      "Cenário": "Ablação B: Sem Distância (wd=0)",
+      "Precision@3": "81.2%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "100.0%"
+    },
+    {
+      "Cenário": "Ablação C: Sem Avaliação/Reputação (wr=0)",
+      "Precision@3": "62.5%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "100.0%"
+    },
+    {
+      "Cenário": "Ablação D: Sem Compatibilidade/Vibe (wc=0)",
+      "Precision@3": "64.6%",
+      "Fundamentação": "100.0%",
+      "Locais Existem": "100.0%",
+      "Abstenção Correta": "100.0%"
+    }
+  ],
+  "experiments": {
+    "baseline": {
+      "modelName": "Linha de Base: Só Tipo e Distância",
+      "metrics": {
+        "precision_at_3": 0.75,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 0
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 41,
+        "correct_abstentions": 0,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'cafe' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'bar' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-06"
+          ],
+          "top3_names": [
+            "Livraria da Travessa & Bistrô Café"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'livraria' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Filtrado exclusivamente por amenity 'parque' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Filtrado exclusivamente por amenity 'cafe' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'gastronomia' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-17"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Filtrado exclusivamente por amenity 'restaurante' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-20"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Cine Drive-In Brasília"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'cinema' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-07"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "CCBB - Centro Cultural Banco do Brasil"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'centro' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'parque' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'casa' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Filtrado exclusivamente por amenity 'recreacao' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-17"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Filtrado exclusivamente por amenity 'restaurante' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-15"
+          ],
+          "top3_names": [
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'jardim' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Filtrado exclusivamente por amenity 'cafe' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Filtrado exclusivamente por amenity 'indefinida' e ordenado por menor distância."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": false,
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "precision_at_3": 0,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "Filtro por tipo 'cafe' ordenado por distância ignorando restrições de patinação e madrugada."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": false,
+          "top3_ids": [],
+          "precision_at_3": 0,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "Filtro categórico não encontrou serviço de frete; baseline falhou em abstenção explícita."
+        }
+      ]
+    },
+    "full_hybrid_vector": {
+      "modelName": "Modelo Completo: Similaridade Vetorial + Híbrido",
+      "metrics": {
+        "precision_at_3": 0.646,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 1
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 48,
+        "correct_abstentions": 2,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "POI-04",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Objeto Encontrado Café Cultural",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-19",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-14",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.4), Distância(0.25), Reputação(0.15), Compatibilidade(0.2)."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Abstenção correta: informado ao usuário que a combinação solicitada é inviável na localidade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção semântica de fora de escopo ativada: sistema absteve-se de sugerir locais."
+        }
+      ]
+    },
+    "ablation_no_vector": {
+      "modelName": "Ablação A: Sem Vetores (wv=0)",
+      "metrics": {
+        "precision_at_3": 0.333,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 1
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 48,
+        "correct_abstentions": 2,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-14",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Cine Brasília & Café Cultural",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-14",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-14",
+            "POI-03",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Sephinah Casa de Chá e Cafeteria",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0), Distância(0.45), Reputação(0.25), Compatibilidade(0.3)."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Abstenção correta: informado ao usuário que a combinação solicitada é inviável na localidade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção semântica de fora de escopo ativada: sistema absteve-se de sugerir locais."
+        }
+      ]
+    },
+    "ablation_no_distance": {
+      "modelName": "Ablação B: Sem Distância (wd=0)",
+      "metrics": {
+        "precision_at_3": 0.812,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 1
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 48,
+        "correct_abstentions": 2,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-06",
+            "POI-22",
+            "POI-19"
+          ],
+          "top3_names": [
+            "Livraria da Travessa & Bistrô Café",
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-08",
+            "POI-02",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque Olhos D'Água",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-16",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Café com Letras UnB Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-18",
+            "POI-23"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Feirinha da Vila Planalto Gastronômica",
+            "Beco Elétrico Gastrobar & Praça Cultural"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-20"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Drive-In Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-19",
+            "POI-22",
+            "POI-07"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão",
+            "CCBB - Centro Cultural Banco do Brasil"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-08",
+            "POI-21"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água",
+            "Parcão do Parque da Cidade - Estacionamento 6"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-17"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-15",
+            "POI-08",
+            "POI-02"
+          ],
+          "top3_names": [
+            "Jardim Botânico de Brasília",
+            "Parque Olhos D'Água",
+            "Parque da Cidade Dona Sarah Kubitschek"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-16",
+            "POI-04",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Café com Letras UnB Cultural",
+            "Objeto Encontrado Café Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-07",
+            "POI-11",
+            "POI-19"
+          ],
+          "top3_names": [
+            "CCBB - Centro Cultural Banco do Brasil",
+            "Castália Padaria & Café Artesanal",
+            "Espaço Cultural Renato Russo - 508 Sul"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.55), Distância(0), Reputação(0.2), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Abstenção correta: informado ao usuário que a combinação solicitada é inviável na localidade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção semântica de fora de escopo ativada: sistema absteve-se de sugerir locais."
+        }
+      ]
+    },
+    "ablation_no_reputation": {
+      "modelName": "Ablação C: Sem Avaliação/Reputação (wr=0)",
+      "metrics": {
+        "precision_at_3": 0.625,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 1
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 48,
+        "correct_abstentions": 2,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-14",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.45), Distância(0.3), Reputação(0), Compatibilidade(0.25)."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Abstenção correta: informado ao usuário que a combinação solicitada é inviável na localidade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção semântica de fora de escopo ativada: sistema absteve-se de sugerir locais."
+        }
+      ]
+    },
+    "ablation_no_compatibility": {
+      "modelName": "Ablação D: Sem Compatibilidade/Vibe (wc=0)",
+      "metrics": {
+        "precision_at_3": 0.646,
+        "fundamentacao": 1,
+        "locais_citados_existem": 1,
+        "abstencao_correta": 1
+      },
+      "counts": {
+        "evaluated_queries": 16,
+        "total_recommendations": 48,
+        "correct_abstentions": 2,
+        "expected_abstentions": 2
+      },
+      "details": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "POI-04",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Objeto Encontrado Café Cultural",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-19",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-14",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Ranking multi-fatorial: Vetores(0.5), Distância(0.3), Reputação(0.2), Compatibilidade(0)."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Abstenção correta: informado ao usuário que a combinação solicitada é inviável na localidade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_ids": [],
+          "precision_at_3": 1,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção semântica de fora de escopo ativada: sistema absteve-se de sugerir locais."
+        }
+      ]
+    }
+  }
+}
