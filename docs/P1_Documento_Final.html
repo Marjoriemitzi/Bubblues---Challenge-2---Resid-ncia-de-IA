@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>P1: Contratos, LLM e Demonstração — Bubbles (Residência em IA)</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #eff6ff;
+      --accent: #2563eb;
+      --text: #1f2937;
+      --text-muted: #4b5563;
+      --border: #e5e7eb;
+      --bg-code: #f8fafc;
+      --success-bg: #ecfdf5;
+      --success-text: #065f46;
+      --warning-bg: #fffbeb;
+      --warning-text: #92400e;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: var(--text);
+      background-color: #f3f4f6;
+      margin: 0;
+      padding: 0;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      z-index: 1000;
+    }
+
+    .toolbar h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: var(--primary);
+    }
+
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover { background: #1d4ed8; }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+    }
+    .btn-secondary:hover { background: #d1d5db; }
+
+    .doc-container {
+      max-width: 900px;
+      margin: 32px auto;
+      background: white;
+      padding: 48px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-box {
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 20px;
+      margin-bottom: 32px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    h1 {
+      color: var(--primary);
+      margin: 0 0 8px 0;
+      font-size: 2rem;
+    }
+
+    .meta {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    h2 {
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      margin-top: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.4rem;
+    }
+
+    h3 {
+      color: #1e293b;
+      margin-top: 24px;
+      font-size: 1.15rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #f8fafc;
+      color: #334155;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) { background: #fbfcfd; }
+
+    pre {
+      background: var(--bg-code);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      overflow-x: auto;
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      font-size: 0.85rem;
+      line-height: 1.45;
+    }
+
+    code {
+      font-family: Consolas, Monaco, "Courier New", monospace;
+      background: #f1f5f9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      color: #0f172a;
+    }
+
+    .alert {
+      padding: 14px 18px;
+      border-radius: 6px;
+      margin: 16px 0;
+      font-size: 0.95rem;
+    }
+
+    .alert-success {
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-left: 4px solid #10b981;
+    }
+
+    .alert-info {
+      background: var(--primary-light);
+      color: var(--primary);
+      border-left: 4px solid var(--accent);
+    }
+
+    .alert-warning {
+      background: var(--warning-bg);
+      color: var(--warning-text);
+      border-left: 4px solid #f59e0b;
+    }
+
+    .copy-btn {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #334155;
+    }
+    .copy-btn:hover { background: #e2e8f0; }
+
+    @media print {
+      body { background: white; }
+      .toolbar { display: none; }
+      .doc-container {
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        max-width: 100%;
+      }
+      .copy-btn { display: none; }
+      h2 { page-break-before: auto; }
+      pre, table { page-break-inside: avoid; }
+      @page {
+        size: A4;
+        margin: 18mm 15mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA DE FERRAMENTAS SUPERIOR -->
+  <div class="toolbar">
+    <h2>📄 Bubbles — Documento Oficial de Entrega do Pacote 1 (P1)</h2>
+    <div>
+      <button class="btn btn-secondary" onclick="copyFullDocument()">📋 Copiar Todo o Texto</button>
+      <button class="btn" onclick="window.print()">🖨️ Salvar como PDF / Imprimir</button>
+    </div>
+  </div>
+
+  <div class="doc-container" id="printable-content">
+    
+    <!-- CABEÇALHO FORMAL -->
+    <div class="header-box">
+      <span class="tag">TIC-IA • Residência em Inteligência Artificial • Grupo 10</span>
+      <h1>Pacote 1 (P1): Contratos, LLM e Demonstração</h1>
+      <div class="meta">
+        <strong>Projeto:</strong> Bubbles — Encontros Presenciais Seguros para Combate à Solidão<br>
+        <strong>Entregável:</strong> P1 (Contratos de Dados, Engenharia de Prompts, Resiliência LLM, Gerador Grounded, Validador e Demonstração)<br>
+        <strong>Data de Homologação:</strong> 09 de Novembro de 2026 | <strong>Status:</strong> 100% Concluído
+      </div>
+    </div>
+
+    <!-- SUMÁRIO EXECUTIVO -->
+    <div class="alert alert-info">
+      <strong>Sumário do Pacote:</strong> O P1 estabelece a camada de comunicação entre a linguagem natural do usuário e o ecossistema de dados geoespaciais e vetoriais do Bubbles. Ele garante que qualquer pedido seja transformado em JSON validado com resiliência a falhas (retry automático), que o gerador de resposta seja 100% fundamentado nas evidências recuperadas, e que um validador pós-geração em código impeça qualquer alucinação.
+    </div>
+
+    <div class="alert alert-success">
+      <strong>Critério de Conclusão ("Pronto Quando"):</strong><br>
+      <em>"Um pedido vira JSON e a resposta cita apenas locais recuperados."</em><br>
+      👉 <strong>Status: HOMOLOGADO com 100% de precisão e conformidade nos 3 casos de teste.</strong>
+    </div>
+
+    <!-- SEÇÃO 1: OS QUATRO FORMATOS -->
+    <h2>
+      1. Definição Formal dos Quatro Formatos (Contratos de Dados)
+      <button class="copy-btn" onclick="copySection('sec1')">Copiar Seção</button>
+    </h2>
+    <div id="sec1">
+      <p>Para desacoplar a interface, a inteligência artificial e o banco de dados relacional e geo-vetorial (PostGIS + pgvector), foram definidos quatro contratos formais com esquemas estritos de validação:</p>
+
+      <h3>1.1. Formato 1: Registro de Local (<code>place_record</code>)</h3>
+      <p>Registro atômico de estabelecimento ou espaço público da base curada do OpenStreetMap (OSM) enriquecido com metadados e vetor semântico (P2/P3/P4).</p>
+      
+      <table>
+        <thead>
+          <tr><th>Campo</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>place_id</code></td><td>string</td><td>Sim</td><td>Identificador único do local (ex: <code>"POI-01"</code>).</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Sim</td><td>Nome oficial do estabelecimento.</td></tr>
+          <tr><td><code>amenity</code></td><td>string</td><td>Sim</td><td>Amenidade OSM (ex: <code>"cafe"</code>, <code>"park"</code>, <code>"library"</code>).</td></tr>
+          <tr><td><code>category</code></td><td>string</td><td>Sim</td><td>Categoria curada (ex: <code>"cafe_especial"</code>, <code>"parque_urbano"</code>).</td></tr>
+          <tr><td><code>address</code></td><td>string</td><td>Sim</td><td>Endereço formatado no DF (ex: <code>"CLS 115 Bloco C, Asa Sul"</code>).</td></tr>
+          <tr><td><code>location</code></td><td>object</td><td>Sim</td><td>Coordenadas geodésicas: <code>{ "lat": float, "lon": float }</code>.</td></tr>
+          <tr><td><code>is_public_verified</code></td><td>boolean</td><td>Sim</td><td><strong>Guardrail RNF01:</strong> Deve ser <code>true</code> para ser elegível a encontros presenciais.</td></tr>
+          <tr><td><code>opening_hours</code></td><td>string</td><td>Não</td><td>Horário de funcionamento verificado (ex: <code>"07:00-20:00"</code>).</td></tr>
+          <tr><td><code>wheelchair</code></td><td>enum</td><td>Não</td><td>Acessibilidade motora: <code>"yes"</code>, <code>"limited"</code>, <code>"no"</code>, <code>"unknown"</code>.</td></tr>
+          <tr><td><code>noise_level</code></td><td>enum</td><td>Não</td><td>Nível de ruído acústico: <code>"baixo"</code>, <code>"moderado"</code>, <code>"alto"</code>.</td></tr>
+          <tr><td><code>vibe</code></td><td>string</td><td>Não</td><td>Atmosfera predominante (ex: <code>"tranquilo"</code>, <code>"ar_livre"</code>).</td></tr>
+          <tr><td><code>ratings</code></td><td>object</td><td>Não</td><td>Notas consolidadas: <code>{ google_rating, app_rating, total_reviews }</code>.</td></tr>
+          <tr><td><code>tags</code></td><td>list[str]</td><td>Sim</td><td>Etiquetas para matching categórico e semântico.</td></tr>
+          <tr><td><code>vector</code></td><td>list[float]</td><td>Sim</td><td>Vetor denso normalizado (16 dimensões do P3).</td></tr>
+          <tr><td><code>provenance</code></td><td>object</td><td>Sim</td><td>Rastreabilidade OSM: <code>{ source, osm_id, osm_type, osm_link, ingestion_date }</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code>// Exemplo JSON: Registro de Local (place_record)
+{
+  "place_id": "POI-01",
+  "name": "Ernesto Cafés Especiais",
+  "amenity": "cafe",
+  "category": "cafe_especial",
+  "address": "CLS 115 Bloco C, Asa Sul, Brasília - DF",
+  "location": { "lat": -15.8234, "lon": -47.9256 },
+  "is_public_verified": true,
+  "opening_hours": "07:00-20:00",
+  "wheelchair": "yes",
+  "noise_level": "baixo",
+  "vibe": "tranquilo",
+  "suitable_for": ["introvertido", "idosos", "adulto", "conversas_profundas"],
+  "ratings": { "google_rating": 4.7, "app_rating": 4.8, "total_reviews": 1240 },
+  "tags": ["cafe", "calmo", "acessivel", "leitura", "conversa", "brunch", "asa sul"],
+  "vector": [0.9, 0.1, 0.3, 0.4, 0.6, 0.0, 0.9, 0.1, 0.2, 0.4, 0.8, 0.0, 0.5, 0.0, 0.0, 0.6],
+  "provenance": {
+    "source": "OpenStreetMap",
+    "osm_id": 482910482,
+    "osm_type": "node",
+    "osm_link": "https://www.openstreetmap.org/node/482910482",
+    "ingestion_date": "2026-11-01T08:00:00Z"
+  }
+}</code></pre>
+
+      <h3>1.2. Formato 2: Pedido Estruturado (<code>structured_request</code>)</h3>
+      <p>Gerado pela LLM a partir da interpretação de linguagem natural livre, estruturando entidades e guardrails.</p>
+      
+      <table>
+        <thead>
+          <tr><th>Campo</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>request_id</code></td><td>string</td><td>Sim</td><td>Identificador único da requisição (UUID).</td></tr>
+          <tr><td><code>raw_query</code></td><td>string</td><td>Sim</td><td>Frase original digitada pelo usuário.</td></tr>
+          <tr><td><code>intent_valid</code></td><td>boolean</td><td>Sim</td><td><code>false</code> se for fora de escopo ou impossível; <code>true</code> para seguir para busca.</td></tr>
+          <tr><td><code>out_of_scope</code></td><td>boolean</td><td>Sim</td><td><code>true</code> se for serviço de frete, carona, comércio ilegal ou fins não-sociais.</td></tr>
+          <tr><td><code>out_of_scope_reason</code></td><td>string/null</td><td>Não</td><td>Justificativa quando fora de escopo.</td></tr>
+          <tr><td><code>impossible_criteria</code></td><td>boolean</td><td>Sim</td><td><code>true</code> se solicitar critérios mutuamente excludentes ou inexistentes na cidade.</td></tr>
+          <tr><td><code>activity</code></td><td>string</td><td>Sim</td><td>Atividade social pretendida (ex: <code>"leitura de livros em grupo"</code>).</td></tr>
+          <tr><td><code>target_amenities</code></td><td>list[str]</td><td>Sim</td><td>Amenidades desejadas (ex: <code>["cafe", "library"]</code>).</td></tr>
+          <tr><td><code>vibe</code></td><td>string</td><td>Sim</td><td>Atmosfera solicitada (ex: <code>"tranquilo"</code>, <code>"ar_livre"</code>).</td></tr>
+          <tr><td><code>noise_tolerance</code></td><td>enum</td><td>Sim</td><td>Tolerância a barulho: <code>"baixo"</code>, <code>"moderado"</code>, <code>"indiferente"</code>.</td></tr>
+          <tr><td><code>spatial_constraints</code></td><td>object</td><td>Sim</td><td><code>{ "target_region": string, "max_radius_km": float }</code>.</td></tr>
+          <tr><td><code>temporal_constraints</code></td><td>object</td><td>Sim</td><td><code>{ "preferred_time_slot": "manha"|"tarde"|"noite", "specific_hours": str }</code>.</td></tr>
+          <tr><td><code>accessibility_requirements</code></td><td>object</td><td>Sim</td><td><code>{ "wheelchair_required": bool, "elder_friendly": bool, "pet_friendly": bool }</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <pre><code>// Exemplo JSON: Pedido Estruturado (structured_request)
+{
+  "request_id": "req-824fbb1c",
+  "raw_query": "Quero um café tranquilo na Asa Sul para conversar sobre livros com pessoas calmas no período da tarde, com acesso para cadeirantes.",
+  "intent_valid": true,
+  "out_of_scope": false,
+  "out_of_scope_reason": null,
+  "impossible_criteria": false,
+  "impossible_criteria_reason": null,
+  "activity": "conversa sobre livros e literatura em grupo calmo",
+  "target_amenities": ["cafe", "library"],
+  "vibe": "tranquilo",
+  "noise_tolerance": "baixo",
+  "spatial_constraints": {
+    "target_region": "Asa Sul",
+    "max_radius_km": 3.0
+  },
+  "temporal_constraints": {
+    "preferred_time_slot": "tarde",
+    "specific_hours": "tarde (14:00 - 18:00)"
+  },
+  "accessibility_requirements": {
+    "wheelchair_required": true,
+    "elder_friendly": true,
+    "pet_friendly": false
+  },
+  "search_vector_focus": ["cafe", "leitura", "calmo", "acessivel", "conversa"]
+}</code></pre>
+
+      <h3>1.3. Formato 3: Retorno da Busca (<code>search_response</code>)</h3>
+      <p>Emitido pela função de busca híbrida (PostGIS + pgvector - P4), contendo os estabelecimentos rankeados por pontuação composta e decomposição aditiva.</p>
+
+      <pre><code>// Exemplo JSON: Retorno da Busca (search_response)
+{
+  "query_id": "req-824fbb1c",
+  "timestamp": "2026-11-09T15:37:00Z",
+  "status": "SUCCESS",
+  "applied_filters": {
+    "radius_km": 3.0,
+    "expanded_once": false,
+    "amenities": ["cafe", "library"]
+  },
+  "results_count": 2,
+  "items": [
+    {
+      "rank": 1,
+      "place_id": "POI-03",
+      "name": "Sephinah Casa de Chá e Cafeteria",
+      "amenity": "cafe",
+      "address": "CLS 403 Bloco B, Asa Sul, Brasília - DF",
+      "distance_km": 1.2,
+      "cosine_similarity": 0.86,
+      "final_score": 0.8722,
+      "score_decomposition": {
+        "vector_contribution": 0.3010,
+        "distance_contribution": 0.1900,
+        "reputation_contribution": 0.1912,
+        "compatibility_contribution": 0.1900,
+        "sum_check": 0.8722
+      }
+    },
+    {
+      "rank": 2,
+      "place_id": "POI-01",
+      "name": "Ernesto Cafés Especiais",
+      "amenity": "cafe",
+      "address": "CLS 115 Bloco C, Asa Sul, Brasília - DF",
+      "distance_km": 1.8,
+      "cosine_similarity": 0.92,
+      "final_score": 0.8624,
+      "score_decomposition": {
+        "vector_contribution": 0.3220,
+        "distance_contribution": 0.1600,
+        "reputation_contribution": 0.1904,
+        "compatibility_contribution": 0.1900,
+        "sum_check": 0.8624
+      }
+    }
+  ]
+}</code></pre>
+
+      <h3>1.4. Formato 4: Registro de Evidência (<code>evidence_record</code>)</h3>
+      <p>Auditoria formal da recomendação que ancora a resposta da LLM e valida os testes de integridade matemática.</p>
+
+      <pre><code>// Exemplo JSON: Registro de Evidência (evidence_record)
+{
+  "evidence_id": "EV-9a3b7c12",
+  "query_id": "req-824fbb1c",
+  "place_id": "POI-01",
+  "place_name": "Ernesto Cafés Especiais",
+  "osm_reference": {
+    "osm_id": 482910482,
+    "osm_type": "node",
+    "osm_link": "https://www.openstreetmap.org/node/482910482"
+  },
+  "matched_tags": ["cafe", "calmo", "acessivel", "leitura", "conversa"],
+  "factors": [
+    { "factor_name": "similaridade_vetorial", "raw_value": 0.92, "normalized_value": 0.92, "weight": 0.35, "weighted_contribution": 0.3220 },
+    { "factor_name": "proximidade_fisica", "raw_value": 1.8, "normalized_value": 0.64, "weight": 0.25, "weighted_contribution": 0.1600 },
+    { "factor_name": "reputacao_comunitaria", "raw_value": 4.76, "normalized_value": 0.952, "weight": 0.20, "weighted_contribution": 0.1904 },
+    { "factor_name": "compatibilidade_psicossocial", "raw_value": 0.95, "normalized_value": 0.95, "weight": 0.20, "weighted_contribution": 0.1900 }
+  ],
+  "total_score": 0.8624,
+  "integrity_test": {
+    "sum_equals_total": true,
+    "all_factors_in_range_0_1": true,
+    "passed": true
+  },
+  "grounding_notes": [
+    "Estabelecimento verificado e público no OpenStreetMap (https://www.openstreetmap.org/node/482910482).",
+    "Acessibilidade garantida com wheelchair=yes.",
+    "Ambiente com nível de ruído 'baixo' e vibe 'tranquilo'."
+  ]
+}</code></pre>
+    </div>
+
+    <!-- SEÇÃO 2: INTERPRETAÇÃO E RETRY -->
+    <h2>
+      2. Interpretação do Pedido e Mecanismo de Retry Automático
+      <button class="copy-btn" onclick="copySection('sec2')">Copiar Seção</button>
+    </h2>
+    <div id="sec2">
+      <p>A etapa de NLU processa a entrada do usuário através de um <strong>System Prompt</strong> com diretrizes rígidas de validação de escopo e tipagem de campos.</p>
+
+      <pre><code>// System Prompt do Interpretador de Intenções
+Você é o interpretador de intenções do Bubbles, um aplicativo de combate à solidão que conecta pessoas em pequenos grupos presenciais (3 a 8 pessoas) em locais públicos e seguros de Brasília (DF).
+Sua missão é ler o pedido em linguagem natural do usuário e convertê-lo ESTRITAMENTE em um objeto JSON válido seguindo a especificação.
+
+Regras de Negócio e Guardrails:
+1. `out_of_scope`: Deve ser TRUE se o usuário pedir serviços não-sociais (ex: frete, carreto, transporte de cargas, serviços ilícitos, venda comercial, encontros individuais românticos privados). Explique o motivo em `out_of_scope_reason`.
+2. `impossible_criteria`: Deve ser TRUE se os filtros forem mutuamente contraditórios ou sabidamente inexistentes na malha urbana (ex: cafeteria vegana aberta às 03:30 da madrugada com pista de patinação no gelo na Asa Sul). Explique em `impossible_criteria_reason`.
+3. `intent_valid`: Será FALSE se `out_of_scope` for TRUE ou `impossible_criteria` for TRUE.
+4. `noise_tolerance`: "baixo" para leitura/conversa calma, "moderado" para parques/cafés comuns, "indiferente" caso não mencione.
+5. `spatial_constraints`: Se não especificado o raio, adote `max_radius_km`: 5.0. Se citar bairro (ex: Asa Sul, Asa Norte), registre em `target_region`.
+6. Responda APENAS com o JSON. Não use blocos de texto antes ou depois. Não use markdown com explicações.</code></pre>
+
+      <div class="alert alert-warning">
+        <strong>Mecanismo de Resiliência (Retry com Autocorreção):</strong><br>
+        Se a primeira chamada à LLM gerar JSON quebrado (ex: erro de delimitador, vírgula ausente ou chaves abertas) ou violar o esquema estruturado, o sistema captura a exceção de parsing, injeta a mensagem exata do erro e realiza uma <strong>segunda tentativa de correção automática</strong>. A demonstração prova que o sistema recupera e valida o pedido com sucesso no Round 2.
+      </div>
+    </div>
+
+    <!-- SEÇÃO 3: GERADOR GROUNDED E AUDITORIA PÓS-GERAÇÃO -->
+    <h2>
+      3. Gerador Grounded e Validador Determinístico Pós-Geração
+      <button class="copy-btn" onclick="copySection('sec3')">Copiar Seção</button>
+    </h2>
+    <div id="sec3">
+      <p>O gerador de linguagem natural recebe estritamente a lista <code>retorno_busca</code> e os <code>evidence_record</code>. O System Prompt proíbe terminantemente qualquer alucinação:</p>
+
+      <pre><code>// System Prompt do Gerador Grounded (Zero-Alucinação)
+Você é o Assistente Bubbles. Seu dever é recomendar locais para encontros presenciais em grupo.
+Diretrizes Rigorosas de Fundamentação (Zero-Hallucination Guardrail):
+1. Você SÓ PODE citar e recomendar os locais que constam explicitamente no objeto 'retorno_busca'.
+2. É ESTRITAMENTE PROIBIDO inventar, deduzir ou mencionar qualquer outro estabelecimento não listado.
+3. Se a busca retornar 0 resultados ('NO_RESULTS') ou for fora de escopo ('OUT_OF_SCOPE'), ABSTENHA-SE categoricamente de indicar locais. Explique educadamente o motivo e oriente o usuário a ajustar seu pedido.
+4. Para cada local recomendado, cite seu nome oficial, seu endereço e destaque fatos comprovados nas evidências (ex: acessibilidade, silêncio, nota).</code></pre>
+
+      <h3>Validador Pós-Geração em Código (Detector de Alucinações)</h3>
+      <p>Para não depender exclusivamente da estocástica do modelo de linguagem, a função em código <code>verify_grounded_places()</code> faz uma auditoria determinística do texto gerado:</p>
+      <ul>
+        <li>Extrai todas as menções a nomes de estabelecimentos no texto.</li>
+        <li>Verifica se cada local citado pertence ao conjunto retornado pela busca: <code>nome ∈ {p.name | p ∈ retorno_busca}</code>.</li>
+        <li>Se citar qualquer local inexistente na busca, marca <code>hallucination_detected = true</code> e rejeita a resposta.</li>
+        <li>Em casos de abstenção (pedidos impossíveis ou fora de escopo), assegura que <strong>zero locais foram citados</strong>.</li>
+      </ul>
+    </div>
+
+    <!-- SEÇÃO 4: DEMONSTRAÇÃO E CASOS DE TESTE -->
+    <h2>
+      4. Demonstração dos Três Casos de Teste (Execução Real)
+      <button class="copy-btn" onclick="copySection('sec4')">Copiar Seção</button>
+    </h2>
+    <div id="sec4">
+      <p>Os testes foram executados via script automatizado <code>scripts/p1_demo.py</code>, demonstrando os 3 fluxos fundamentais:</p>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Caso</th>
+            <th>Texto do Usuário</th>
+            <th>Status da Busca</th>
+            <th>Locais Retornados</th>
+            <th>Tentativas (Retry)</th>
+            <th>Locais Citados no Retorno</th>
+            <th>Abstenção</th>
+            <th>Status P1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>TC-01</strong></td>
+            <td><em>"Quero um café tranquilo na Asa Sul para conversar sobre livros com pessoas calmas no período da tarde, com acesso para cadeirantes."</em></td>
+            <td><code>SUCCESS</code></td>
+            <td>3 locais</td>
+            <td>2 (erro corrigido com retry)</td>
+            <td><strong>100.0%</strong> (3 de 3)</td>
+            <td>N/A</td>
+            <td><strong style="color: #059669;">APROVADO</strong></td>
+          </tr>
+          <tr>
+            <td><strong>TC-02</strong></td>
+            <td><em>"Procuro uma cafeteria vegana com pista de patinação no gelo e música ao vivo na Asa Sul aberta às 03:30 da madrugada de segunda-feira."</em></td>
+            <td><code>NO_RESULTS</code></td>
+            <td>0 locais</td>
+            <td>1 tentativa</td>
+            <td><strong>100.0%</strong> (0 citados)</td>
+            <td><strong>100.0%</strong></td>
+            <td><strong style="color: #059669;">APROVADO</strong></td>
+          </tr>
+          <tr>
+            <td><strong>TC-03</strong></td>
+            <td><em>"Preciso urgente de um frete com caminhão baú e 2 carregadores para transportar meus móveis da Asa Norte até Taguatinga no próximo sábado."</em></td>
+            <td><code>OUT_OF_SCOPE</code></td>
+            <td>0 locais</td>
+            <td>1 tentativa</td>
+            <td><strong>100.0%</strong> (0 citados)</td>
+            <td><strong>100.0%</strong></td>
+            <td><strong style="color: #059669;">APROVADO</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Resumo das Saídas dos Testes:</h3>
+      <ul>
+        <li><strong>TC-01 (Válido):</strong> O Round 1 disparou propositalmente falha de sintaxe. O sistema acionou a nova tentativa (Round 2) e recuperou o JSON. A busca retornou *Sephinah Casa de Chá*, *Ernesto Cafés Especiais* e *Parque da Cidade*. A resposta citou exatamente esses 3 locais e o validador atestou 100% de fundamentação.</li>
+        <li><strong>TC-02 (Impossível):</strong> A LLM detectou <code>impossible_criteria = true</code>. O gerador absteve-se educadamente explicando a inviabilidade do horário e atividade em Brasília, sem alucinar estabelecimentos.</li>
+        <li><strong>TC-03 (Fora de Escopo):</strong> A LLM detectou <code>out_of_scope = true</code>. O assistente recusou o serviço de frete e orientou sobre a finalidade estritamente social e comunitária da plataforma.</li>
+      </ul>
+    </div>
+
+    <!-- SEÇÃO 5: RUNBOOK OPERACIONAL -->
+    <h2>
+      5. RUNBOOK: Guia de Execução e Integração
+      <button class="copy-btn" onclick="copySection('sec5')">Copiar Seção</button>
+    </h2>
+    <div id="sec5">
+      <h3>Como Executar a Demonstração</h3>
+      <ol>
+        <li>Abra o terminal na pasta raiz do repositório.</li>
+        <li>Execute o script nativo em Python (compatível com Python 3.10+, sem dependências externas):
+          <pre><code>python scripts/p1_demo.py</code></pre>
+        </li>
+        <li>Observe a saída no console: verificação de esquemas, autocorreção no Round 2, validação da integridade matemática das evidências e a mensagem final de homologação:
+          <pre><code>>> STATUS DO P1: 100% CONCLUÍDO E HOMOLOGADO COM SUCESSO! <<</code></pre>
+        </li>
+      </ol>
+
+      <h3>Mapeamento de Integração com os Demais Pacotes</h3>
+      <ul>
+        <li><strong>Integração com P2 (Dados OSM / Base Curada):</strong> A tabela <code>places</code> deve expor os campos definidos no contrato <code>place_record</code>, garantindo <code>is_public_verified = true</code>.</li>
+        <li><strong>Integração com P3 (Dimensões e Vetores):** O vetor denso normalizado de 16 dimensões do P3 é consumido pelo campo <code>vector</code> de <code>place_record</code> e <code>search_vector_focus</code> de <code>structured_request</code>.</li>
+        <li><strong>Integração com P4 (Banco, Busca e Evidência):** A função de busca SQL devolve o formato <code>search_response</code> com decomposição de score e os <code>evidence_record</code> associados.</li>
+        <li><strong>Integração com P5 (Avaliação e Métricas):** As métricas de *Locais Citados que Existem (Meta: 100%)* e *Abstenção Correta* utilizam diretamente a lógica do validador determinístico do P1.</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <script>
+    function copySection(sectionId) {
+      const el = document.getElementById(sectionId);
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        alert("Conteúdo da seção copiado para a área de transferência!");
+      }).catch(err => {
+        alert("Erro ao copiar: " + err);
+      });
+    }
+
+    function copyFullDocument() {
+      const el = document.getElementById('printable-content');
+      if (!el) return;
+      navigator.clipboard.writeText(el.innerText).then(() => {
+        alert("Todo o documento copiado para a área de transferência!");
+      }).catch(err => {
+        alert("Erro ao copiar: " + err);
+      });
+    }
+  </script>
+</body>
+</html>
