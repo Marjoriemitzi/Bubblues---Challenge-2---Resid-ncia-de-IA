@@ -1,0 +1,251 @@
+[
+  {
+    "id": "TC-01",
+    "persona": "Dona Helena (Idosa, 68 anos, busca tranquilidade)",
+    "query": "Gostaria de um café calmo e tranquilo na Asa Sul, com boa acessibilidade para caminhar sem escadas, para conversar com pessoas da minha faixa etária pela manhã.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "cafe",
+    "restricoes": {
+      "acessibilidade": "yes",
+      "ambiente": "tranquilo",
+      "horario": "manha",
+      "raio_max_km": 5.0
+    },
+    "criterios_aceitabilidade": "O local deve ser um café ou casa de chá com ambiente silencioso ou de baixo ruído, entrada e circulação acessíveis a pessoas com mobilidade reduzida, localizado em raio compatível e em funcionamento no período matutino.",
+    "locais_esperados_relevantes": ["POI-01", "POI-03", "POI-12"]
+  },
+  {
+    "id": "TC-02",
+    "persona": "Carla Mendes (Jovem adulta, 29 anos, ativa)",
+    "query": "Procuro um lugar descontraído no final de tarde para encontrar um grupo pequeno para jogar jogos de tabuleiro ou bater papo tomando um suco ou cerveja artesanal.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "bar_cafe_jogos",
+    "restricoes": {
+      "ambiente": "descontraido",
+      "horario": "final_tarde",
+      "raio_max_km": 10.0
+    },
+    "criterios_aceitabilidade": "Espaço comercial/cultural público verificado que ofereça mesas amplas, jogos de tabuleiro ou ambiente propício a pequenos grupos sociais com opções de bebidas e petiscos.",
+    "locais_esperados_relevantes": ["POI-05", "POI-10", "POI-24"]
+  },
+  {
+    "id": "TC-03",
+    "persona": "Adulto introvertido (34 anos, TI)",
+    "query": "Um espaço silencioso e aconchegante para leitura em grupo e debate sobre livros de ficção científica, de preferência integrado a uma livraria ou centro cultural.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "livraria_cultural",
+    "restricoes": {
+      "ambiente": "silencioso",
+      "perfil": "introvertido",
+      "raio_max_km": 8.0
+    },
+    "criterios_aceitabilidade": "Livraria com cafeteria, biblioteca pública ou centro cultural com poltronas e espaço propício para conversa em voz baixa e leitura compartilhada.",
+    "locais_esperados_relevantes": ["POI-06", "POI-07", "POI-14"]
+  },
+  {
+    "id": "TC-04",
+    "persona": "Idoso (72 anos, aposentado)",
+    "query": "Parque aberto com pistas planas e sombras de árvores para uma caminhada leve em grupo no início da manhã, seguido de conversa em banco de praça.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "parque",
+    "restricoes": {
+      "acessibilidade": "yes",
+      "ambiente": "ar_livre",
+      "horario": "manha",
+      "raio_max_km": 6.0
+    },
+    "criterios_aceitabilidade": "Parque urbano público verificado com trilhas pavimentadas/planas, bancos conservados, banheiros públicos e policiamento/iluminação adequada.",
+    "locais_esperados_relevantes": ["POI-02", "POI-08", "POI-15"]
+  },
+  {
+    "id": "TC-05",
+    "persona": "Jovem universitária (22 anos)",
+    "query": "Cafeteria com mesinhas externas e tomadas, onde seja comum ver pessoas estudando ou trabalhando em grupo com laptops.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "cafe_coworking",
+    "restricoes": {
+      "ambiente": "produtivo_descontraido",
+      "wi_fi": true,
+      "raio_max_km": 7.0
+    },
+    "criterios_aceitabilidade": "Cafeteria com infraestrutura de internet/tomadas, mesas de uso coletivo e tolerância a permanência prolongada de pequenos grupos de estudo.",
+    "locais_esperados_relevantes": ["POI-04", "POI-11", "POI-16"]
+  },
+  {
+    "id": "TC-06",
+    "persona": "Adulto extrovertido (31 anos)",
+    "query": "Gostaria de uma praça gastronômica ou feirinha ao ar livre com música ambiente moderada no sábado à noite para interagir com novas pessoas.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "gastronomia_ar_livre",
+    "restricoes": {
+      "ambiente": "animado",
+      "horario": "noite",
+      "raio_max_km": 9.0
+    },
+    "criterios_aceitabilidade": "Praça gastronômica ou complexo cultural com food trucks e área comum compartilhada propícia à interação entre desconhecidos de forma segura.",
+    "locais_esperados_relevantes": ["POI-09", "POI-18", "POI-23"]
+  },
+  {
+    "id": "TC-07",
+    "persona": "Usuário vegano/vegetariano (27 anos)",
+    "query": "Restaurante com culinária saudável e vegetariana/vegana na Asa Norte, com espaço arejado e cardápio vegetal para um almoço de socialização.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "restaurante_vegetariano",
+    "restricoes": {
+      "alimentacao": "vegana_vegetariana",
+      "horario": "almoco",
+      "raio_max_km": 6.0
+    },
+    "criterios_aceitabilidade": "Restaurante que comprove opções vegetarianas/veganas no cardápio cadastrado, em ambiente limpo, público e com boa avaliação comunitária.",
+    "locais_esperados_relevantes": ["POI-13", "POI-17", "POI-01"]
+  },
+  {
+    "id": "TC-08",
+    "persona": "Grupo cultural / cinéfilo (35 anos)",
+    "query": "Cinema de rua ou espaço exibidor de filmes alternativos com cafeteria integrada para debate pós-sessão com os outros participantes.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "cinema_cultural",
+    "restricoes": {
+      "ambiente": "cultural",
+      "horario": "noite",
+      "raio_max_km": 12.0
+    },
+    "criterios_aceitabilidade": "Cineclube, cinema alternativo ou centro cultural de acesso público que conte com programação autoral e área de convivência adjacente.",
+    "locais_esperados_relevantes": ["POI-14", "POI-20", "POI-07"]
+  },
+  {
+    "id": "TC-09",
+    "persona": "Dona Helena (Idosa, busca oficina artística)",
+    "query": "Ateliê comunitário ou centro de convivência público para oficina de cerâmica ou artesanato em grupo na parte da tarde.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "centro_convivencia_artes",
+    "restricoes": {
+      "ambiente": "acochegante",
+      "horario": "tarde",
+      "raio_max_km": 8.0
+    },
+    "criterios_aceitabilidade": "Espaço cultural público ou comunitário que oferte oficinas manuais/artesanato em ambiente seguro e acolhedor para adultos mais velhos.",
+    "locais_esperados_relevantes": ["POI-07", "POI-19", "POI-22"]
+  },
+  {
+    "id": "TC-10",
+    "persona": "Jovem amante de animais (25 anos)",
+    "query": "Parque ou praça pet friendly com cercado para cachorros, onde tutores costumam se reunir para deixar os pets brincarem e socializarem.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "parque_pet",
+    "restricoes": {
+      "pet_friendly": true,
+      "ambiente": "ar_livre",
+      "raio_max_km": 7.0
+    },
+    "criterios_aceitabilidade": "Parque público aberto que possua 'parcão' ou área expressamente permitida e adaptada para convívio canino seguro com donos reunidos.",
+    "locais_esperados_relevantes": ["POI-02", "POI-21", "POI-08"]
+  },
+  {
+    "id": "TC-11",
+    "persona": "Pessoa tímida em reinserção social (40 anos)",
+    "query": "Quero um chá da tarde em ambiente muito discreto e pouco barulhento, com mesas espaçadas para conversar sem me sentir vigiado.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "casa_de_cha",
+    "restricoes": {
+      "ambiente": "muito_silencioso",
+      "layout": "mesas_espacadas",
+      "raio_max_km": 5.0
+    },
+    "criterios_aceitabilidade": "Bistrô ou casa de chá com acústica tratada, disposição que garanta privacidade conversacional e iluminação suave.",
+    "locais_esperados_relevantes": ["POI-03", "POI-12", "POI-06"]
+  },
+  {
+    "id": "TC-12",
+    "persona": "Adulto entusiasta de esportes leves (45 anos)",
+    "query": "Quadra pública ou parque com mesas de ping-pong ou xadrez ao ar livre para encontrar parceiros de partida recreativa sem custo.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "recreacao_esportiva",
+    "restricoes": {
+      "custo": "gratuito",
+      "ambiente": "ar_livre",
+      "raio_max_km": 8.0
+    },
+    "criterios_aceitabilidade": "Parque ou praça comunitária pública dotada de infraestrutura de jogos de tabuleiro fixos de concreto ou mesas recreativas abertas.",
+    "locais_esperados_relevantes": ["POI-02", "POI-08", "POI-15"]
+  },
+  {
+    "id": "TC-13",
+    "persona": "Jovem apreciador de gastronomia oriental (26 anos)",
+    "query": "Quero comer sushi e comida japonesa fresca num restaurante agradável na Asa Sul com mesas coletivas ou tatames aconchegantes.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "restaurante_japones",
+    "restricoes": {
+      "culinaria": "japonesa",
+      "localizacao": "Asa Sul",
+      "raio_max_km": 6.0
+    },
+    "criterios_aceitabilidade": "Restaurante japonês verificado com boa reputação na Asa Sul, com ambientação propícia para confraternização e cardápio típico oriental.",
+    "locais_esperados_relevantes": ["POI-25", "POI-17", "POI-05"]
+  },
+  {
+    "id": "TC-14",
+    "persona": "Grupo de senhoras (60+ anos)",
+    "query": "Espaço com jardim florido ou orquidário com banquinhos à sombra para conversar e tomar uma água de coco na manhã de domingo.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "jardim_botanico_parque",
+    "restricoes": {
+      "ambiente": "jardim_natureza",
+      "acessibilidade": "yes",
+      "horario": "domingo_manha",
+      "raio_max_km": 15.0
+    },
+    "criterios_aceitabilidade": "Jardim botânico ou parque ecológico público/institucional com trilhas acessíveis, sanitários limpos e presença de vegetação preservada e bancos.",
+    "locais_esperados_relevantes": ["POI-15", "POI-02", "POI-07"]
+  },
+  {
+    "id": "TC-15",
+    "persona": "Estudante noturno (23 anos)",
+    "query": "Lanchonete ou café cultural perto da universidade aberto até às 22h com clima jovem e opções de lanches rápidos e baratos.",
+    "tipo_pedido": "Padrao",
+    "categoria_pretendida": "cafe_universitario",
+    "restricoes": {
+      "preco": "economico",
+      "horario": "noite_ate_22h",
+      "raio_max_km": 5.0
+    },
+    "criterios_aceitabilidade": "Cafeteria ou lanchonete cultural em setor universitário que funcione no período noturno com preços acessíveis e ambiente acolhedor.",
+    "locais_esperados_relevantes": ["POI-16", "POI-04", "POI-10"]
+  },
+  {
+    "id": "TC-16",
+    "persona": "Usuário indeciso / vago",
+    "query": "Quero sair para algum lugar legal para espairecer ou encontrar gente, qualquer coisa bacana serve.",
+    "tipo_pedido": "Ambiguo",
+    "categoria_pretendida": "indefinida",
+    "restricoes": {},
+    "criterios_aceitabilidade": "Por se tratar de pedido ambíguo e genérico sem atividade delimitada, o sistema DEVE solicitar clarificação de preferência (ex: ambiente tranquilo vs movimentado; café vs parque) OU fornecer no máximo sugestões contrastantes seguras com aviso explícito. Considera-se aceitável qualquer ponto de convívio público seguro central, mas a resposta de excelência é a interação orientada de desambiguação.",
+    "locais_esperados_relevantes": ["POI-01", "POI-02", "POI-07"]
+  },
+  {
+    "id": "TC-17",
+    "persona": "Usuário com requisitos mutuamente excludentes/impossíveis",
+    "query": "Procuro uma cafeteria vegana com pista de patinação no gelo e música ao vivo na Asa Sul aberta às 03:30 da madrugada de segunda-feira.",
+    "tipo_pedido": "Sem_Resultado_Possivel",
+    "categoria_pretendida": "impossivel",
+    "restricoes": {
+      "culinaria": "vegana",
+      "atracao": "patinacao_no_gelo",
+      "horario": "03:30_madrugada",
+      "bairro": "Asa Sul"
+    },
+    "criterios_aceitabilidade": "NENHUM local da base atende a essa combinação de restrições incompatíveis (patinação no gelo + cafeteria vegana às 3h30 da manhã na Asa Sul). A ÚNICA ação aceitável do sistema é a ABSTENÇÃO CORRETA: declarar transparentemente que não foram encontrados locais compatíveis na base verificada e propor o relaxamento dos filtros (horário comercial ou outra atração), sem inventar nenhum estabelecimento.",
+    "locais_esperados_relevantes": []
+  },
+  {
+    "id": "TC-18",
+    "persona": "Usuário requisitando serviço não relacionado",
+    "query": "Preciso urgente de um frete com caminhão baú e 2 carregadores para transportar meus móveis da Asa Norte até Taguatinga no próximo sábado.",
+    "tipo_pedido": "Fora_De_Escopo",
+    "categoria_pretendida": "fora_de_escopo",
+    "restricoes": {},
+    "criterios_aceitabilidade": "O pedido trata de contratação de transporte de cargas/mudança residencial e está totalmente fora do escopo da plataforma (combate à solidão e encontros sociais presenciais). O sistema DEVE se abster de recomendar cafeterias ou praças para mudança, informando gentilmente ao usuário o escopo de atuação do aplicativo e recusando a solicitação de serviço logístico.",
+    "locais_esperados_relevantes": []
+  }
+]
+
