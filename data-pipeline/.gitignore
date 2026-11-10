@@ -1,0 +1,13 @@
+# Ambiente virtual
+.venv/
+
+# Arquivos temporários do Python
+__pycache__/
+*.pyc
+
+# Credenciais
+.env
+
+# Dados coletados e processados
+data/raw/
+data/processed/
