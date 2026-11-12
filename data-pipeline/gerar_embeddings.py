@@ -3,6 +3,7 @@
 import argparse
 
 from busca import DIMENSAO_EMBEDDING, conectar, vetor_para_texto
+from observabilidade import atributos, atualizar, finalizar, observacao
 
 MODELO = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
@@ -37,8 +38,14 @@ def carregar_modelo():
 
 
 def gerar_embedding_consulta(texto, modelo=None):
-    modelo = modelo or carregar_modelo()
-    return modelo.encode(texto, normalize_embeddings=True).tolist()
+    with observacao("embed-query", "embedding", input=texto, model=MODELO) as obs:
+        modelo_carregado_agora = modelo is None
+        modelo = modelo or carregar_modelo()
+        vetor = modelo.encode(texto, normalize_embeddings=True).tolist()
+        # Output = resumo: o vetor de 768 floats so polui o trace.
+        atualizar(obs, output={"dimensoes": len(vetor)},
+                  metadata={"modelo_carregado_na_chamada": str(modelo_carregado_agora)})
+        return vetor
 
 
 def main():
@@ -57,20 +64,35 @@ def main():
             return
 
         modelo = carregar_modelo()
-        for inicio in range(0, len(linhas), args.lote):
-            lote = linhas[inicio:inicio + args.lote]
-            textos = [texto_do_lugar(nome, categoria, tags) for _, nome, categoria, tags in lote]
-            vetores = modelo.encode(textos, normalize_embeddings=True, batch_size=args.lote)
-            with conexao.transaction(), conexao.cursor() as cursor:
-                cursor.executemany(
-                    "UPDATE places SET embedding = %s::vector WHERE place_id = %s",
-                    [
-                        (vetor_para_texto(vetor), linha[0])
-                        for vetor, linha in zip(vetores.tolist(), lote)
-                    ],
-                )
-            print(f"{inicio + len(lote)}/{len(linhas)} lugares processados")
-
+        try:
+            with atributos(trace_name="embed-places", tags=["embeddings", "pipeline"]), observacao(
+                "embed-places",
+                "chain",
+                input={"lugares_pendentes": len(linhas), "tamanho_lote": args.lote, "refazer_todos": args.todos},
+                metadata={"modelo": MODELO},
+            ) as raiz:
+                for inicio in range(0, len(linhas), args.lote):
+                    lote = linhas[inicio:inicio + args.lote]
+                    textos = [texto_do_lugar(nome, categoria, tags) for _, nome, categoria, tags in lote]
+                    with observacao(
+                        "embed-batch", "embedding", model=MODELO,
+                        input=textos[:5],  # amostra: o lote inteiro so infla o trace
+                        metadata={"textos_no_lote": str(len(textos))},
+                    ) as obs:
+                        vetores = modelo.encode(textos, normalize_embeddings=True, batch_size=args.lote)
+                        with conexao.transaction(), conexao.cursor() as cursor:
+                            cursor.executemany(
+                                "UPDATE places SET embedding = %s::vector WHERE place_id = %s",
+                                [
+                                    (vetor_para_texto(vetor), linha[0])
+                                    for vetor, linha in zip(vetores.tolist(), lote)
+                                ],
+                            )
+                        atualizar(obs, output={"vetores": len(textos), "dimensoes": DIMENSAO_EMBEDDING})
+                    print(f"{inicio + len(lote)}/{len(linhas)} lugares processados")
+                atualizar(raiz, output={"lugares_processados": len(linhas)})
+        finally:
+            finalizar()
 
 if __name__ == "__main__":
     main()

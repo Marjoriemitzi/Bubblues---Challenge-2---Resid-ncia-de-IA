@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
+from observabilidade import atributos, atualizar, coordenada_anonima, finalizar, observacao
 from score import (
     PESOS,
     calcular_score,
@@ -79,12 +80,28 @@ def _validar_parametros(latitude, longitude, embedding, raio_m, k):
 
 
 def _candidatos(conexao, latitude, longitude, vetor, tipos, raio_m):
-    with conexao.cursor(row_factory=dict_row) as cursor:
-        cursor.execute(
-            SQL_CANDIDATOS,
-            {"lat": latitude, "lon": longitude, "vetor": vetor, "tipos": tipos, "raio": raio_m},
+    with observacao(
+        "fetch-candidates",
+        "retriever",
+        input={"tipos": tipos, "raio_m": raio_m},
+        metadata={"fonte": "postgis+pgvector"},
+    ) as obs:
+        with conexao.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                SQL_CANDIDATOS,
+                {"lat": latitude, "lon": longitude, "vetor": vetor, "tipos": tipos, "raio": raio_m},
+            )
+            linhas = cursor.fetchall()
+        atualizar(
+            obs,
+            output=[
+                {"place_id": l["place_id"], "nome": l["nome"], "similaridade": l["similaridade"],
+                 "distancia_m": l["distancia_m"]}
+                for l in linhas[:20]
+            ],
+            metadata={"total_candidatos": str(len(linhas))},
         )
-        return cursor.fetchall()
+        return linhas
 
 
 def _pontuar(linha, etiquetas_desejadas):
@@ -137,6 +154,52 @@ def buscar(
     etiquetas_desejadas=None,
     texto_consulta=None,
 ):
+    """Busca hibrida rastreada no Langfuse (trace `hybrid-search`). Ver `_buscar`."""
+    # Input explicito: sem a conexao e sem o vetor de 768 floats; localizacao arredondada.
+    entrada = {
+        "consulta": texto_consulta,
+        "latitude": coordenada_anonima(latitude),
+        "longitude": coordenada_anonima(longitude),
+        "raio_m": raio_m,
+        "tipos": tipos,
+        "k": k,
+        "etiquetas_desejadas": etiquetas_desejadas or {},
+    }
+    with observacao("hybrid-search", "chain", input=entrada) as obs:
+        registro = _buscar(
+            conexao, latitude, longitude, embedding_consulta,
+            raio_m, tipos, k, etiquetas_desejadas, texto_consulta,
+        )
+        atualizar(
+            obs,
+            output={
+                "status": registro["status"],
+                "recomendacoes": [
+                    {"posicao": r["posicao"], "nome": r["local"]["nome"], "score_total": r["score_total"]}
+                    for r in registro["resultados"]
+                ],
+            },
+            metadata={
+                "consulta_id": registro["consulta_id"],
+                "raio_final_m": str(registro["raio"]["final_m"]),
+                "raio_ampliado": str(registro["raio"]["ampliado"]),
+                "total_candidatos": str(registro["total_candidatos"]),
+            },
+        )
+        return registro
+
+
+def _buscar(
+    conexao,
+    latitude,
+    longitude,
+    embedding_consulta,
+    raio_m=1000,
+    tipos=None,
+    k=3,
+    etiquetas_desejadas=None,
+    texto_consulta=None,
+):
     """Devolve o top-k com decomposicao e grava (e confirma) o registro de evidencia.
 
     `tipos` filtra por `places.categoria` (ex.: ["cafe", "park"]). Se houver menos
@@ -154,16 +217,22 @@ def buscar(
         raio_final = raio_m * FATOR_AMPLIACAO_RAIO
         linhas = _candidatos(conexao, latitude, longitude, vetor, tipos, raio_final)
 
-    pontuados = sorted(
-        (_pontuar(linha, etiquetas_desejadas) for linha in linhas),
-        key=lambda p: chave_ordenacao(
-            p["total"], p["linha"]["distancia_m"], p["linha"]["osm_type"], p["linha"]["osm_id"]
-        ),
-    )
-    resultados = [
-        _resultado(posicao, pontuado, etiquetas_desejadas)
-        for posicao, pontuado in enumerate(pontuados[:k], start=1)
-    ]
+    with observacao("rank-candidates", input={"candidatos": len(linhas), "k": k, "pesos": PESOS}) as obs:
+        pontuados = sorted(
+            (_pontuar(linha, etiquetas_desejadas) for linha in linhas),
+            key=lambda p: chave_ordenacao(
+                p["total"], p["linha"]["distancia_m"], p["linha"]["osm_type"], p["linha"]["osm_id"]
+            ),
+        )
+        resultados = [
+            _resultado(posicao, pontuado, etiquetas_desejadas)
+            for posicao, pontuado in enumerate(pontuados[:k], start=1)
+        ]
+        atualizar(obs, output=[
+            {"posicao": r["posicao"], "nome": r["local"]["nome"], "fatores": r["fatores"],
+             "score_total": r["score_total"]}
+            for r in resultados
+        ])
 
     registro = {
         "consulta_id": str(uuid.uuid4()),
@@ -188,11 +257,12 @@ def buscar(
 
 
 def _registrar_evidencia(conexao, registro):
-    conexao.execute(
-        "INSERT INTO evidencias_busca (consulta_id, criada_em, registro) VALUES (%s, %s, %s)",
-        (registro["consulta_id"], registro["criada_em"], Jsonb(registro)),
-    )
-    conexao.commit()
+    with observacao("persist-evidence", input={"consulta_id": registro["consulta_id"]}):
+        conexao.execute(
+            "INSERT INTO evidencias_busca (consulta_id, criada_em, registro) VALUES (%s, %s, %s)",
+            (registro["consulta_id"], registro["criada_em"], Jsonb(registro)),
+        )
+        conexao.commit()
 
 
 def main():
@@ -208,18 +278,31 @@ def main():
 
     from gerar_embeddings import gerar_embedding_consulta
 
-    with conectar() as conexao:
-        registro = buscar(
-            conexao,
-            args.lat,
-            args.lon,
-            gerar_embedding_consulta(args.texto),
-            raio_m=args.raio,
-            tipos=args.tipo,
-            k=args.k,
-            etiquetas_desejadas=dict(e.split("=", 1) for e in args.etiqueta),
-            texto_consulta=args.texto,
-        )
+    # Um trace por pedido: embedding da consulta + busca hibrida sob a mesma raiz.
+    try:
+        with atributos(trace_name="place-search", tags=["busca", "pgvector", "postgis"]), observacao(
+            "place-search",
+            "chain",
+            input={"consulta": args.texto, "raio_m": args.raio, "tipos": args.tipo, "k": args.k},
+        ) as raiz:
+            with conectar() as conexao:
+                registro = buscar(
+                    conexao,
+                    args.lat,
+                    args.lon,
+                    gerar_embedding_consulta(args.texto),
+                    raio_m=args.raio,
+                    tipos=args.tipo,
+                    k=args.k,
+                    etiquetas_desejadas=dict(e.split("=", 1) for e in args.etiqueta),
+                    texto_consulta=args.texto,
+                )
+            atualizar(raiz, output={
+                "status": registro["status"],
+                "locais": [r["local"]["nome"] for r in registro["resultados"]],
+            })
+    finally:
+        finalizar()  # CLI de vida curta: sem flush os traces se perdem.
     print(json.dumps(registro, ensure_ascii=False, indent=2))
 
 
