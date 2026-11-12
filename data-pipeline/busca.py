@@ -257,12 +257,13 @@ def _buscar(
 
 
 def _registrar_evidencia(conexao, registro):
-    with observacao("persist-evidence", input={"consulta_id": registro["consulta_id"]}):
+    with observacao("persist-evidence", input={"consulta_id": registro["consulta_id"]}) as obs:
         conexao.execute(
             "INSERT INTO evidencias_busca (consulta_id, criada_em, registro) VALUES (%s, %s, %s)",
             (registro["consulta_id"], registro["criada_em"], Jsonb(registro)),
         )
         conexao.commit()
+        atualizar(obs, output={"gravado": True, "tabela": "evidencias_busca"})
 
 
 def main():
