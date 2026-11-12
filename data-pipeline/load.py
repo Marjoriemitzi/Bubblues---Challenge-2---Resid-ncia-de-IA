@@ -53,10 +53,11 @@ with psycopg.connect(
                 latitude,
                 longitude,
                 cidade,
+                tags,
                 geom
             )
             VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s,
+                %s, %s, %s, %s, %s, %s, %s, %s, %s::jsonb,
                 ST_SetSRID(ST_MakePoint(%s, %s), 4326)
             )
         """, [
@@ -69,6 +70,7 @@ with psycopg.connect(
                 float(linha["latitude"]),
                 float(linha["longitude"]),
                 linha["cidade"],
+                linha["tags"],
                 float(linha["longitude"]),
                 float(linha["latitude"])
             )

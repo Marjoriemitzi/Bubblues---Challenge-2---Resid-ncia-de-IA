@@ -62,7 +62,8 @@ INSERT INTO places (
     osm_id,
     osm_type,
     osm_ids_origem,
-    quantidade_origens
+    quantidade_origens,
+    tags
 )
 SELECT
     p.nome,
@@ -75,7 +76,8 @@ SELECT
     p.osm_id,
     p.osm_type,
     g.origens,
-    g.quantidade
+    g.quantidade,
+    p.tags
 FROM principais p
 JOIN grupos g
     ON p.grupo_tipo = g.grupo_tipo
