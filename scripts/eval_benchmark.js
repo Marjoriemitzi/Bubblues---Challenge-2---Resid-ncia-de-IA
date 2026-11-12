@@ -858,92 +858,106 @@ function evaluateSystem(modelName, runnerFn) {
   };
 }
 
-// 5. Execução dos Cenários Comparativos e de Ablação
-console.log("=== INICIANDO EXECUÇÃO DO BENCHMARK DE AVALIAÇÃO ===");
-
-const baselineResult = evaluateSystem("Linha de Base: Só Tipo e Distância", (tc, cat) => runBaseline(tc, cat));
-const fullModelResult = evaluateSystem("Modelo Completo: Similaridade Vetorial + Híbrido", (tc, cat) => runHybridModel(tc, cat, { wv: 0.40, wd: 0.25, wr: 0.15, wc: 0.20 }));
-const ablationNoVectorResult = evaluateSystem("Ablação A: Sem Vetores (wv=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.0, wd: 0.45, wr: 0.25, wc: 0.30 }));
-const ablationNoDistResult = evaluateSystem("Ablação B: Sem Distância (wd=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.55, wd: 0.0, wr: 0.20, wc: 0.25 }));
-const ablationNoRepResult = evaluateSystem("Ablação C: Sem Avaliação/Reputação (wr=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.45, wd: 0.30, wr: 0.0, wc: 0.25 }));
-const ablationNoCompResult = evaluateSystem("Ablação D: Sem Compatibilidade/Vibe (wc=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.50, wd: 0.30, wr: 0.20, wc: 0.0 }));
-
-const comparisonTable = [
-  {
-    Cenário: baselineResult.modelName,
-    "Precision@3": (baselineResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (baselineResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (baselineResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (baselineResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  },
-  {
-    Cenário: fullModelResult.modelName,
-    "Precision@3": (fullModelResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (fullModelResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (fullModelResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (fullModelResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  },
-  {
-    Cenário: ablationNoVectorResult.modelName,
-    "Precision@3": (ablationNoVectorResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (ablationNoVectorResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (ablationNoVectorResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (ablationNoVectorResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  },
-  {
-    Cenário: ablationNoDistResult.modelName,
-    "Precision@3": (ablationNoDistResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (ablationNoDistResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (ablationNoDistResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (ablationNoDistResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  },
-  {
-    Cenário: ablationNoRepResult.modelName,
-    "Precision@3": (ablationNoRepResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (ablationNoRepResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (ablationNoRepResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (ablationNoRepResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  },
-  {
-    Cenário: ablationNoCompResult.modelName,
-    "Precision@3": (ablationNoCompResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
-    "Fundamentação": (ablationNoCompResult.metrics.fundamentacao * 100).toFixed(1) + "%",
-    "Locais Existem": (ablationNoCompResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
-    "Abstenção Correta": (ablationNoCompResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
-  }
-];
-
-console.table(comparisonTable);
-
-const consolidatedResults = {
-  timestamp: new Date().toISOString(),
-  total_test_cases: testCases.length,
-  comparison_table: comparisonTable,
-  experiments: {
-    baseline: baselineResult,
-    full_hybrid_vector: fullModelResult,
-    ablation_no_vector: ablationNoVectorResult,
-    ablation_no_distance: ablationNoDistResult,
-    ablation_no_reputation: ablationNoRepResult,
-    ablation_no_compatibility: ablationNoCompResult
-  }
+module.exports = {
+  POIS,
+  QUERY_EMBEDDINGS,
+  testCases,
+  runHybridModel,
+  runBaseline,
+  evaluateSystem,
+  normalizeVector,
+  cosineSimilarity
 };
 
-const outputPath = path.join(__dirname, '..', 'docs', 'avaliacao', 'resultados_avaliacao.json');
-fs.writeFileSync(outputPath, JSON.stringify(consolidatedResults, null, 2), 'utf8');
-console.log(`Resultados gravados com sucesso em: ${outputPath}`);
+if (require.main === module) {
+  // 5. Execução dos Cenários Comparativos e de Ablação
+  console.log("=== INICIANDO EXECUÇÃO DO BENCHMARK DE AVALIAÇÃO ===");
 
-// Verificação de asserção de metas de qualidade (CI/CD)
-const meetsGoals = 
-  fullModelResult.metrics.locais_citados_existem === 1.0 &&
-  fullModelResult.metrics.fundamentacao === 1.0 &&
-  fullModelResult.metrics.abstencao_correta === 1.0 &&
-  fullModelResult.metrics.precision_at_3 >= 0.60;
+  const baselineResult = evaluateSystem("Linha de Base: Só Tipo e Distância", (tc, cat) => runBaseline(tc, cat));
+  const fullModelResult = evaluateSystem("Modelo Completo: Similaridade Vetorial + Híbrido", (tc, cat) => runHybridModel(tc, cat, { wv: 0.40, wd: 0.25, wr: 0.15, wc: 0.20 }));
+  const ablationNoVectorResult = evaluateSystem("Ablação A: Sem Vetores (wv=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.0, wd: 0.45, wr: 0.25, wc: 0.30 }));
+  const ablationNoDistResult = evaluateSystem("Ablação B: Sem Distância (wd=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.55, wd: 0.0, wr: 0.20, wc: 0.25 }));
+  const ablationNoRepResult = evaluateSystem("Ablação C: Sem Avaliação/Reputação (wr=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.45, wd: 0.30, wr: 0.0, wc: 0.25 }));
+  const ablationNoCompResult = evaluateSystem("Ablação D: Sem Compatibilidade/Vibe (wc=0)", (tc, cat) => runHybridModel(tc, cat, { wv: 0.50, wd: 0.30, wr: 0.20, wc: 0.0 }));
 
-if (!meetsGoals) {
-  console.error("❌ FALHA: O modelo não atingiu as metas mínimas estabelecidas!");
-  process.exit(1);
-} else {
-  console.log("✅ SUCESSO: Todas as metas de avaliação foram estritamente cumpridas!");
+  const comparisonTable = [
+    {
+      Cenário: baselineResult.modelName,
+      "Precision@3": (baselineResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (baselineResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (baselineResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (baselineResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    },
+    {
+      Cenário: fullModelResult.modelName,
+      "Precision@3": (fullModelResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (fullModelResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (fullModelResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (fullModelResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    },
+    {
+      Cenário: ablationNoVectorResult.modelName,
+      "Precision@3": (ablationNoVectorResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (ablationNoVectorResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (ablationNoVectorResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (ablationNoVectorResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    },
+    {
+      Cenário: ablationNoDistResult.modelName,
+      "Precision@3": (ablationNoDistResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (ablationNoDistResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (ablationNoDistResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (ablationNoDistResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    },
+    {
+      Cenário: ablationNoRepResult.modelName,
+      "Precision@3": (ablationNoRepResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (ablationNoRepResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (ablationNoRepResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (ablationNoRepResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    },
+    {
+      Cenário: ablationNoCompResult.modelName,
+      "Precision@3": (ablationNoCompResult.metrics.precision_at_3 * 100).toFixed(1) + "%",
+      "Fundamentação": (ablationNoCompResult.metrics.fundamentacao * 100).toFixed(1) + "%",
+      "Locais Existem": (ablationNoCompResult.metrics.locais_citados_existem * 100).toFixed(1) + "%",
+      "Abstenção Correta": (ablationNoCompResult.metrics.abstencao_correta * 100).toFixed(1) + "%"
+    }
+  ];
+
+  console.table(comparisonTable);
+
+  const consolidatedResults = {
+    timestamp: new Date().toISOString(),
+    total_test_cases: testCases.length,
+    comparison_table: comparisonTable,
+    experiments: {
+      baseline: baselineResult,
+      full_hybrid_vector: fullModelResult,
+      ablation_no_vector: ablationNoVectorResult,
+      ablation_no_distance: ablationNoDistResult,
+      ablation_no_reputation: ablationNoRepResult,
+      ablation_no_compatibility: ablationNoCompResult
+    }
+  };
+
+  const outputPath = path.join(__dirname, '..', 'docs', 'avaliacao', 'resultados_avaliacao.json');
+  fs.writeFileSync(outputPath, JSON.stringify(consolidatedResults, null, 2), 'utf8');
+  console.log(`Resultados gravados com sucesso em: ${outputPath}`);
+
+  // Verificação de asserção de metas de qualidade (CI/CD)
+  const meetsGoals = 
+    fullModelResult.metrics.locais_citados_existem === 1.0 &&
+    fullModelResult.metrics.fundamentacao === 1.0 &&
+    fullModelResult.metrics.abstencao_correta === 1.0 &&
+    fullModelResult.metrics.precision_at_3 >= 0.60;
+
+  if (!meetsGoals) {
+    console.error("❌ FALHA: O modelo não atingiu as metas mínimas estabelecidas!");
+    process.exit(1);
+  } else {
+    console.log("✅ SUCESSO: Todas as metas de avaliação foram estritamente cumpridas!");
+  }
 }
+
 

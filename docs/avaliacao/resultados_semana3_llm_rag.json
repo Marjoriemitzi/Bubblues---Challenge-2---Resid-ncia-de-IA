@@ -1,0 +1,1784 @@
+{
+  "metadata": {
+    "projeto": "Bubbles — Challenge 2 (TIC-IA)",
+    "semana": "Semana 3 - LLM x RAG",
+    "data_execucao": "2026-11-12T17:59:59.480Z",
+    "total_test_cases": 18,
+    "descricao": "Avaliação comparativa e melhoria de métricas: LLM pura vs RAG sem LLM vs RAG clássico vs RAG modular avançado."
+  },
+  "tabela_comparativa": [
+    {
+      "Configuração": "Teste 1: LLM Pura (Zero-Shot / Sem RAG)",
+      "Precision@3": "16.7%",
+      "Locais Existem": "37.5%",
+      "Fundamentação": "0.0%",
+      "Abstenção Correta": "0.0%",
+      "Latência Média": "1450 ms",
+      "Tokens Médios": 418
+    },
+    {
+      "Configuração": "Teste 2: RAG Sem LLM (Retrieval-Only / Recuperação Pura)",
+      "Precision@3": "64.6%",
+      "Locais Existem": "100.0%",
+      "Fundamentação": "100.0%",
+      "Abstenção Correta": "50.0%",
+      "Latência Média": "22 ms",
+      "Tokens Médios": 0
+    },
+    {
+      "Configuração": "Teste 3: RAG Clássico (Retrieval Simples + LLM Geradora)",
+      "Precision@3": "79.2%",
+      "Locais Existem": "100.0%",
+      "Fundamentação": "100.0%",
+      "Abstenção Correta": "0.0%",
+      "Latência Média": "1246 ms",
+      "Tokens Médios": 718
+    },
+    {
+      "Configuração": "Teste 4A: RAG Modular Bubbles (Semana 2: wv=0.40, wd=0.25, wr=0.15, wc=0.20)",
+      "Precision@3": "64.6%",
+      "Locais Existem": "100.0%",
+      "Fundamentação": "100.0%",
+      "Abstenção Correta": "100.0%",
+      "Latência Média": "693 ms",
+      "Tokens Médios": 473
+    },
+    {
+      "Configuração": "Teste 4B: RAG Modular Bubbles Otimizado (Semana 3: wv=0.45, wd=0.15, wr=0.15, wc=0.25)",
+      "Precision@3": "75.0%",
+      "Locais Existem": "100.0%",
+      "Fundamentação": "100.0%",
+      "Abstenção Correta": "100.0%",
+      "Latência Média": "689 ms",
+      "Tokens Médios": 473
+    },
+    {
+      "Configuração": "Teste 4C: RAG Modular Bubbles Refinado (Semana 3: wv=0.50, wd=0.05, wr=0.15, wc=0.30)",
+      "Precision@3": "77.1%",
+      "Locais Existem": "100.0%",
+      "Fundamentação": "100.0%",
+      "Abstenção Correta": "100.0%",
+      "Latência Média": "687 ms",
+      "Tokens Médios": 473
+    }
+  ],
+  "experimentos": {
+    "teste_1_llm_pura": {
+      "testName": "Teste 1: LLM Pura (Zero-Shot / Sem RAG)",
+      "metrics": {
+        "precision_at_3": 0.167,
+        "locais_citados_existem": 0.375,
+        "fundamentacao": 0,
+        "abstencao_correta": 0,
+        "latencia_media_ms": 1450,
+        "consumo_medio_tokens": 418
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-04",
+            "ALUC-05"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Bistrô das Letras 108 Sul",
+            "Café Colonial Brasília"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "ALUC-06",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna do Dragão Jogos",
+            "Carcará Hamburgueria & Jogos Sociais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-07",
+            "ALUC-07",
+            "ALUC-08"
+          ],
+          "top3_names": [
+            "CCBB - Centro Cultural Banco do Brasil",
+            "Livraria Cultura Shopping Iguatemi (Fechada)",
+            "Sebo Estação Central"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-08",
+            "ALUC-09"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água",
+            "Bosque das Palmeiras Asa Sul"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-01",
+            "ALUC-GEN1",
+            "ALUC-GEN2"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Café Central Brasília",
+            "Espaço Convivência DF"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Geração paramétrica pura da LLM sem fundamentação em base de dados geoespaciais."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": false,
+          "top3_count": 2,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "LLM pura falhou em se abster: tentou inventar cafeteria com gelo aberta na madrugada."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": false,
+          "top3_count": 2,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "LLM pura tentou atender pedido de frete sugerindo serviços logísticos sem guardrail."
+        }
+      ]
+    },
+    "teste_2_rag_sem_llm": {
+      "testName": "Teste 2: RAG Sem LLM (Retrieval-Only / Recuperação Pura)",
+      "metrics": {
+        "precision_at_3": 0.646,
+        "locais_citados_existem": 1,
+        "fundamentacao": 1,
+        "abstencao_correta": 0.5,
+        "latencia_media_ms": 22,
+        "consumo_medio_tokens": 0
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "POI-04",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Objeto Encontrado Café Cultural",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-19",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-14",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação puramente algorítmica retornando ranking de dados brutos sem síntese generativa."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Filtro vetorial retornou 0 candidatos acima do limiar mínimo de similaridade."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": false,
+          "top3_count": 3,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "RAG sem LLM não possui detecção de intenção comercial; devolveu POIs por vizinhança vetorial."
+        }
+      ]
+    },
+    "teste_3_rag_classico": {
+      "testName": "Teste 3: RAG Clássico (Retrieval Simples + LLM Geradora)",
+      "metrics": {
+        "precision_at_3": 0.792,
+        "locais_citados_existem": 1,
+        "fundamentacao": 1,
+        "abstencao_correta": 0,
+        "latencia_media_ms": 1246,
+        "consumo_medio_tokens": 718
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-06",
+            "POI-22",
+            "POI-19"
+          ],
+          "top3_names": [
+            "Livraria da Travessa & Bistrô Café",
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-08",
+            "POI-02",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque Olhos D'Água",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-16",
+            "POI-04",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Café com Letras UnB Cultural",
+            "Objeto Encontrado Café Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-23",
+            "POI-18",
+            "POI-09"
+          ],
+          "top3_names": [
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica",
+            "Praça Gastronômica Pontão do Lago Sul"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-17",
+            "POI-13",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante e Armazém Vegano Bioon",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-20"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Drive-In Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-19",
+            "POI-22",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-08",
+            "POI-21"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água",
+            "Parcão do Parque da Cidade - Estacionamento 6"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-17",
+            "POI-13"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante e Armazém Vegano Bioon",
+            "Restaurante Girassol Comida Saudável & Natural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-15",
+            "POI-08",
+            "POI-02"
+          ],
+          "top3_names": [
+            "Jardim Botânico de Brasília",
+            "Parque Olhos D'Água",
+            "Parque da Cidade Dona Sarah Kubitschek"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-16",
+            "POI-04",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Café com Letras UnB Cultural",
+            "Objeto Encontrado Café Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-07",
+            "POI-11",
+            "POI-09"
+          ],
+          "top3_names": [
+            "CCBB - Centro Cultural Banco do Brasil",
+            "Castália Padaria & Café Artesanal",
+            "Praça Gastronômica Pontão do Lago Sul"
+          ],
+          "precision_at_3": 1,
+          "rationale": "Recuperação ingênua por cosseno vetorial + prompt de síntese generativa sem filtros estruturados."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": false,
+          "top3_count": 2,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "RAG clássico recuperou cafeterias e a LLM gerou texto alucinando horários na madrugada."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": false,
+          "top3_count": 3,
+          "status": "FALHA_ALUCINACAO",
+          "rationale": "RAG clássico forneceu POIs à LLM, que tentou recomendar locais para frete em vez de recusar."
+        }
+      ]
+    },
+    "teste_4a_rag_modular_semana2": {
+      "testName": "Teste 4A: RAG Modular Bubbles (Semana 2: wv=0.40, wd=0.25, wr=0.15, wc=0.20)",
+      "metrics": {
+        "precision_at_3": 0.646,
+        "locais_citados_existem": 1,
+        "fundamentacao": 1,
+        "abstencao_correta": 1,
+        "latencia_media_ms": 693,
+        "consumo_medio_tokens": 473
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-01",
+            "POI-04",
+            "POI-12"
+          ],
+          "top3_names": [
+            "Ernesto Cafés Especiais",
+            "Objeto Encontrado Café Cultural",
+            "Belini Café & Bistrô"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-03"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Sephinah Casa de Chá e Cafeteria"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-19",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-01",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Ernesto Cafés Especiais",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-14",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.4, wd=0.25, wr=0.15, wc=0.2) com Grounding Estrito."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção precoce de critérios impossíveis: abstenção transparente sem alucinação."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Guardrail NLU ativado: solicitação de frete bloqueada com recusa educada e acolhedora."
+        }
+      ]
+    },
+    "teste_4b_rag_modular_otimizado_semana3": {
+      "testName": "Teste 4B: RAG Modular Bubbles Otimizado (Semana 3: wv=0.45, wd=0.15, wr=0.15, wc=0.25)",
+      "metrics": {
+        "precision_at_3": 0.75,
+        "locais_citados_existem": 1,
+        "fundamentacao": 1,
+        "abstencao_correta": 1,
+        "latencia_media_ms": 689,
+        "consumo_medio_tokens": 473
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-06"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Livraria da Travessa & Bistrô Café"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-11",
+            "POI-16"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Castália Padaria & Café Artesanal",
+            "Café com Letras UnB Cultural"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-23",
+            "POI-18"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Beco Elétrico Gastrobar & Praça Cultural",
+            "Feirinha da Vila Planalto Gastronômica"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-22",
+            "POI-19",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-21",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-17"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-15",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Jardim Botânico de Brasília",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-16",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Café com Letras UnB Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-19",
+            "POI-07",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "CCBB - Centro Cultural Banco do Brasil",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.45, wd=0.15, wr=0.15, wc=0.25) com Grounding Estrito."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção precoce de critérios impossíveis: abstenção transparente sem alucinação."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Guardrail NLU ativado: solicitação de frete bloqueada com recusa educada e acolhedora."
+        }
+      ]
+    },
+    "teste_4c_rag_modular_refinado_semana3": {
+      "testName": "Teste 4C: RAG Modular Bubbles Refinado (Semana 3: wv=0.50, wd=0.05, wr=0.15, wc=0.30)",
+      "metrics": {
+        "precision_at_3": 0.771,
+        "locais_citados_existem": 1,
+        "fundamentacao": 1,
+        "abstencao_correta": 1,
+        "latencia_media_ms": 687,
+        "consumo_medio_tokens": 473
+      },
+      "perQueryDetails": [
+        {
+          "id": "TC-01",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-02",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-05",
+            "POI-10",
+            "POI-24"
+          ],
+          "top3_names": [
+            "Ludoteca BGC Boardgames & Bar",
+            "Taberna Lúdica Café & Bar",
+            "Asa Geek Coffee & Games"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-03",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-06",
+            "POI-22",
+            "POI-19"
+          ],
+          "top3_names": [
+            "Livraria da Travessa & Bistrô Café",
+            "Galeria e Ateliê Athos Bulcão",
+            "Espaço Cultural Renato Russo - 508 Sul"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-04",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-08",
+            "POI-15"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água",
+            "Jardim Botânico de Brasília"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-05",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-16",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Café com Letras UnB Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-06",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-09",
+            "POI-18",
+            "POI-23"
+          ],
+          "top3_names": [
+            "Praça Gastronômica Pontão do Lago Sul",
+            "Feirinha da Vila Planalto Gastronômica",
+            "Beco Elétrico Gastrobar & Praça Cultural"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-07",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-13",
+            "POI-17",
+            "POI-25"
+          ],
+          "top3_names": [
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon",
+            "Nazo Japanese Food"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-08",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-14",
+            "POI-19",
+            "POI-22"
+          ],
+          "top3_names": [
+            "Cine Brasília & Café Cultural",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão"
+          ],
+          "precision_at_3": 0.333,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-09",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-19",
+            "POI-22",
+            "POI-14"
+          ],
+          "top3_names": [
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Galeria e Ateliê Athos Bulcão",
+            "Cine Brasília & Café Cultural"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-10",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-21",
+            "POI-02",
+            "POI-08"
+          ],
+          "top3_names": [
+            "Parcão do Parque da Cidade - Estacionamento 6",
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-11",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-03",
+            "POI-12",
+            "POI-01"
+          ],
+          "top3_names": [
+            "Sephinah Casa de Chá e Cafeteria",
+            "Belini Café & Bistrô",
+            "Ernesto Cafés Especiais"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-12",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-02",
+            "POI-08",
+            "POI-21"
+          ],
+          "top3_names": [
+            "Parque da Cidade Dona Sarah Kubitschek",
+            "Parque Olhos D'Água",
+            "Parcão do Parque da Cidade - Estacionamento 6"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-13",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-25",
+            "POI-13",
+            "POI-17"
+          ],
+          "top3_names": [
+            "Nazo Japanese Food",
+            "Restaurante Girassol Comida Saudável & Natural",
+            "Restaurante e Armazém Vegano Bioon"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-14",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-15",
+            "POI-08",
+            "POI-02"
+          ],
+          "top3_names": [
+            "Jardim Botânico de Brasília",
+            "Parque Olhos D'Água",
+            "Parque da Cidade Dona Sarah Kubitschek"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-15",
+          "tipo": "Padrao",
+          "top3_ids": [
+            "POI-04",
+            "POI-16",
+            "POI-11"
+          ],
+          "top3_names": [
+            "Objeto Encontrado Café Cultural",
+            "Café com Letras UnB Cultural",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 0.667,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-16",
+          "tipo": "Ambiguo",
+          "top3_ids": [
+            "POI-07",
+            "POI-19",
+            "POI-11"
+          ],
+          "top3_names": [
+            "CCBB - Centro Cultural Banco do Brasil",
+            "Espaço Cultural Renato Russo - 508 Sul",
+            "Castália Padaria & Café Artesanal"
+          ],
+          "precision_at_3": 1,
+          "rationale": "RAG Modular Bubbles (wv=0.5, wd=0.05, wr=0.15, wc=0.3) com Grounding Estrito."
+        },
+        {
+          "id": "TC-17",
+          "tipo": "Sem_Resultado_Possivel",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Detecção precoce de critérios impossíveis: abstenção transparente sem alucinação."
+        },
+        {
+          "id": "TC-18",
+          "tipo": "Fora_De_Escopo",
+          "abstained": true,
+          "top3_count": 0,
+          "status": "SUCESSO_ABSTENCAO",
+          "rationale": "Guardrail NLU ativado: solicitação de frete bloqueada com recusa educada e acolhedora."
+        }
+      ]
+    }
+  },
+  "evolucao_metricas_semana2_vs_semana3": {
+    "semana_2_precision_at_3": 0.646,
+    "semana_3_otimizado_precision_at_3": 0.75,
+    "semana_3_refinado_precision_at_3": 0.771,
+    "ganho_pontos_percentuais": 10.4,
+    "motivo_ganho": "Redução do peso excessivo da distância (wd: 0.25 -> 0.15), aumento do peso semântico (wv: 0.40 -> 0.45) e elevação do fator de compatibilidade estrita de vibe (wc: 0.20 -> 0.25)."
+  }
+}

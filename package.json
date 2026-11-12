@@ -5,7 +5,10 @@
   "main": "scripts/eval_benchmark.js",
   "scripts": {
     "test": "node scripts/eval_benchmark.js",
-    "benchmark": "node scripts/eval_benchmark.js"
+    "benchmark": "node scripts/eval_benchmark.js",
+    "test:semana3": "node scripts/benchmark_semana3_llm_rag.js",
+    "benchmark:semana3": "node scripts/benchmark_semana3_llm_rag.js",
+    "plot:semana3": "python3 scripts/plot_metricas_semana3.py"
   },
   "keywords": [
     "ai",
