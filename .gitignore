@@ -1,0 +1,9 @@
+
+# Ambiente virtual e variáveis sensíveis
+.venv/
+.env
+__pycache__/
+*.pyc
+
+# Banco local de teste
+*.db
