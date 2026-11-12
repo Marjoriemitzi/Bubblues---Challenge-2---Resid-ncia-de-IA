@@ -25,3 +25,5 @@ A solução elimina a sobrecarga cognitiva e as barreiras logísticas de marcar 
 | <img src="https://github.com/Ruan-Carvalho.png" width="60" height="60" style="border-radius: 50%;" alt="Ruan Carvalho" /> | **Ruan Carvalho** | [@Ruan-Carvalho](https://github.com/Ruan-Carvalho) |
 | <img src="https://github.com/sammiess2.png" width="60" height="60" style="border-radius: 50%;" alt="Samara" /> | **Samara** | [@sammiess2](https://github.com/sammiess2) |
 | <img src="https://github.com/yanrdgs-dev.png" width="60" height="60" style="border-radius: 50%;" alt="Yan Santos" /> | **Yan Santos** | [@yanrdgs-dev](https://github.com/yanrdgs-dev) |
+|
+<img src="https://github.com/wincsSI.png" width="60" height="60" style="border-radius: 50%;" alt="Wingrid Silva" /> | **Wingrid Silva** | [@wincsSI](https://github.com/wincsSI) |
