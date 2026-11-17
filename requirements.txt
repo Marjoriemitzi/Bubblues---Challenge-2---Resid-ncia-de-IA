@@ -1,0 +1,6 @@
+tavily-python
+openai
+sentence-transformers
+numpy
+psycopg2-binary
+python-dotenv

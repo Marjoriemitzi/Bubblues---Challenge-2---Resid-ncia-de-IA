@@ -1,7 +1,8 @@
-# Credenciais (nunca versionar)
-.env
-
-# Ambientes e caches Python
+# Ambiente virtual e variáveis sensíveis
 .venv/
+.env
 __pycache__/
-.pytest_cache/
+*.pyc
+
+# Banco local de teste
+*.db

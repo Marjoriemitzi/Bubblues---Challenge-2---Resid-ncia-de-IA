@@ -1,0 +1,56 @@
+[
+    {
+        "nome": "Ernesto Cafés Especiais Asa Sul",
+        "cidade": "Brasília",
+        "reviews": [
+            "O local em si é bastante aconchegante. Provei o queijo quente vegano, extremamente saboroso com um leve toque de defumado. Provei a panelinha de pães da casa e ...Read more",
+            "Um local muito agradável com atendimento muito bom e ampla variedade em seu cardápio. O capuccino é de primeira qualidade e os cafés não ficam para trás. O mais ...Read more",
+            "... Asa Sul – Um clássico de Brasília que une café, gastronomia e cultura. Com cafés especiais, pães artesanais, brunches e um ambiente acolhedor.Read more",
+            "Mantenha o volume baixo em chamadas e utilize fones de ouvido. Assim, o ambiente segue agradável para todos. Fale com o local. Cada espaço tem suas ...Read more"
+        ],
+        "vibe_estruturada": {
+            "vibe_resumo": "Ambiente urbano agradável e convidativo para socialização, cafés e conversas em grupo.",
+            "nivel_ruido": "Moderado",
+            "acessibilidade_provavel": false,
+            "publico_frequente": "Misto",
+            "pontuacao_natureza": 0.1,
+            "pontuacao_socializacao": 0.6
+        }
+    },
+    {
+        "nome": "Parque da Cidade Sarah Kubitschek",
+        "cidade": "Brasília",
+        "reviews": [
+            "Parque da Cidade Sarah Kubitchek 4,6 ( 71 avaliações ) é considerada uma caminhada moderada que cobre 9,2 km, firmeza da superfície e tipo de superfície.",
+            "The Parque da Cidade (City Park), one of the largest urban parks in the world, makes for a great place to run in Brasília. Part of Brasília’s master plan, the park features large open exhibition spaces, numerous recreation facilities, a lake, an amusement park, & more. For running, there three main paved trails, roughly 2, 4 and 6 miles long. There’s also 9.3 km loop path that runs alongside the main perimeter road, with good options to add on interior paths, fields, and open spaces. The terrain is mainly open rather than wooded, with rolling hills. Some of the more scenic sections are around the lake at the park’s northwestern end. There’s a running track just outside the park near the Praça das Fontes (#9 parking area). [...] ### Brasília, Brazil\n\n Trail Running\n\nOne of the largest parks in the world located in an urban area. In addition to its popular natural swimming pools, there are good trails for walking, running, and cycling. Best for running is the Crystal Water Trail, up to 15 km.\n\nExplore\n\n### User Ratings\n\nLeave A Review or Comment\n\n### Review or Comment on This Route/Share a Photo!\n\nShare your feedback on this route and see that of other Great Runs users. Click on the image icon to upload a photo. And please let us know if there are notes or changes we should incorporate!\n\nSubscribe\n\n0 Comments\n\nOldest\n\nInline Feedbacks\n\nView all comments\n\nEssentials [...] ##### Categories:\n\n Iconic Parks\n Running Track\n\nThe Parque da Cidade (City Park), one of the largest urban parks in the world, makes for a great place to run in Brasília. Part of Brasília’s master plan, the park features large open exhibition spaces, numerous recreation facilities, a lake, an amusement park, & more. For running, there three main paved trails, roughly 2, 4 and 6 miles long. There’s also 9.3 km loop path that runs alongside the main perimeter road, with good options to add on interior paths, fields, and open spaces. The terrain is mainly open rather than wooded, with rolling hills. Some of the more scenic sections are around the lake at the park’s northwestern end. There’s a running track just outside the park near the Praça das Fontes (#9 parking area).",
+            "O Parque Sarah Kubitschek, também conhecido como Parque da Cidade, possui 420 hectares, sendo maior até que o Central Park de Nova York. O local é ponto de encontro, diversão e prática de diversas modalidades esportivas.   \n   \nA estrutura do lugar conta com lagos artificiais, parques infantis, uma ciclovia (9.700 m), pista de patinação e caminhada (percursos de 10km, 6km e 4km), churrasqueiras, pista de kart, mesas para piqueniques, centro hípico, academia livre, quadras poliesportivas, tendas de massagens e ainda a segunda maior área de exposição do Brasil, o ExpoBrasília. [...] Frequentemente, profissionais da saúde se disponibilizam para mutirões de atendimento à população no Parque. Eventos de conscientização e disseminação de temas ligados ao bem-estar são comuns nas manhãs de domingo, o que confere ao Parque um clima saudável e familiar.   \n   \nO lugar foi projetado por volta de 1978 na intenção de conservar a área verde de Brasília. Recebe paisagismo de Burle Marx e contém Azulejos de Athos Bulcão que decoram banheiros públicos ao longo da pista de Cooper. [...] # COMO CHEGAR\n\nEndereço: Setor Bancário Norte – SBN, Quadra 2, Bloco K, Edifício Wagner, 1º Subsolo, Brasília-DF.\n\nNos aplicativos de transporte, basta escrever \"Parque da Cidade Sarah Kubitscheck\".\n\nHá um amplo estacionamento. Inclusive, as vagas são divididas em vários estacionamentos. O principal fica próximo ao parque de diversões Nicolndia.\n\n# SAIBA MAIS\n\nPara mais informações, acompanhe as redes sociais do Parque da Cidade - @parquedacidadebsb\n\n### Visite Brasília\n\n Notícias\n Sobre a cidade de Brasília\n Sobre nós\n Fale conosco\n Cadastre seu negócio\n\n### Encontre em Brasília\n\n Cultura, Lazer e Bem-estar\n Gastronomia\n Hospedagem\n Turismo\n Amei Brasília\n\n### Sobre nós\n\nTemos como objetivo principal reunir o melhor da cidade e para a cidade.",
+            "Parque da Cidade Sarah Kubitschek, o coração verde de Brasília. Uma caminhada suave com meu amore em um dos maiores parques urbanos do país."
+        ],
+        "vibe_estruturada": {
+            "vibe_resumo": "Espaço amplo ao ar livre com forte contato com a natureza, ideal para caminhadas e encontros descontraídos em grupo.",
+            "nivel_ruido": "Moderado",
+            "acessibilidade_provavel": true,
+            "publico_frequente": "Misto",
+            "pontuacao_natureza": 1.0,
+            "pontuacao_socializacao": 0.7
+        }
+    },
+    {
+        "nome": "Sebinho Livraria Café e Bistrô Asa Norte",
+        "cidade": "Brasília",
+        "reviews": [
+            "Sebinho Livraria, Cafeteria, Bistrô e Restaurante is a unique establishment in Brasília that combines a bookstore with a café and bistro. Located in the Asa",
+            "Sebinho Livraria, Cafeteria e Bistrô Scln 406 Bloco \"C\" Loja 72 Asa Norte 70847530 Brasilia Brasil DF. Café: 11h30 às 20h (61) 3447-4444. E-mail: sebinho@",
+            "Endereço. Comércio Local Norte 406 - BL C - Lj 44 - Asa Norte, Brasília - DF, 70847-530 ; Cidade: Brasília ; Bairro: Asa Norte ; Telefone do local: (61) 3447-4444.Read more",
+            "# Sebinho Livraria, Cafeteria e Bistrô\nID: AAup4ZLriDqk\nWebsite: www.sebinho.com.br\nHeadquarters: Brasília, Brazil\nLinkedIn: www.linkedin.com/company/sebinho-livraria-cafeteria-e-bistr%C3%B4 · 23 followers\nIndustry: Retail\nIndustry codes: SIC 73, 738, NAICS 56, 561\nCompany type: Privately Held\nBusiness model: B2C\nSaaS: no\nSocial profiles: www.facebook.com/sebinhocult, www.instagram.com/livrariasebinho/#\nEmail: sebinho@sebinho.com.br\nPhone: (61) 3447-4444 [...] ## Reputation\n- Employee review score: 4 from 1 reviews\n- Open roles: 0 [...] ## Products and services\nBusiness areas: Book Retail, Online Bookstore\nProducts: Books, Fiction Books, Non-Fiction Books, Educational Books, Children's Books, Dictionaries\n\n## Headcount\n- Now: 16 · +2 yearly (14.3%) · +2 quarterly · 0 monthly\n  - Latin America: 4\n  - Eastern Europe: 0\n  - Southern Europe: 0\n  - Sub Saharan Africa: 0\n  - Central Asia: 0\n  - Northern America: 0\n  - Australia New Zealand: 0\n  - Northern Europe: 0\n  - South Eastern Asia: 0\n  - Polynesia: 0\n  - Southern Asia: 0\n  - Northern Africa: 0\n  - Melanesia: 0\n  - Western Europe: 0\n  - Western Asia: 0\n\n## Web traffic\n- Monthly visits: 6,425 (28.3% change)\n- Pages per visit: 2.59\n- Average visit duration: 64 seconds\n- Bounce rate: 42%\n- Global rank: 2,642,523\n- Country rank: 199,212\n- Category rank: 2,868"
+        ],
+        "vibe_estruturada": {
+            "vibe_resumo": "Ambiente acolhedor e tranquilo, propício para leitura, conversas calmas e encontros em pequenos grupos.",
+            "nivel_ruido": "Baixo",
+            "acessibilidade_provavel": false,
+            "publico_frequente": "Misto",
+            "pontuacao_natureza": 0.1,
+            "pontuacao_socializacao": 0.7
+        }
+    }
+]
