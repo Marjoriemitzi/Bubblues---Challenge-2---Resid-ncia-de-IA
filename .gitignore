@@ -1,0 +1,7 @@
+# Credenciais (nunca versionar)
+.env
+
+# Ambientes e caches Python
+.venv/
+__pycache__/
+.pytest_cache/
