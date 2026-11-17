@@ -90,20 +90,20 @@ python src/6_multiagente_prototipo.py
 Saída real obtida:
 
 ```text
-🤖 Inicializando Sistema Multiagentes (4 Agentes) — Projeto Bubbles
+Inicializando Sistema Multiagentes (4 Agentes) — Projeto Bubbles
 
 ===========================================================================
-👤 ENTRADA DO USUÁRIO: "Sou a Dona Helena, uso cadeira de rodas e quero um café calmo e silencioso na Asa Norte para ler e conversar à tarde."
+ ENTRADA DO USUÁRIO: "Sou a Dona Helena, uso cadeira de rodas e quero um café calmo e silencioso na Asa Norte para ler e conversar à tarde."
 ===========================================================================
-🧠 [1. Intake_NLU_Agent] Extraindo Contrato 2 e verificando guardrails...
-🔍 [2. Research_Agent] Vetorizando foco semântico: 'encontro social para conversa e café. Ambiente calmo, acolhedor e silencioso. Ruído: Baixo. Acessibilidade: cadeirante=True, idosos=True.'
+ [1. Intake_NLU_Agent] Extraindo Contrato 2 e verificando guardrails...
+ [2. Research_Agent] Vetorizando foco semântico: 'encontro social para conversa e café. Ambiente calmo, acolhedor e silencioso. Ruído: Baixo. Acessibilidade: cadeirante=True, idosos=True.'
    -> 3 candidatos recuperados do banco vetorial.
-🛡️ [3. Validation_Agent] Auditando RNF01, acessibilidade e soma matemática...
+ [3. Validation_Agent] Auditando RNF01, acessibilidade e soma matemática...
    -> Aprovados: 2 | Reprovados: 1
    -> [REPROVADO] Ernesto Cafés Especiais Asa Sul: Violação de Acessibilidade: requisição exige wheelchair_required=true, mas o local possui wheelchair='no'.
-💬 [4. Communication_Agent] Adaptando resposta ao perfil do usuário...
+ [4. Communication_Agent] Adaptando resposta ao perfil do usuário...
 
-✅ RESPOSTA ENTREGUE AO USUÁRIO:
+ RESPOSTA ENTREGUE AO USUÁRIO:
 Olá! Selecionamos apenas locais públicos verificados no OpenStreetMap com acessibilidade para cadeira de rodas e conforto para idosos:
 
   1. Sebinho Livraria Café e Bistrô Asa Norte (OSM: node/1849203941)
@@ -112,7 +112,7 @@ Olá! Selecionamos apenas locais públicos verificados no OpenStreetMap com aces
      • Score Auditado: 0.6546 | Evidência: EVID-32AA2894
 
 ===========================================================================
-👤 ENTRADA DO USUÁRIO: "Preciso contratar um frete de caminhão para mudança em Taguatinga."
+ ENTRADA DO USUÁRIO: "Preciso contratar um frete de caminhão para mudança em Taguatinga."
 ===========================================================================
-🧠 [1. Intake_NLU_Agent] Extraindo Contrato 2 e verificando guardrails...
-🛑 [1. Intake_NLU_Agent] Pedido bloqueado na entrada: Solicitação de serviço comercial/logístico (frete/transporte), fora do escopo de encontros sociais públicos.
+ [1. Intake_NLU_Agent] Extraindo Contrato 2 e verificando guardrails...
+ [1. Intake_NLU_Agent] Pedido bloqueado na entrada: Solicitação de serviço comercial/logístico (frete/transporte), fora do escopo de encontros sociais públicos.
