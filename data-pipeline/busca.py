@@ -7,13 +7,26 @@ import os
 import uuid
 from datetime import datetime, timezone
 
-import psycopg
-from dotenv import load_dotenv
-from psycopg.rows import dict_row
-from psycopg.types.json import Jsonb
+try:
+    import psycopg
+    from psycopg.rows import dict_row
+    from psycopg.types.json import Jsonb
+except ImportError:
+    psycopg = None
+    dict_row = None
+
+    def Jsonb(valor):
+        return valor
+
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    def load_dotenv():
+        return False
 
 from score import (
     PESOS,
+    atende_barreiras,
     calcular_score,
     chave_ordenacao,
     etiquetas_usadas,
@@ -37,12 +50,16 @@ SQL_CANDIDATOS = """
     ) o
     WHERE p.embedding IS NOT NULL
       AND (%(tipos)s::text[] IS NULL OR p.categoria = ANY(%(tipos)s::text[]))
+      AND (NOT %(exigir_acessibilidade)s OR COALESCE(LOWER(p.tags->>'wheelchair'), '') <> 'no')
+      AND (NOT %(bloquear_ruido_alto)s OR COALESCE(LOWER(p.tags->>'noise_level'), LOWER(p.tags->>'nivel_ruido'), '') <> 'alto')
       AND ST_DWithin(p.geom::geography, o.ponto, %(raio)s)
 """
 
 
 def conectar():
     """Abre uma conexao em autocommit com as configuracoes do .env."""
+    if psycopg is None:
+        raise RuntimeError("Instale psycopg para conectar ao PostgreSQL.")
     load_dotenv()
     senha = os.getenv("DB_PASSWORD")
     if not senha:
@@ -78,11 +95,28 @@ def _validar_parametros(latitude, longitude, embedding, raio_m, k):
         raise ValueError("O embedding nao pode ser o vetor nulo: o cosseno e indefinido.")
 
 
-def _candidatos(conexao, latitude, longitude, vetor, tipos, raio_m):
+def _candidatos(
+    conexao,
+    latitude,
+    longitude,
+    vetor,
+    tipos,
+    raio_m,
+    exigir_acessibilidade=False,
+    bloquear_ruido_alto=False,
+):
     with conexao.cursor(row_factory=dict_row) as cursor:
         cursor.execute(
             SQL_CANDIDATOS,
-            {"lat": latitude, "lon": longitude, "vetor": vetor, "tipos": tipos, "raio": raio_m},
+            {
+                "lat": latitude,
+                "lon": longitude,
+                "vetor": vetor,
+                "tipos": tipos,
+                "raio": raio_m,
+                "exigir_acessibilidade": exigir_acessibilidade,
+                "bloquear_ruido_alto": bloquear_ruido_alto,
+            },
         )
         return cursor.fetchall()
 
@@ -126,6 +160,41 @@ def _status(quantidade, k):
     return "completo" if quantidade >= k else "parcial"
 
 
+def _buscar_elegiveis(
+    conexao,
+    latitude,
+    longitude,
+    vetor,
+    tipos,
+    raio_m,
+    etiquetas_desejadas,
+    tolerancia_efetiva,
+):
+    exigir_acessibilidade = (
+        str(etiquetas_desejadas.get("wheelchair", "")).strip().casefold() == "yes"
+    )
+    bloquear_ruido_alto = tolerancia_efetiva in ("baixo", "moderado")
+    linhas = _candidatos(
+        conexao,
+        latitude,
+        longitude,
+        vetor,
+        tipos,
+        raio_m,
+        exigir_acessibilidade=exigir_acessibilidade,
+        bloquear_ruido_alto=bloquear_ruido_alto,
+    )
+    return [
+        linha
+        for linha in linhas
+        if atende_barreiras(
+            linha["tags"],
+            etiquetas_desejadas,
+            tolerancia_sensorial=tolerancia_efetiva,
+        )
+    ]
+
+
 def buscar(
     conexao,
     latitude,
@@ -136,23 +205,46 @@ def buscar(
     k=3,
     etiquetas_desejadas=None,
     texto_consulta=None,
+    tolerancia_ruido="indiferente",
+    tolerancia_sensorial=None,
 ):
     """Devolve o top-k com decomposicao e grava (e confirma) o registro de evidencia.
 
     `tipos` filtra por `places.categoria` (ex.: ["cafe", "park"]). Se houver menos
-    de k candidatos, o raio e ampliado uma unica vez.
+    de k candidatos elegiveis, o raio e ampliado uma unica vez.
     """
     _validar_parametros(latitude, longitude, embedding_consulta, raio_m, k)
     tipos = [t.strip().lower() for t in tipos] if tipos else None
     etiquetas_desejadas = etiquetas_desejadas or {}
+    tolerancia_efetiva = str(
+        tolerancia_sensorial or tolerancia_ruido or "indiferente"
+    ).strip().casefold()
     vetor = vetor_para_texto(embedding_consulta)
 
     raio_final = raio_m
-    linhas = _candidatos(conexao, latitude, longitude, vetor, tipos, raio_final)
+    linhas = _buscar_elegiveis(
+        conexao,
+        latitude,
+        longitude,
+        vetor,
+        tipos,
+        raio_final,
+        etiquetas_desejadas,
+        tolerancia_efetiva,
+    )
     ampliado = len(linhas) < k
     if ampliado:
         raio_final = raio_m * FATOR_AMPLIACAO_RAIO
-        linhas = _candidatos(conexao, latitude, longitude, vetor, tipos, raio_final)
+        linhas = _buscar_elegiveis(
+            conexao,
+            latitude,
+            longitude,
+            vetor,
+            tipos,
+            raio_final,
+            etiquetas_desejadas,
+            tolerancia_efetiva,
+        )
 
     pontuados = sorted(
         (_pontuar(linha, etiquetas_desejadas) for linha in linhas),
@@ -175,6 +267,7 @@ def buscar(
             "tipos": tipos,
             "k": k,
             "etiquetas_desejadas": etiquetas_desejadas,
+            "tolerancia_sensorial": tolerancia_efetiva,
         },
         "raio": {"solicitado_m": raio_m, "final_m": raio_final, "ampliado": ampliado},
         "status": _status(len(resultados), k),
@@ -204,6 +297,11 @@ def main():
     parser.add_argument("--tipo", action="append", help="Pode ser repetido.")
     parser.add_argument("-k", type=int, default=3)
     parser.add_argument("--etiqueta", action="append", default=[], metavar="CHAVE=VALOR")
+    parser.add_argument(
+        "--tolerancia-sensorial",
+        default="indiferente",
+        choices=("baixo", "moderado", "indiferente"),
+    )
     args = parser.parse_args()
 
     from gerar_embeddings import gerar_embedding_consulta
@@ -219,6 +317,7 @@ def main():
             k=args.k,
             etiquetas_desejadas=dict(e.split("=", 1) for e in args.etiqueta),
             texto_consulta=args.texto,
+            tolerancia_sensorial=args.tolerancia_sensorial,
         )
     print(json.dumps(registro, ensure_ascii=False, indent=2))
 
