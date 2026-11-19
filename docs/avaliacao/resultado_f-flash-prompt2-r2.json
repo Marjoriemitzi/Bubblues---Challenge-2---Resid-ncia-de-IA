@@ -1,0 +1,1113 @@
+{
+  "metadata": {
+    "commit": "92e5630",
+    "branch": "feat/integracao-orquestrador",
+    "dataset": "bubbles-retrieval-osm-v1",
+    "gabarito": "osm_v1",
+    "retrieval": "agente LLM (DeepSeek) SEM fallback",
+    "validation": "EvidenceValidator como ferramenta/gate, MAX_RETRIES=2",
+    "llm": "deepseek-flash",
+    "llm_reasoning_effort": "none",
+    "llm_strict": "0",
+    "prompt": "v2",
+    "embedding": "paraphrase-multilingual-mpnet-base-v2",
+    "nlu": "structured_request do dataset (DeepSeek deepseek-chat revisado)",
+    "politica_acessibilidade": "wheelchair=yes explicito",
+    "k": "3",
+    "anotador": "Claude (unico, nao cego)"
+  },
+  "run_name": "f-flash-prompt2-r2-92e5630",
+  "run_scores": {
+    "media_p_at_3": 0.711111111111111,
+    "media_ndcg_at_3": 0.6818848553181699,
+    "taxa_acao_correta": 1.0,
+    "total_violacoes_entregues": 0.0,
+    "total_entregas_fora_do_raio": 0.0,
+    "media_cobertura_rotulos": 0.9555555555555556,
+    "taxa_aprovado_na_1a_rodada": 1.0,
+    "media_reconsultas": 0.0,
+    "media_latencia_s": 3.708888888888889,
+    "taxa_evidencia_completa": 1.0,
+    "total_erros_de_agente": 0.0,
+    "total_fallbacks": 0.0,
+    "media_passos_llm": 3.4,
+    "media_tokens_prompt": 8853.866666666667,
+    "media_tokens_saida": 336.6
+  },
+  "itens": [
+    {
+      "id": "TC-18",
+      "output": {
+        "acao": "abster",
+        "entregues": [],
+        "status_busca": null,
+        "n_candidatos": 0,
+        "retry_count": 0,
+        "validacao_aprovada": null,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "communication_agent"
+        ],
+        "segundos": 0.0,
+        "nota_retrieval": ""
+      },
+      "scores": {
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "reconsultas": 0.0,
+        "latencia_s": 0.0,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "187551268d6f809adffc0325dd3ef5f4"
+    },
+    {
+      "id": "TC-17",
+      "output": {
+        "acao": "abster",
+        "entregues": [],
+        "status_busca": null,
+        "n_candidatos": 0,
+        "retry_count": 0,
+        "validacao_aprovada": null,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "communication_agent"
+        ],
+        "segundos": 0.0,
+        "nota_retrieval": ""
+      },
+      "scores": {
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "reconsultas": 0.0,
+        "latencia_s": 0.0,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "2ddf9021643fa4c048776410ac9289d1"
+    },
+    {
+      "id": "TC-16",
+      "output": {
+        "acao": "clarificar",
+        "entregues": [],
+        "status_busca": null,
+        "n_candidatos": 0,
+        "retry_count": 0,
+        "validacao_aprovada": null,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "communication_agent"
+        ],
+        "segundos": 0.0,
+        "nota_retrieval": ""
+      },
+      "scores": {
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "reconsultas": 0.0,
+        "latencia_s": 0.0,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "8e4f68ce7670f431ed24e2f36d8439e9"
+    },
+    {
+      "id": "TC-15",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/6247734412",
+            "place_id": "1945",
+            "nome": "Cafeteria Metrô",
+            "score": 0.665168,
+            "distancia_km": 0.6374934179199999,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/6247734412",
+            "integridade": true
+          },
+          {
+            "osm": "node/4585529781",
+            "place_id": "1420",
+            "nome": "Grande Café",
+            "score": 0.652978,
+            "distancia_km": 0.75517390991,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/4585529781",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 2,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.59,
+        "nota_retrieval": "agente llm: 2 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7135/304/0; consulta_id=6521579f-e303-48ea-874f-d3e9589e584f"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7135.0,
+        "tokens_saida": 304.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.6666666666666666,
+        "ndcg_at_3": 0.7653606369886217,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.59,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "c046f1c0354db8e15ee2ec9061a8f488"
+    },
+    {
+      "id": "TC-14",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "way/551056721",
+            "place_id": "3811",
+            "nome": "Área verde",
+            "score": 0.621016,
+            "distancia_km": 0.77066100942,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/551056721",
+            "integridade": true
+          },
+          {
+            "osm": "way/227022746",
+            "place_id": "3471",
+            "nome": "Parque Ana Lídia",
+            "score": 0.595916,
+            "distancia_km": 1.40545042947,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/227022746",
+            "integridade": true
+          },
+          {
+            "osm": "way/280578983",
+            "place_id": "3596",
+            "nome": "Galeria dos Estados",
+            "score": 0.575985,
+            "distancia_km": 0.59199643879,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/280578983",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.93,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=11178/378/0; consulta_id=2ea89e2d-7026-408b-a13d-a625bc84983f"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 11178.0,
+        "tokens_saida": 378.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 0.5158474921363962,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.93,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "199898bdf5b087e4aafdbb0354d3dae9"
+    },
+    {
+      "id": "TC-13",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/2691239353",
+            "place_id": "656",
+            "nome": "OMA Japanese Experience",
+            "score": 0.668879,
+            "distancia_km": 1.33880203567,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/2691239353",
+            "integridade": true
+          },
+          {
+            "osm": "node/6779836007",
+            "place_id": "2176",
+            "nome": "Sushi San",
+            "score": 0.734331,
+            "distancia_km": 0.66343161603,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/6779836007",
+            "integridade": true
+          },
+          {
+            "osm": "node/2691239467",
+            "place_id": "687",
+            "nome": "Hana",
+            "score": 0.667205,
+            "distancia_km": 0.65747857225,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/2691239467",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.93,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=10817/344/0; consulta_id=3c96bc1b-7adf-46dd-b33f-4e892775a4c8"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 10817.0,
+        "tokens_saida": 344.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 1.0,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.93,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "5bfdb8aa0f407d2359e6920354c1758b"
+    },
+    {
+      "id": "TC-12",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/2524893720",
+            "place_id": "170",
+            "nome": "Praça das bicicletas",
+            "score": 0.580606,
+            "distancia_km": 0.47875409104,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/2524893720",
+            "integridade": true
+          },
+          {
+            "osm": "way/469233908",
+            "place_id": "3726",
+            "nome": "Torre de TV",
+            "score": 0.574598,
+            "distancia_km": 1.0044648462,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/469233908",
+            "integridade": true
+          },
+          {
+            "osm": "way/227022746",
+            "place_id": "3471",
+            "nome": "Parque Ana Lídia",
+            "score": 0.573843,
+            "distancia_km": 1.40523557977,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/227022746",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 3.81,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,listar_categoriasx1,validar_candidatosx1; reconsultas=0; tokens=8031/315/0; consulta_id=5165871e-2084-4589-b5dd-8e89f422fb60"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 8031.0,
+        "tokens_saida": 315.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.3333333333333333,
+        "ndcg_at_3": 0.24207625393180188,
+        "cobertura_rotulos": 0.6666666666666666,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 3.81,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "497259ef8cad01d092e080b6c4f9441f"
+    },
+    {
+      "id": "TC-11",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/5416977721",
+            "place_id": "1783",
+            "nome": "Melbourne Café & Co.",
+            "score": 0.653766,
+            "distancia_km": 0.45171924886,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5416977721",
+            "integridade": true
+          },
+          {
+            "osm": "node/3958863455",
+            "place_id": "1188",
+            "nome": "Tomilla Café",
+            "score": 0.626883,
+            "distancia_km": 0.7503290892700001,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/node/3958863455",
+            "integridade": true
+          },
+          {
+            "osm": "node/4585529781",
+            "place_id": "1420",
+            "nome": "Grande Café",
+            "score": 0.623153,
+            "distancia_km": 0.75517390991,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/4585529781",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.2,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7048/319/0; consulta_id=97299c44-095e-4113-ad32-408ef64e4058"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7048.0,
+        "tokens_saida": 319.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 1.0,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.2,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "4b7c1ac9ed7344858a63d46740e6144c"
+    },
+    {
+      "id": "TC-10",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "way/227022746",
+            "place_id": "3471",
+            "nome": "Parque Ana Lídia",
+            "score": 0.610108,
+            "distancia_km": 1.40523557977,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/227022746",
+            "integridade": true
+          },
+          {
+            "osm": "node/14334436644",
+            "place_id": "3194",
+            "nome": "Parquinho Infantil",
+            "score": 0.60411,
+            "distancia_km": 2.1233580208499996,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/14334436644",
+            "integridade": true
+          },
+          {
+            "osm": "way/734333868",
+            "place_id": "4063",
+            "nome": "Parquinho Infantil do Bloco G da 104 Sul",
+            "score": 0.602877,
+            "distancia_km": 2.05939995302,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/734333868",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 3.9,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7014/297/0; consulta_id=fc76a4ce-93b8-4b72-83e7-762af79a298d"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7014.0,
+        "tokens_saida": 297.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.3333333333333333,
+        "ndcg_at_3": 0.24207625393180188,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 3.9,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "602ea6dff5764a6acb50bee240990174"
+    },
+    {
+      "id": "TC-09",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/5116146130",
+            "place_id": "1656",
+            "nome": "Espaço Cultural Canteiro Central",
+            "score": 0.658095,
+            "distancia_km": 0.6728560235500001,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5116146130",
+            "integridade": true
+          },
+          {
+            "osm": "node/4185561285",
+            "place_id": "1257",
+            "nome": "Cursos de Artes",
+            "score": 0.644694,
+            "distancia_km": 1.18380069382,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/4185561285",
+            "integridade": true
+          },
+          {
+            "osm": "way/222399169",
+            "place_id": "3453",
+            "nome": "Caixa Cultural",
+            "score": 0.62608,
+            "distancia_km": 1.11651945595,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/way/222399169",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 3.86,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7045/311/0; consulta_id=730a3e33-9ae7-4adf-87b1-f95da8b44158"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7045.0,
+        "tokens_saida": 311.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 1.0,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 3.86,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "40fb4cf7a8717dc26b1cc4fb6c69c3ae"
+    },
+    {
+      "id": "TC-08",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/1666249648",
+            "place_id": "67",
+            "nome": "CineCultura Liberty Mall",
+            "score": 0.620764,
+            "distancia_km": 0.8436240123400001,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/1666249648",
+            "integridade": true
+          },
+          {
+            "osm": "node/5116146130",
+            "place_id": "1656",
+            "nome": "Espaço Cultural Canteiro Central",
+            "score": 0.586693,
+            "distancia_km": 0.66738778798,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5116146130",
+            "integridade": true
+          },
+          {
+            "osm": "node/3958863453",
+            "place_id": "1187",
+            "nome": "Art Café",
+            "score": 0.593904,
+            "distancia_km": 0.69087781073,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/3958863453",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 5.14,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=12127/365/0; consulta_id=97bcd300-20ff-4768-83dc-ceba013b4287"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 12127.0,
+        "tokens_saida": 365.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.3333333333333333,
+        "ndcg_at_3": 1.0,
+        "cobertura_rotulos": 0.6666666666666666,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 5.14,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "e6c60fa6d7f679d702a805822d79c355"
+    },
+    {
+      "id": "TC-07",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/5131056525",
+            "place_id": "1661",
+            "nome": "Apetit Natural",
+            "score": 0.688687,
+            "distancia_km": 0.73127386325,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5131056525",
+            "integridade": true
+          },
+          {
+            "osm": "node/5129563422",
+            "place_id": "1660",
+            "nome": "A Tribo",
+            "score": 0.670769,
+            "distancia_km": 0.9480366061,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5129563422",
+            "integridade": true
+          },
+          {
+            "osm": "node/3200165050",
+            "place_id": "938",
+            "nome": "Churrasgril",
+            "score": 0.675919,
+            "distancia_km": 0.82657809533,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/3200165050",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.79,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=10870/374/0; consulta_id=bc1952e4-5977-47e6-b9a7-967d891171de"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 10870.0,
+        "tokens_saida": 374.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.6666666666666666,
+        "ndcg_at_3": 0.6732934624429354,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.79,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "241224c8b59cb7bb602b961a0cce3a37"
+    },
+    {
+      "id": "TC-06",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/11209188936",
+            "place_id": "2668",
+            "nome": "Edifício Financial Center Park",
+            "score": 0.627364,
+            "distancia_km": 0.5222509508000001,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/11209188936",
+            "integridade": true
+          },
+          {
+            "osm": "node/4185562604",
+            "place_id": "1261",
+            "nome": "Lanchonete Pimenta de Cheiro",
+            "score": 0.576214,
+            "distancia_km": 0.929555244,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/4185562604",
+            "integridade": true
+          },
+          {
+            "osm": "node/6587306453",
+            "place_id": "2149",
+            "nome": "Espaço do Servidor",
+            "score": 0.564813,
+            "distancia_km": 2.3218214529,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/6587306453",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.28,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,listar_categoriasx1,validar_candidatosx1; reconsultas=0; tokens=8102/328/0; consulta_id=39c8eebf-8342-4308-abb5-588fa9dc2d4e"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 8102.0,
+        "tokens_saida": 328.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.0,
+        "ndcg_at_3": 0.0,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.28,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "7194378e3d6bd6a0ba116226b82acee3"
+    },
+    {
+      "id": "TC-05",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/5766574433",
+            "place_id": "1843",
+            "nome": "Quanto",
+            "score": 0.575997,
+            "distancia_km": 1.8087193499299998,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5766574433",
+            "integridade": true
+          },
+          {
+            "osm": "node/5416977721",
+            "place_id": "1783",
+            "nome": "Melbourne Café & Co.",
+            "score": 0.582435,
+            "distancia_km": 0.45171924886,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/5416977721",
+            "integridade": true
+          },
+          {
+            "osm": "node/3958863455",
+            "place_id": "1188",
+            "nome": "Tomilla Café",
+            "score": 0.561523,
+            "distancia_km": 0.7503290892700001,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/node/3958863455",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 3.71,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7185/329/0; consulta_id=d2362ab3-64c6-482b-84ea-03cdc635e627"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7185.0,
+        "tokens_saida": 329.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 1.0,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 3.71,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "1ca57044f05ea545168b74b55e24dad9"
+    },
+    {
+      "id": "TC-04",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "way/227022746",
+            "place_id": "3471",
+            "nome": "Parque Ana Lídia",
+            "score": 0.634604,
+            "distancia_km": 1.40523557977,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/227022746",
+            "integridade": true
+          },
+          {
+            "osm": "node/13040446322",
+            "place_id": "2875",
+            "nome": "Praça dos artistas",
+            "score": 0.580491,
+            "distancia_km": 0.9046834066799999,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/13040446322",
+            "integridade": true
+          },
+          {
+            "osm": "way/555952785",
+            "place_id": "3843",
+            "nome": "Praça Galeria",
+            "score": 0.575332,
+            "distancia_km": 0.67271505392,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/555952785",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 4.35,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7081/333/0; consulta_id=55b0cf27-c077-46da-8106-8ede4611db09"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7081.0,
+        "tokens_saida": 333.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 0.5158474921363962,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 4.35,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "f9bb9a020f39a1ec57483e7f33a7106f"
+    },
+    {
+      "id": "TC-03",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "way/124199196",
+            "place_id": "3281",
+            "nome": "Biblioteca Nacional de Brasília Leonel de Moura Brizola",
+            "score": 0.57707,
+            "distancia_km": 0.41522803515,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/124199196",
+            "integridade": true
+          },
+          {
+            "osm": "node/9975325964",
+            "place_id": "2524",
+            "nome": "Biblioteca do Senado Federal",
+            "score": 0.572211,
+            "distancia_km": 2.06529153835,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/9975325964",
+            "integridade": true
+          },
+          {
+            "osm": "way/140931474",
+            "place_id": "3319",
+            "nome": "Biblioteca Infantil",
+            "score": 0.609448,
+            "distancia_km": 2.0203252422999998,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/way/140931474",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 3.97,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=3; tools=buscar_lugaresx1,validar_candidatosx1; reconsultas=0; tokens=7058/317/0; consulta_id=ba5485e7-b1b1-40ee-9910-c417ed876b13"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 3.0,
+        "tokens_prompt": 7058.0,
+        "tokens_saida": 317.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.6666666666666666,
+        "ndcg_at_3": 0.878961873034099,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 3.97,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "2507bec60a739997f4340d26c9458250"
+    },
+    {
+      "id": "TC-02",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/2678830162",
+            "place_id": "578",
+            "nome": "Beer Selection",
+            "score": 0.607029,
+            "distancia_km": 1.11246367446,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/2678830162",
+            "integridade": true
+          },
+          {
+            "osm": "node/14101984401",
+            "place_id": "3173",
+            "nome": "Conic",
+            "score": 0.590086,
+            "distancia_km": 0.31462451664,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/14101984401",
+            "integridade": true
+          },
+          {
+            "osm": "node/2678830198",
+            "place_id": "599",
+            "nome": "Só Drinks Bar dos Botafoguenses",
+            "score": 0.595958,
+            "distancia_km": 1.75553556378,
+            "wheelchair": null,
+            "osm_link": "https://www.openstreetmap.org/node/2678830198",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 5.25,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=11185/366/0; consulta_id=fa788770-4278-4558-be29-4f5b42cef3d0"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 11185.0,
+        "tokens_saida": 366.0,
+        "acao_correta": 1.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 1.0,
+        "ndcg_at_3": 0.5158474921363962,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 5.25,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "e6db53a1ee94a6a43958269f2f1abb0a"
+    },
+    {
+      "id": "TC-01",
+      "output": {
+        "acao": "recomendar",
+        "entregues": [
+          {
+            "osm": "node/11913506269",
+            "place_id": "2723",
+            "nome": "Saboretto Cafés Especiais",
+            "score": 0.658767,
+            "distancia_km": 3.31526792334,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/node/11913506269",
+            "integridade": true
+          },
+          {
+            "osm": "node/3958863455",
+            "place_id": "1188",
+            "nome": "Tomilla Café",
+            "score": 0.680791,
+            "distancia_km": 3.78234494865,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/node/3958863455",
+            "integridade": true
+          },
+          {
+            "osm": "node/3093838425",
+            "place_id": "903",
+            "nome": "Candy House",
+            "score": 0.640121,
+            "distancia_km": 4.98696214101,
+            "wheelchair": "yes",
+            "osm_link": "https://www.openstreetmap.org/node/3093838425",
+            "integridade": true
+          }
+        ],
+        "status_busca": "SUCCESS",
+        "n_candidatos": 3,
+        "retry_count": 0,
+        "validacao_aprovada": true,
+        "erro": null,
+        "trilha": [
+          "nlu_guardrail_agent",
+          "retrieval",
+          "communication_agent"
+        ],
+        "segundos": 5.05,
+        "nota_retrieval": "agente llm: 3 aprovado(s); passos=4; tools=buscar_lugaresx1,listar_categoriasx1,resolver_regiaox1,validar_candidatosx1; reconsultas=0; tokens=10932/369/0; consulta_id=e54f98cb-1fd8-4a98-817e-2d6283378e61"
+      },
+      "scores": {
+        "usou_fallback": 0.0,
+        "passos_llm": 4.0,
+        "tokens_prompt": 10932.0,
+        "tokens_saida": 369.0,
+        "acao_correta": 1.0,
+        "violacao_restricao_entregue": 0.0,
+        "entrega_fora_do_raio": 0.0,
+        "evidencia_completa": 1.0,
+        "p_at_3": 0.6666666666666666,
+        "ndcg_at_3": 0.878961873034099,
+        "cobertura_rotulos": 1.0,
+        "reconsultas": 0.0,
+        "aprovado_na_1a_rodada": 1.0,
+        "latencia_s": 5.05,
+        "erro_de_agente": 0.0
+      },
+      "trace_id": "278e3e3ef5878b8dbba729cd4c9e610d"
+    }
+  ]
+}

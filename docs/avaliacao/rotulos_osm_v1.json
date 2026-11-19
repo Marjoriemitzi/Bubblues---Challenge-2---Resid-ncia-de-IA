@@ -1,6 +1,6 @@
 {
   "anotador": "Claude (unico, nao cego)",
-  "versao": "v1.2 (v1 + 9 lugares entregues pelo agente LLM)",
+  "versao": "v1.3 (v1 + 21 lugares entregues pelos agentes LLM)",
   "escala": "0/1/2",
   "casos": {
     "TC-01": {
@@ -339,6 +339,32 @@
           "evidencia": "web",
           "confianca": "M",
           "motivo": "REFERENCIA: Carcassonne Pub (407 Norte) foca em jogos de tabuleiro (Correio Braziliense); OSM: Ter-Qui 18h-24h"
+        },
+        {
+          "place_id": "1188",
+          "osm": "node/3958863455",
+          "nome": "Tomilla Café",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.75,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: cafe; jogos de tabuleiro/horario sem fonte (web: nenhum resultado)"
+        },
+        {
+          "place_id": "1673",
+          "osm": "node/5135659811",
+          "nome": "Bar Querubim",
+          "categoria": "pub",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 2.44,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: pub; jogos de tabuleiro/horario sem fonte"
         }
       ]
     },
@@ -1037,6 +1063,19 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "contraste; sem fonte"
+        },
+        {
+          "place_id": "1665",
+          "osm": "node/5131167638",
+          "nome": "Vegan-se",
+          "categoria": "restaurant",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 1.65,
+          "grau": 2,
+          "evidencia": "osm",
+          "confianca": "M",
+          "motivo": "AGENTE LLM: Vegan-se; OSM diet:vegan=only, Seg-Sab 11:00-21:00 (cobre o almoco)"
         }
       ]
     },
@@ -1174,6 +1213,19 @@
           "evidencia": "web",
           "confianca": "M",
           "motivo": "contraste: CineCultura Liberty Mall, programacao alternativa premiada, reformado em 2025 com acessibilidade total (Jornal de Brasilia); cafeteria integrada NAO confirmada. Ficou fora do top-8 do pipeline"
+        },
+        {
+          "place_id": "1656",
+          "osm": "node/5116146130",
+          "nome": "Espaço Cultural Canteiro Central",
+          "categoria": "arts_centre",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.67,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: centro cultural; exibicao de filmes alternativos sem fonte"
         }
       ]
     },
@@ -1461,6 +1513,32 @@
           "evidencia": "web",
           "confianca": "M",
           "motivo": "REFERENCIA: Parque da Cidade tem area para cachorros no Eixo Monumental Sul (quadras 901/906/910; lista de 2020). Nao veio do pipeline"
+        },
+        {
+          "place_id": "3596",
+          "osm": "way/280578983",
+          "nome": "Galeria dos Estados",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.6,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: area verde; area para caes sem fonte"
+        },
+        {
+          "place_id": "3726",
+          "osm": "way/469233908",
+          "nome": "Torre de TV",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 1.0,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: Torre de TV (park); area para caes sem fonte"
         }
       ]
     },
@@ -1761,6 +1839,19 @@
           "evidencia": "web",
           "confianca": "M",
           "motivo": "REFERENCIA: Deck Sul tem mesas de jogos (dama, xadrez, pingue-pongue) e sombreiros (Diario do Poder, sem data). Nao veio do pipeline"
+        },
+        {
+          "place_id": "2875",
+          "osm": "node/13040446322",
+          "nome": "Praça dos artistas",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.9,
+          "grau": 1,
+          "evidencia": "osm",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: praca 24/7; mesas de jogos sem fonte"
         }
       ]
     },
@@ -1898,6 +1989,19 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "contraste; Nippon; cozinha asiatica"
+        },
+        {
+          "place_id": "1036",
+          "osm": "node/3364783551",
+          "nome": "Sushi Loko",
+          "categoria": "restaurant",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 2.29,
+          "grau": 2,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: Sushi Loko; o nome indica sushi (OSM sem cuisine/endereco)"
         }
       ]
     },
@@ -2048,6 +2152,45 @@
           "evidencia": "web",
           "confianca": "M",
           "motivo": "REFERENCIA: Jardim Botanico de Brasilia: orquidario com ~3 mil orquideas, aberto Ter-Dom 9-17h, entrada gratuita (Catraca Livre/Agencia Brasilia); bancos a sombra sem fonte. 9,4 km, dentro do raio de 15 km. Nao veio do pipeline"
+        },
+        {
+          "place_id": "3449",
+          "osm": "way/221840826",
+          "nome": "Parque de Exposições da Granja do Torto",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 10.49,
+          "grau": 0,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: parque de exposicoes (recinto de eventos), nao e jardim/orquidario"
+        },
+        {
+          "place_id": "3856",
+          "osm": "way/557472108",
+          "nome": "Jardim Persona Ventura",
+          "categoria": "garden",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 6.36,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: jardim; florido/bancos a sombra sem fonte"
+        },
+        {
+          "place_id": "3925",
+          "osm": "way/625633658",
+          "nome": "Praça dos Cogumelos",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 3.36,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: praca; jardim florido sem fonte"
         }
       ]
     },
@@ -2237,6 +2380,19 @@
           "evidencia": "osm",
           "confianca": "M",
           "motivo": "AGENTE LLM: Melbourne Cafe; OSM Seg-Sex 08:15-17:30, nao atende 'aberto ate 22h'"
+        },
+        {
+          "place_id": "1187",
+          "osm": "node/3958863453",
+          "nome": "Art Café",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.69,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: cafe; horario ate 22h sem fonte (nao confirmado)"
         }
       ]
     },
@@ -2338,14 +2494,14 @@
     {
       "id": "TC-07",
       "p3_pipeline": 0.67,
-      "ndcg3_pipeline": 0.65,
+      "ndcg3_pipeline": 0.55,
       "top3_graus": [
         2,
         0,
         1
       ],
-      "n_grau2": 2,
-      "n_grau2_fora_do_pipeline": 1,
+      "n_grau2": 3,
+      "n_grau2_fora_do_pipeline": 2,
       "max_p3": 1.0
     },
     {
@@ -2359,7 +2515,7 @@
       ],
       "n_grau2": 1,
       "n_grau2_fora_do_pipeline": 1,
-      "max_p3": 0.33
+      "max_p3": 0.67
     },
     {
       "id": "TC-09",
@@ -2422,8 +2578,8 @@
         2,
         2
       ],
-      "n_grau2": 7,
-      "n_grau2_fora_do_pipeline": 1,
+      "n_grau2": 8,
+      "n_grau2_fora_do_pipeline": 2,
       "max_p3": 1.0
     },
     {

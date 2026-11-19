@@ -204,11 +204,32 @@ R = {
   "1783": (0, "osm", "M", "AGENTE LLM: Melbourne Cafe; OSM Seg-Sex 08:15-17:30, nao atende 'aberto ate 22h'"),
  }),
 }
+# v1.3: lugares que os agentes da Fase F entregaram e ainda nao tinham rotulo (mesmo protocolo).
+ROTULOS_FASE_F = {
+ "TC-02": {"1188": (1, "tipo", "B", "AGENTE LLM: cafe; jogos de tabuleiro/horario sem fonte (web: nenhum resultado)"),
+           "1673": (1, "tipo", "B", "AGENTE LLM: pub; jogos de tabuleiro/horario sem fonte")},
+ "TC-07": {"1665": (2, "osm", "M", "AGENTE LLM: Vegan-se; OSM diet:vegan=only, Seg-Sab 11:00-21:00 (cobre o almoco)")},
+ "TC-08": {"1656": (1, "tipo", "B", "AGENTE LLM: centro cultural; exibicao de filmes alternativos sem fonte")},
+ "TC-10": {"3596": (1, "tipo", "B", "AGENTE LLM: area verde; area para caes sem fonte"),
+           "3726": (1, "tipo", "B", "AGENTE LLM: Torre de TV (park); area para caes sem fonte")},
+ "TC-12": {"2875": (1, "osm", "B", "AGENTE LLM: praca 24/7; mesas de jogos sem fonte")},
+ "TC-13": {"1036": (2, "tipo", "B", "AGENTE LLM: Sushi Loko; o nome indica sushi (OSM sem cuisine/endereco)")},
+ "TC-14": {"3449": (0, "tipo", "B", "AGENTE LLM: parque de exposicoes (recinto de eventos), nao e jardim/orquidario"),
+           "3856": (1, "tipo", "B", "AGENTE LLM: jardim; florido/bancos a sombra sem fonte"),
+           "3925": (1, "tipo", "B", "AGENTE LLM: praca; jardim florido sem fonte")},
+ "TC-15": {"1187": (1, "tipo", "B", "AGENTE LLM: cafe; horario ate 22h sem fonte (nao confirmado)")},
+}
+
 SEEDS = {  # place_id -> (nome, categoria, lat, lon) lidos do banco
  "846": ("Carcassonne Pub", "pub", -15.7659, -47.8771, "node/2966823722"),
  "3228": ("Parque da Cidade Dona Sarah Kubitschek", "park", -15.8015, -47.9117, "way/25535698"),
  "3764": ("Deck Sul", "park", -15.8382, -47.9020, "way/495849346"),
  "2810": ("Jardim Botânico de Brasília", "garden", -15.8732, -47.8367, "node/12690162901"),
+ "1673": ("Bar Querubim", "pub", -15.7730, -47.8758, "node/5135659811"),
+ "1665": ("Vegan-se", "restaurant", -15.7768, -47.8789, "node/5131167638"),
+ "1036": ("Sushi Loko", "restaurant", -15.8312, -47.9155, "node/3364783551"),
+ "3449": ("Parque de Exposições da Granja do Torto", "park", -15.7053, -47.9164, "way/221840826"),
+ "3856": ("Jardim Persona Ventura", "garden", -15.7445, -47.9127, "way/557472108"),
  "3471": ("Parque Ana Lídia", "park", -15.7937, -47.8959, "way/227022746"),
  "1489": ("Entre Eixos", "fast_food", -15.7899, -47.8803, "node/4716974234"),
  "1783": ("Melbourne Café & Co.", "cafe", -15.7902, -47.8847, "node/5416977721"),
@@ -226,6 +247,8 @@ def dcg(gs):
 
 
 def main():
+    for tid, extra in ROTULOS_FASE_F.items():  # v1.3
+        R[tid][1].update(extra)
     pool = {c["id"]: c for c in json.loads((AV / "pool_candidatos.json").read_text(encoding="utf-8"))}
     ficha = json.loads((AV / "pool_ficha_lugares.json").read_text(encoding="utf-8"))
     pedidos = {p["id"]: p for p in json.loads((AV / "pedidos_teste.json").read_text(encoding="utf-8"))}
@@ -243,7 +266,7 @@ def main():
                 la, lo = ficha[pid]["lat"], ficha[pid]["lon"]; origem = "agente_llm"
                 dist = round(km(ponto, (float(la), float(lo))), 2); posicao = None
             else:
-                nome, cat, la, lo, osm = SEEDS[pid]; origem = "agente_llm" if pid in ("3471", "1489", "1783") else "referencia"; dist = round(km(ponto, (la, lo)), 2); posicao = None
+                nome, cat, la, lo, osm = SEEDS[pid]; origem = "agente_llm" if pid in ("3471", "1489", "1783", "1673", "1665", "1036", "3449", "3856") else "referencia"; dist = round(km(ponto, (la, lo)), 2); posicao = None
             itens.append({"place_id": pid, "osm": osm, "nome": nome, "categoria": cat, "origem": origem, "posicao_pipeline": posicao,
                           "distancia_km": dist, "grau": g, "evidencia": ev, "confianca": conf, "motivo": motivo})
         faltando = set(cands) - set(labels)
@@ -258,7 +281,7 @@ def main():
     saida["TC-16"] = {"acao_esperada": "clarificar", "nucleo": "pedido ambiguo: a resposta correta e perguntar; candidatos nao rotulados", "labels": []}
     saida["TC-17"] = {"acao_esperada": "abster", "nucleo": "criterio impossivel (patinacao no gelo + 03:30)", "labels": []}
     saida["TC-18"] = {"acao_esperada": "abster", "nucleo": "fora de escopo (frete)", "labels": []}
-    (AV / "rotulos_osm_v1.json").write_text(json.dumps({"anotador": "Claude (unico, nao cego)", "versao": "v1.2 (v1 + 9 lugares entregues pelo agente LLM)", "escala": "0/1/2", "casos": saida, "baseline_pipeline": metr}, ensure_ascii=False, indent=2), encoding="utf-8")
+    (AV / "rotulos_osm_v1.json").write_text(json.dumps({"anotador": "Claude (unico, nao cego)", "versao": "v1.3 (v1 + 21 lugares entregues pelos agentes LLM)", "escala": "0/1/2", "casos": saida, "baseline_pipeline": metr}, ensure_ascii=False, indent=2), encoding="utf-8")
     ok = [m for m in metr if m["ndcg3_pipeline"] is not None]
     print(f"{len(metr)} casos rotulados; {sum(len(v['labels']) for v in saida.values())} rotulos")
     print(f"baseline do pipeline atual: P@3 medio={sum(m['p3_pipeline'] for m in metr)/len(metr):.2f} | nDCG@3 medio={sum(m['ndcg3_pipeline'] for m in ok)/len(ok):.2f}")
