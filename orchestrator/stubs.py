@@ -1,8 +1,7 @@
-"""Agentes de mentira (stubs) para exercitar o orquestrador antes das issues #7-#10.
+"""Agentes de mentira (stubs) para exercitar o orquestrador sem banco nem LLM.
 
-Cada stub segue o mesmo formato que o agente real tera: recebe o estado e
-devolve um dict parcial. Quando o agente real ficar pronto, basta passa-lo
-para `build_graph` no lugar do stub.
+Cada stub segue o formato do componente real: recebe o estado e devolve um dict parcial. O Retrieval
+devolve ja a busca, a auditoria (gate) e as evidencias; o laco de reconsulta e interno a ele.
 """
 
 from __future__ import annotations
@@ -41,11 +40,7 @@ def stub_nlu(**overrides):
     return agent
 
 
-def stub_retrieval(state):
-    rid = state["request_id"]
-    fb = state.get("validation_feedback")
-    rejected = set(fb.rejected_place_ids) if fb else set()
-    pid = "POI-02" if "POI-01" in rejected else "POI-01"
+def _search_response(rid: str, pid: str = "POI-01") -> dict:
     item = {
         "rank": 1,
         "place_id": pid,
@@ -60,52 +55,57 @@ def stub_retrieval(state):
             "compatibility_contribution": 0.13,
             "sum_check": 0.8,
         },
+        "osm_id": 1,
+        "osm_type": "node",
+        "osm_tags": {"wheelchair": "yes", "noise_level": "baixo"},
+        "is_public_verified": True,
     }
     return {
-        "search_response": {
-            "query_id": rid,
-            "status": "SUCCESS",
-            "applied_filters": {"radius_km": 5.0, "expanded_once": False, "amenities": ["cafe"]},
-            "results_count": 1,
-            "items": [item],
-        },
-        "note": f"stub retrieval -> {pid}",
+        "query_id": rid,
+        "status": "SUCCESS",
+        "applied_filters": {"radius_km": 5.0, "expanded_once": False, "amenities": ["cafe"]},
+        "results_count": 1,
+        "items": [item],
     }
 
 
-def stub_validation(approve_on_attempt: int | None = 1):
-    """Aprova na N-esima chamada; None = reprova sempre (testa a trava de retries)."""
-    calls = {"n": 0}
+def stub_retrieval(state):
+    """Retrieval de mentira com o contrato novo: ja devolve a busca, a auditoria e as evidencias."""
+    rid = state["request_id"]
+    evidencia = {
+        "evidence_id": f"EV-{uuid.uuid4().hex[:8]}",
+        "query_id": rid,
+        "place_id": "POI-01",
+        "place_name": "Local POI-01",
+        "osm_reference": {"osm_id": 1, "osm_type": "node", "osm_link": "https://www.openstreetmap.org/node/1"},
+        "matched_tags": ["wheelchair=yes"],
+        "factors": [],
+        "total_score": 0.8,
+        "integrity_test": {"sum_equals_total": True, "all_factors_in_range_0_1": True, "passed": True},
+        "grounding_notes": ["wheelchair=yes"],
+    }
+    return {
+        "search_response": _search_response(rid),
+        "validation_feedback": ValidationFeedback(approved=True),
+        "evidence_records": [evidencia],
+        "retry_count": 0,
+        "note": "stub retrieval: aprovado",
+    }
 
-    def agent(state):
-        calls["n"] += 1
-        ok = approve_on_attempt is not None and calls["n"] >= approve_on_attempt
-        if ok:
-            fb = ValidationFeedback(approved=True)
-            records = [
-                {
-                    "evidence_id": f"EV-{uuid.uuid4().hex[:8]}",
-                    "query_id": state["request_id"],
-                    "place_id": "POI-02" if calls["n"] > 1 else "POI-01",
-                    "place_name": "Local",
-                    "osm_reference": {"osm_id": 1, "osm_type": "node", "osm_link": "https://www.openstreetmap.org/node/1"},
-                    "matched_tags": ["cafe"],
-                    "factors": [],
-                    "total_score": 0.8,
-                    "integrity_test": {"sum_equals_total": True, "all_factors_in_range_0_1": True, "passed": True},
-                    "grounding_notes": ["wheelchair=yes"],
-                }
-            ]
-            return {"validation_feedback": fb, "evidence_records": records, "note": "stub aprovou"}
-        fb = ValidationFeedback(
+
+def stub_retrieval_reprovado(state):
+    """Retrieval cujo gate reprova ate esgotar as reconsultas: sem evidencias, vai para a abstencao."""
+    return {
+        "search_response": _search_response(state["request_id"]),
+        "validation_feedback": ValidationFeedback(
             approved=False,
             rejected_place_ids=["POI-01"],
             hard_filters={"wheelchair": "yes"},
             diagnostics=["wheelchair=no viola wheelchair_required"],
-        )
-        return {"validation_feedback": fb, "note": "stub reprovou"}
-
-    return agent
+        ),
+        "retry_count": 2,
+        "note": "stub retrieval: reprovado pelo gate",
+    }
 
 
 def stub_communication(state):

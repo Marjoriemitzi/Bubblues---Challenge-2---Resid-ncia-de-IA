@@ -1,0 +1,1407 @@
+{
+ "2388": {
+  "place_id": "2388",
+  "nome": "Lugano",
+  "categoria": "cafe",
+  "lat": -15.81521,
+  "lon": -47.90298,
+  "osm": "node/8435477631",
+  "tags": {
+   "amenity": "cafe",
+   "addr:street": "CLS 108",
+   "addr:housenumber": "Bloco D Loja x"
+  }
+ },
+ "67": {
+  "place_id": "67",
+  "nome": "CineCultura Liberty Mall",
+  "categoria": "cinema",
+  "lat": -15.78648,
+  "lon": -47.88414,
+  "osm": "node/1666249648",
+  "tags": {
+   "amenity": "cinema",
+   "website": "https://cinecultura.com.br/"
+  }
+ },
+ "2447": {
+  "place_id": "2447",
+  "nome": "Café da Mata",
+  "categoria": "cafe",
+  "lat": -15.80694,
+  "lon": -47.89338,
+  "osm": "node/9559046118",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "2454": {
+  "place_id": "2454",
+  "nome": "Starbucks",
+  "categoria": "cafe",
+  "lat": -15.79097,
+  "lon": -47.88297,
+  "osm": "node/9577464680",
+  "tags": {
+   "brand": "Starbucks",
+   "amenity": "cafe",
+   "cuisine": "coffee_shop"
+  }
+ },
+ "2507": {
+  "place_id": "2507",
+  "nome": "Quadra esportiva",
+  "categoria": "pitch",
+  "lat": -15.77684,
+  "lon": -47.87558,
+  "osm": "node/9917528077",
+  "tags": {
+   "leisure": "pitch"
+  }
+ },
+ "2524": {
+  "place_id": "2524",
+  "nome": "Biblioteca do Senado Federal",
+  "categoria": "library",
+  "lat": -15.79761,
+  "lon": -47.86391,
+  "osm": "node/9975325964",
+  "tags": {
+   "amenity": "library"
+  }
+ },
+ "2546": {
+  "place_id": "2546",
+  "nome": "Pastelaria Viçosa",
+  "categoria": "fast_food",
+  "lat": -15.79393,
+  "lon": -47.882,
+  "osm": "node/10236270110",
+  "tags": {
+   "amenity": "fast_food",
+   "cuisine": "pastel"
+  }
+ },
+ "2547": {
+  "place_id": "2547",
+  "nome": "Subway",
+  "categoria": "fast_food",
+  "lat": -15.79409,
+  "lon": -47.88206,
+  "osm": "node/10236270111",
+  "tags": {
+   "brand": "Subway",
+   "amenity": "fast_food",
+   "cuisine": "sandwich"
+  }
+ },
+ "2648": {
+  "place_id": "2648",
+  "nome": "Biblioteca Pedro Aleixo",
+  "categoria": "library",
+  "lat": -15.80128,
+  "lon": -47.86446,
+  "osm": "node/10959640838",
+  "tags": {
+   "phone": "08000619619",
+   "access": "yes",
+   "amenity": "library",
+   "website": "https://www2.camara.leg.br/a-camara/documentos-e-pesquisa/biblioteca",
+   "addr:city": "Brasília",
+   "wheelchair": "yes",
+   "opening_hours": "Mo-Th 09:00-19:00; Fr 09:00-18:00",
+   "internet_access": "wlan"
+  }
+ },
+ "2668": {
+  "place_id": "2668",
+  "nome": "Edifício Financial Center Park",
+  "categoria": "food_court",
+  "lat": -15.79862,
+  "lon": -47.88299,
+  "osm": "node/11209188936",
+  "tags": {
+   "amenity": "food_court"
+  }
+ },
+ "2723": {
+  "place_id": "2723",
+  "nome": "Saboretto Cafés Especiais",
+  "categoria": "cafe",
+  "lat": -15.79321,
+  "lon": -47.91893,
+  "osm": "node/11913506269",
+  "tags": {
+   "phone": "+556198153-2308",
+   "amenity": "cafe",
+   "cuisine": "coffee_shop;sandwich;breakfast;dessert;crepe",
+   "website": "https://saborettocafesespeciais.com.br/",
+   "addr:city": "Sudoeste e Octogonal",
+   "wheelchair": "yes",
+   "addr:street": "CLSW 300B Bl 4 Lj 2",
+   "addr:suburb": "Setor Sudoeste",
+   "opening_hours": "Mo-Su 09:00-19:00",
+   "internet_access": "wlan",
+   "outdoor_seating": "yes"
+  }
+ },
+ "577": {
+  "place_id": "577",
+  "nome": "Bar e Café do Brasil",
+  "categoria": "bar",
+  "lat": -15.78348,
+  "lon": -47.87853,
+  "osm": "node/2678830161",
+  "tags": {
+   "amenity": "bar",
+   "addr:street": "CLN 202"
+  }
+ },
+ "578": {
+  "place_id": "578",
+  "nome": "Beer Selection",
+  "categoria": "bar",
+  "lat": -15.79365,
+  "lon": -47.89318,
+  "osm": "node/2678830162",
+  "tags": {
+   "amenity": "bar"
+  }
+ },
+ "2875": {
+  "place_id": "2875",
+  "nome": "Praça dos artistas",
+  "categoria": "park",
+  "lat": -15.79763,
+  "lon": -47.89031,
+  "osm": "node/13040446322",
+  "tags": {
+   "leisure": "park",
+   "opening_hours": "24/7"
+  }
+ },
+ "2937": {
+  "place_id": "2937",
+  "nome": "Yakiton",
+  "categoria": "restaurant",
+  "lat": -15.80919,
+  "lon": -47.90141,
+  "osm": "node/13252502253",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "oriental"
+  }
+ },
+ "2938": {
+  "place_id": "2938",
+  "nome": "Biricutico",
+  "categoria": "bar",
+  "lat": -15.80917,
+  "lon": -47.90142,
+  "osm": "node/13252502255",
+  "tags": {
+   "amenity": "bar"
+  }
+ },
+ "2947": {
+  "place_id": "2947",
+  "nome": "Casa da Cultura Brasília",
+  "categoria": "arts_centre",
+  "lat": -15.77925,
+  "lon": -47.88901,
+  "osm": "node/13291474946",
+  "tags": {
+   "amenity": "arts_centre"
+  }
+ },
+ "775": {
+  "place_id": "775",
+  "nome": "Barulho",
+  "categoria": "bar",
+  "lat": -15.79528,
+  "lon": -47.90115,
+  "osm": "node/2712055074",
+  "tags": {
+   "amenity": "bar"
+  }
+ },
+ "3092": {
+  "place_id": "3092",
+  "nome": "Koji",
+  "categoria": "restaurant",
+  "lat": -15.81888,
+  "lon": -47.89523,
+  "osm": "node/13720731385",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "japanese",
+   "addr:city": "Brasília",
+   "addr:street": "CLS 406 s/n",
+   "addr:suburb": "Asa Sul"
+  }
+ },
+ "900": {
+  "place_id": "900",
+  "nome": "Cafezinho Express",
+  "categoria": "cafe",
+  "lat": -15.78697,
+  "lon": -47.88637,
+  "osm": "node/3089963930",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "903": {
+  "place_id": "903",
+  "nome": "Candy House",
+  "categoria": "cafe",
+  "lat": -15.77709,
+  "lon": -47.87831,
+  "osm": "node/3093838425",
+  "tags": {
+   "amenity": "cafe",
+   "wheelchair": "yes",
+   "addr:street": "CLN 204"
+  }
+ },
+ "3097": {
+  "place_id": "3097",
+  "nome": "The Coffee",
+  "categoria": "cafe",
+  "lat": -15.81556,
+  "lon": -47.90271,
+  "osm": "node/13741593001",
+  "tags": {
+   "amenity": "cafe",
+   "website": "https://thecoffee.jp/shortcut/brasil/brasilia/the-coffee-108-sul",
+   "opening_hours": "Mo-Su 07:00-20:00"
+  }
+ },
+ "3173": {
+  "place_id": "3173",
+  "nome": "Conic",
+  "categoria": "pub",
+  "lat": -15.79599,
+  "lon": -47.88488,
+  "osm": "node/14101984401",
+  "tags": {
+   "amenity": "pub"
+  }
+ },
+ "3193": {
+  "place_id": "3193",
+  "nome": "Parquinho",
+  "categoria": "park",
+  "lat": -15.77528,
+  "lon": -47.88351,
+  "osm": "node/14334436643",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3194": {
+  "place_id": "3194",
+  "nome": "Parquinho Infantil",
+  "categoria": "park",
+  "lat": -15.77472,
+  "lon": -47.8823,
+  "osm": "node/14334436644",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "1029": {
+  "place_id": "1029",
+  "nome": "Café com Café",
+  "categoria": "cafe",
+  "lat": -15.78097,
+  "lon": -47.88623,
+  "osm": "node/3362308337",
+  "tags": {
+   "amenity": "cafe",
+   "cuisine": "arab"
+  }
+ },
+ "3209": {
+  "place_id": "3209",
+  "nome": "SESI Lab",
+  "categoria": "arts_centre",
+  "lat": -15.79628,
+  "lon": -47.88233,
+  "osm": "relation/16031579",
+  "tags": {
+   "amenity": "arts_centre",
+   "wheelchair": "yes"
+  }
+ },
+ "3212": {
+  "place_id": "3212",
+  "nome": "Parque da 202/203 Sul",
+  "categoria": "park",
+  "lat": -15.80735,
+  "lon": -47.88752,
+  "osm": "relation/18686900",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3245": {
+  "place_id": "3245",
+  "nome": "Biblioteca Demonstrativa de Brasília",
+  "categoria": "library",
+  "lat": -15.81034,
+  "lon": -47.90286,
+  "osm": "way/43376766",
+  "tags": {
+   "amenity": "library",
+   "opening_hours": "Mo-Fr 07:30-23:00; Sa 08:00-14:00"
+  }
+ },
+ "3247": {
+  "place_id": "3247",
+  "nome": "Praça Índio Pataxó Galdino Jesus dos Santos",
+  "categoria": "park",
+  "lat": -15.8031,
+  "lon": -47.89774,
+  "osm": "way/50321791",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3281": {
+  "place_id": "3281",
+  "nome": "Biblioteca Nacional de Brasília Leonel de Moura Brizola",
+  "categoria": "library",
+  "lat": -15.79668,
+  "lon": -47.8802,
+  "osm": "way/124199196",
+  "tags": {
+   "amenity": "library",
+   "addr:city": "Brasília",
+   "addr:suburb": "Zona Cívico-Administrativa"
+  }
+ },
+ "3283": {
+  "place_id": "3283",
+  "nome": "Centro de Convenções Ulysses Guimarães",
+  "categoria": "arts_centre",
+  "lat": -15.78829,
+  "lon": -47.90031,
+  "osm": "way/124696695",
+  "tags": {
+   "amenity": "arts_centre",
+   "addr:city": "Brasília"
+  }
+ },
+ "3291": {
+  "place_id": "3291",
+  "nome": "Amigos do Tênis",
+  "categoria": "pitch",
+  "lat": -15.79024,
+  "lon": -47.85225,
+  "osm": "way/125265696",
+  "tags": {
+   "sport": "tennis",
+   "leisure": "pitch"
+  }
+ },
+ "3298": {
+  "place_id": "3298",
+  "nome": "Espaço Cultural Renato Guerreiro - Anatel",
+  "categoria": "arts_centre",
+  "lat": -15.80524,
+  "lon": -47.88294,
+  "osm": "way/133334933",
+  "tags": {
+   "amenity": "arts_centre",
+   "addr:city": "Brasília",
+   "wheelchair": "yes",
+   "addr:street": "SAUS Quadra 6",
+   "addr:suburb": "Asa Sul",
+   "opening_hours": "restricted",
+   "addr:housenumber": "Bloco C"
+  }
+ },
+ "3308": {
+  "place_id": "3308",
+  "nome": "NIPPO Club",
+  "categoria": "pitch",
+  "lat": -15.83151,
+  "lon": -47.8902,
+  "osm": "way/139123597",
+  "tags": {
+   "sport": "tennis",
+   "leisure": "pitch"
+  }
+ },
+ "3309": {
+  "place_id": "3309",
+  "nome": "NIPPO Club",
+  "categoria": "pitch",
+  "lat": -15.83136,
+  "lon": -47.89042,
+  "osm": "way/139123600",
+  "tags": {
+   "sport": "tennis",
+   "leisure": "pitch"
+  }
+ },
+ "3313": {
+  "place_id": "3313",
+  "nome": "Bloco R",
+  "categoria": "food_court",
+  "lat": -15.79042,
+  "lon": -47.89442,
+  "osm": "way/140613907",
+  "tags": {
+   "amenity": "food_court",
+   "opening_hours": "Tu-Th 09:00-17:00; Fr-Su 09:00-18:00"
+  }
+ },
+ "3314": {
+  "place_id": "3314",
+  "nome": "Bloco Q",
+  "categoria": "food_court",
+  "lat": -15.78994,
+  "lon": -47.89427,
+  "osm": "way/140613908",
+  "tags": {
+   "amenity": "food_court",
+   "opening_hours": "Tu-Th 09:00-17:00; Fr-Su 09:00-18:00"
+  }
+ },
+ "3319": {
+  "place_id": "3319",
+  "nome": "Biblioteca Infantil",
+  "categoria": "library",
+  "lat": -15.80748,
+  "lon": -47.8954,
+  "osm": "way/140931474",
+  "tags": {
+   "amenity": "library"
+  }
+ },
+ "3453": {
+  "place_id": "3453",
+  "nome": "Caixa Cultural",
+  "categoria": "arts_centre",
+  "lat": -15.80388,
+  "lon": -47.88434,
+  "osm": "way/222399169",
+  "tags": {
+   "amenity": "arts_centre",
+   "addr:city": "Brasília",
+   "wheelchair": "yes",
+   "addr:suburb": "Asa Sul"
+  }
+ },
+ "3471": {
+  "place_id": "3471",
+  "nome": "Parque Ana Lídia",
+  "categoria": "park",
+  "lat": -15.79366,
+  "lon": -47.89591,
+  "osm": "way/227022746",
+  "tags": {
+   "access": "yes",
+   "leisure": "park",
+   "operator": "Parque da Cidade",
+   "description": "Parque urbano movimentado com várias áreas de lazer para crianças, bancos e percursos para caminhada."
+  }
+ },
+ "3515": {
+  "place_id": "3515",
+  "nome": "Praça das Fontes",
+  "categoria": "garden",
+  "lat": -15.80513,
+  "lon": -47.91438,
+  "osm": "way/245309987",
+  "tags": {
+   "leisure": "garden"
+  }
+ },
+ "3596": {
+  "place_id": "3596",
+  "nome": "Galeria dos Estados",
+  "categoria": "park",
+  "lat": -15.79902,
+  "lon": -47.88466,
+  "osm": "way/280578983",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3677": {
+  "place_id": "3677",
+  "nome": "Bosque dos Constituintes",
+  "categoria": "park",
+  "lat": -15.81222,
+  "lon": -47.8698,
+  "osm": "way/378658513",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3811": {
+  "place_id": "3811",
+  "nome": "Área verde",
+  "categoria": "garden",
+  "lat": -15.78741,
+  "lon": -47.88517,
+  "osm": "way/551056721",
+  "tags": {
+   "leisure": "garden"
+  }
+ },
+ "3925": {
+  "place_id": "3925",
+  "nome": "Praça dos Cogumelos",
+  "categoria": "park",
+  "lat": -15.8149,
+  "lon": -47.90539,
+  "osm": "way/625633658",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "4029": {
+  "place_id": "4029",
+  "nome": "Ponto de Convivência",
+  "categoria": "park",
+  "lat": -15.76506,
+  "lon": -47.87838,
+  "osm": "way/696050217",
+  "tags": {
+   "leisure": "park",
+   "opening_hours": "24/7"
+  }
+ },
+ "4063": {
+  "place_id": "4063",
+  "nome": "Parquinho Infantil do Bloco G da 104 Sul",
+  "categoria": "park",
+  "lat": -15.80856,
+  "lon": -47.89464,
+  "osm": "way/734333868",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "4107": {
+  "place_id": "4107",
+  "nome": "Parquinho",
+  "categoria": "playground",
+  "lat": -15.80625,
+  "lon": -47.88695,
+  "osm": "way/814496082",
+  "tags": {
+   "access": "yes",
+   "leisure": "playground"
+  }
+ },
+ "4186": {
+  "place_id": "4186",
+  "nome": "Casa de Biscoitos Mineiros",
+  "categoria": "cafe",
+  "lat": -15.83446,
+  "lon": -47.95554,
+  "osm": "way/1052530850",
+  "tags": {
+   "shop": "yes",
+   "indoor": "room",
+   "amenity": "cafe",
+   "cuisine": "coffee_shop",
+   "smoking": "no",
+   "wheelchair": "yes",
+   "addr:street": "SAI/SO Área 6580",
+   "addr:suburb": "Guará"
+  }
+ },
+ "4208": {
+  "place_id": "4208",
+  "nome": "Quadra de esportes",
+  "categoria": "pitch",
+  "lat": -15.77871,
+  "lon": -47.87914,
+  "osm": "way/1082145697",
+  "tags": {
+   "leisure": "pitch"
+  }
+ },
+ "3726": {
+  "place_id": "3726",
+  "nome": "Torre de TV",
+  "categoria": "park",
+  "lat": -15.79075,
+  "lon": -47.89159,
+  "osm": "way/469233908",
+  "tags": {
+   "leisure": "park"
+  }
+ },
+ "3843": {
+  "place_id": "3843",
+  "nome": "Praça Galeria",
+  "categoria": "park",
+  "lat": -15.79921,
+  "lon": -47.88585,
+  "osm": "way/555952785",
+  "tags": {
+   "leisure": "park",
+   "description": "Praça acima da Galeria dos Estados. Local de feiras e conregação popular"
+  }
+ },
+ "7": {
+  "place_id": "7",
+  "nome": "Feirinha do anexo do Buriti",
+  "categoria": "food_court",
+  "lat": -15.78281,
+  "lon": -47.90852,
+  "osm": "node/826342664",
+  "tags": {
+   "amenity": "food_court"
+  }
+ },
+ "170": {
+  "place_id": "170",
+  "nome": "Praça das bicicletas",
+  "categoria": "pitch",
+  "lat": -15.79659,
+  "lon": -47.8793,
+  "osm": "node/2524893720",
+  "tags": {
+   "sport": "skateboard",
+   "leisure": "pitch"
+  }
+ },
+ "599": {
+  "place_id": "599",
+  "nome": "Só Drinks Bar dos Botafoguenses",
+  "categoria": "bar",
+  "lat": -15.77983,
+  "lon": -47.8754,
+  "osm": "node/2678830198",
+  "tags": {
+   "amenity": "bar",
+   "addr:street": "CLN 403"
+  }
+ },
+ "656": {
+  "place_id": "656",
+  "nome": "OMA Japanese Experience",
+  "categoria": "restaurant",
+  "lat": -15.82759,
+  "lon": -47.906,
+  "osm": "node/2691239353",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "japanese;sushi",
+   "addr:street": "CLS 411"
+  }
+ },
+ "687": {
+  "place_id": "687",
+  "nome": "Hana",
+  "categoria": "restaurant",
+  "lat": -15.82282,
+  "lon": -47.90096,
+  "osm": "node/2691239467",
+  "tags": {
+   "phone": "+55 61 3244 9999",
+   "amenity": "restaurant",
+   "cuisine": "asian",
+   "addr:street": "CLS 408 Bloco B Loja 35"
+  }
+ },
+ "703": {
+  "place_id": "703",
+  "nome": "Nippon",
+  "categoria": "restaurant",
+  "lat": -15.83094,
+  "lon": -47.91179,
+  "osm": "node/2691239496",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "asian",
+   "addr:street": "Cls 413"
+  }
+ },
+ "728": {
+  "place_id": "728",
+  "nome": "Sumo",
+  "categoria": "restaurant",
+  "lat": -15.81008,
+  "lon": -47.88958,
+  "osm": "node/2691239567",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "asian;japones",
+   "addr:street": "Cls 204"
+  }
+ },
+ "730": {
+  "place_id": "730",
+  "nome": "Sushi San",
+  "categoria": "restaurant",
+  "lat": -15.82711,
+  "lon": -47.91025,
+  "osm": "node/2691239583",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "sushi",
+   "diet:vegan": "yes",
+   "addr:street": "CLS 211",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "868": {
+  "place_id": "868",
+  "nome": "Amor à Torta",
+  "categoria": "cafe",
+  "lat": -15.75673,
+  "lon": -47.89138,
+  "osm": "node/3051977281",
+  "tags": {
+   "amenity": "cafe",
+   "wheelchair": "yes",
+   "opening_hours": "Mo-Fr 07:30-19:30; Sa 08:00-18:00",
+   "internet_access": "no"
+  }
+ },
+ "883": {
+  "place_id": "883",
+  "nome": "Kikebab",
+  "categoria": "restaurant",
+  "lat": -15.75846,
+  "lon": -47.88759,
+  "osm": "node/3060727064",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "kebab",
+   "wheelchair": "yes",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "919": {
+  "place_id": "919",
+  "nome": "Subway",
+  "categoria": "fast_food",
+  "lat": -15.79857,
+  "lon": -47.88677,
+  "osm": "node/3153295654",
+  "tags": {
+   "brand": "Subway",
+   "amenity": "fast_food",
+   "cuisine": "sandwich",
+   "website": "https://subway.com.br/"
+  }
+ },
+ "938": {
+  "place_id": "938",
+  "nome": "Churrasgril",
+  "categoria": "restaurant",
+  "lat": -15.76661,
+  "lon": -47.87732,
+  "osm": "node/3200165050",
+  "tags": {
+   "amenity": "restaurant",
+   "opening_hours": "Mo-Su 11:00-15:00",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "964": {
+  "place_id": "964",
+  "nome": "Saborear",
+  "categoria": "restaurant",
+  "lat": -15.75981,
+  "lon": -47.879,
+  "osm": "node/3217619699",
+  "tags": {
+   "amenity": "restaurant"
+  }
+ },
+ "969": {
+  "place_id": "969",
+  "nome": "Greens",
+  "categoria": "restaurant",
+  "lat": -15.78084,
+  "lon": -47.88502,
+  "osm": "node/3222516873",
+  "tags": {
+   "amenity": "restaurant",
+   "website": "https://www.greens.com.br/",
+   "diet:vegan": "yes",
+   "opening_hours": "Mo-Sa 10:00-22:00",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "970": {
+  "place_id": "970",
+  "nome": "Caramella",
+  "categoria": "cafe",
+  "lat": -15.78063,
+  "lon": -47.8861,
+  "osm": "node/3222516874",
+  "tags": {
+   "amenity": "cafe",
+   "smoking": "no",
+   "website": "http://www.caramellaconfeitaria.com.br/",
+   "wheelchair": "yes",
+   "opening_hours": "Mo-Su 07:30-21:00",
+   "internet_access": "wlan"
+  }
+ },
+ "990": {
+  "place_id": "990",
+  "nome": "Maori",
+  "categoria": "restaurant",
+  "lat": -15.75868,
+  "lon": -47.88826,
+  "osm": "node/3247591563",
+  "tags": {
+   "amenity": "restaurant",
+   "diet:vegetarian": "only"
+  }
+ },
+ "1010": {
+  "place_id": "1010",
+  "nome": "D'Vilella",
+  "categoria": "cafe",
+  "lat": -15.75639,
+  "lon": -47.89032,
+  "osm": "node/3324092861",
+  "tags": {
+   "amenity": "cafe",
+   "wheelchair": "yes",
+   "internet_access": "wlan"
+  }
+ },
+ "1022": {
+  "place_id": "1022",
+  "nome": "Café Cristina Colina da Pedra",
+  "categoria": "cafe",
+  "lat": -15.78332,
+  "lon": -47.87859,
+  "osm": "node/3358345330",
+  "tags": {
+   "amenity": "cafe",
+   "addr:city": "Brasilia",
+   "addr:street": "CLN 202 Bloco A",
+   "addr:suburb": "Asa Norte",
+   "opening_hours": "Su 12:00-19:00; Mo-Sa 08:00-19:00",
+   "internet_access": "wlan"
+  }
+ },
+ "1066": {
+  "place_id": "1066",
+  "nome": "Café das Letras",
+  "categoria": "cafe",
+  "lat": -15.76492,
+  "lon": -47.87019,
+  "osm": "node/3525964203",
+  "tags": {
+   "amenity": "cafe",
+   "wheelchair": "yes"
+  }
+ },
+ "1083": {
+  "place_id": "1083",
+  "nome": "Ashram Zen Lounge",
+  "categoria": "restaurant",
+  "lat": -15.82292,
+  "lon": -47.90089,
+  "osm": "node/3634309334",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "indian",
+   "addr:street": "CLS 408",
+   "contact:phone": "+55 61 3541-5670",
+   "opening_hours": "Tu-Fr 10:00-22:00; Sa-Su 09:00-22:00",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "1088": {
+  "place_id": "1088",
+  "nome": "Café do Ponto",
+  "categoria": "cafe",
+  "lat": -15.80452,
+  "lon": -47.88519,
+  "osm": "node/3634570442",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1170": {
+  "place_id": "1170",
+  "nome": "Subway",
+  "categoria": "fast_food",
+  "lat": -15.79866,
+  "lon": -47.8829,
+  "osm": "node/3944566704",
+  "tags": {
+   "brand": "Subway",
+   "amenity": "fast_food",
+   "cuisine": "sandwich"
+  }
+ },
+ "1187": {
+  "place_id": "1187",
+  "nome": "Art Café",
+  "categoria": "cafe",
+  "lat": -15.78774,
+  "lon": -47.88266,
+  "osm": "node/3958863453",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1188": {
+  "place_id": "1188",
+  "nome": "Tomilla Café",
+  "categoria": "cafe",
+  "lat": -15.78712,
+  "lon": -47.88281,
+  "osm": "node/3958863455",
+  "tags": {
+   "amenity": "cafe",
+   "wheelchair": "yes"
+  }
+ },
+ "1215": {
+  "place_id": "1215",
+  "nome": "Chateau Brasil",
+  "categoria": "cafe",
+  "lat": -15.79014,
+  "lon": -47.88499,
+  "osm": "node/4081269533",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1244": {
+  "place_id": "1244",
+  "nome": "Oficina de Arte",
+  "categoria": "arts_centre",
+  "lat": -15.77697,
+  "lon": -47.88344,
+  "osm": "node/4156223788",
+  "tags": {
+   "phone": "+556132020220",
+   "amenity": "arts_centre",
+   "addr:housenumber": "52"
+  }
+ },
+ "1257": {
+  "place_id": "1257",
+  "nome": "Cursos de Artes",
+  "categoria": "arts_centre",
+  "lat": -15.7832,
+  "lon": -47.88276,
+  "osm": "node/4185561285",
+  "tags": {
+   "amenity": "arts_centre"
+  }
+ },
+ "1261": {
+  "place_id": "1261",
+  "nome": "Lanchonete Pimenta de Cheiro",
+  "categoria": "food_court",
+  "lat": -15.78551,
+  "lon": -47.88313,
+  "osm": "node/4185562604",
+  "tags": {
+   "amenity": "food_court",
+   "smoking": "no"
+  }
+ },
+ "1280": {
+  "place_id": "1280",
+  "nome": "Lanches",
+  "categoria": "fast_food",
+  "lat": -15.7883,
+  "lon": -47.88345,
+  "osm": "node/4195659580",
+  "tags": {
+   "amenity": "fast_food"
+  }
+ },
+ "1420": {
+  "place_id": "1420",
+  "nome": "Grande Café",
+  "categoria": "cafe",
+  "lat": -15.78719,
+  "lon": -47.88407,
+  "osm": "node/4585529781",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1422": {
+  "place_id": "1422",
+  "nome": "Subway",
+  "categoria": "fast_food",
+  "lat": -15.78713,
+  "lon": -47.88438,
+  "osm": "node/4585529788",
+  "tags": {
+   "brand": "Subway",
+   "amenity": "fast_food",
+   "cuisine": "sandwich"
+  }
+ },
+ "1486": {
+  "place_id": "1486",
+  "nome": "Horta Comunitária",
+  "categoria": "garden",
+  "lat": -15.76732,
+  "lon": -47.8798,
+  "osm": "node/4704216079",
+  "tags": {
+   "leisure": "garden"
+  }
+ },
+ "1487": {
+  "place_id": "1487",
+  "nome": "Horta Comunitária",
+  "categoria": "garden",
+  "lat": -15.76756,
+  "lon": -47.87925,
+  "osm": "node/4704216080",
+  "tags": {
+   "leisure": "garden"
+  }
+ },
+ "1554": {
+  "place_id": "1554",
+  "nome": "Gaudi Café",
+  "categoria": "cafe",
+  "lat": -15.79062,
+  "lon": -47.88318,
+  "osm": "node/4908141129",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1629": {
+  "place_id": "1629",
+  "nome": "Oficina Café",
+  "categoria": "cafe",
+  "lat": -15.78083,
+  "lon": -47.88914,
+  "osm": "node/5029115521",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1656": {
+  "place_id": "1656",
+  "nome": "Espaço Cultural Canteiro Central",
+  "categoria": "arts_centre",
+  "lat": -15.79739,
+  "lon": -47.88794,
+  "osm": "node/5116146130",
+  "tags": {
+   "amenity": "arts_centre"
+  }
+ },
+ "1657": {
+  "place_id": "1657",
+  "nome": "Café Civitá",
+  "categoria": "cafe",
+  "lat": -15.79622,
+  "lon": -47.89279,
+  "osm": "node/5124575930",
+  "tags": {
+   "amenity": "cafe",
+   "internet_access": "wlan"
+  }
+ },
+ "1660": {
+  "place_id": "1660",
+  "nome": "A Tribo",
+  "categoria": "restaurant",
+  "lat": -15.77136,
+  "lon": -47.88406,
+  "osm": "node/5129563422",
+  "tags": {
+   "amenity": "restaurant",
+   "diet:vegetarian": "only"
+  }
+ },
+ "1661": {
+  "place_id": "1661",
+  "nome": "Apetit Natural",
+  "categoria": "restaurant",
+  "lat": -15.7663,
+  "lon": -47.87817,
+  "osm": "node/5131056525",
+  "tags": {
+   "amenity": "restaurant",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "1703": {
+  "place_id": "1703",
+  "nome": "Maxsushi",
+  "categoria": "restaurant",
+  "lat": -15.80351,
+  "lon": -47.89238,
+  "osm": "node/5225096721",
+  "tags": {
+   "amenity": "restaurant",
+   "cuisine": "japanese;sushi"
+  }
+ },
+ "1705": {
+  "place_id": "1705",
+  "nome": "Nosso Quadrado",
+  "categoria": "cafe",
+  "lat": -15.80288,
+  "lon": -47.89312,
+  "osm": "node/5225539396",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1727": {
+  "place_id": "1727",
+  "nome": "Uai Bezinha!",
+  "categoria": "cafe",
+  "lat": -15.81955,
+  "lon": -47.91219,
+  "osm": "node/5299457845",
+  "tags": {
+   "amenity": "cafe"
+  }
+ },
+ "1783": {
+  "place_id": "1783",
+  "nome": "Melbourne Café & Co.",
+  "categoria": "cafe",
+  "lat": -15.79024,
+  "lon": -47.88467,
+  "osm": "node/5416977721",
+  "tags": {
+   "amenity": "cafe",
+   "website": "http://www.olamelbourne.com.br/",
+   "addr:street": "SHN Quadra 1",
+   "opening_hours": "Mo-Fr 08:15-17:30",
+   "outdoor_seating": "yes"
+  }
+ },
+ "1800": {
+  "place_id": "1800",
+  "nome": "Nutri Vida",
+  "categoria": "restaurant",
+  "lat": -15.77977,
+  "lon": -47.87595,
+  "osm": "node/5461939620",
+  "tags": {
+   "phone": "+55 61 3328 1404",
+   "amenity": "restaurant",
+   "diet:vegetarian": "yes"
+  }
+ },
+ "1843": {
+  "place_id": "1843",
+  "nome": "Quanto",
+  "categoria": "cafe",
+  "lat": -15.77756,
+  "lon": -47.88265,
+  "osm": "node/5766574433",
+  "tags": {
+   "amenity": "cafe",
+   "smoking": "no",
+   "addr:city": "Brasília",
+   "addr:street": "CLN 103/104",
+   "opening_hours": "Mo-Fr 11:00-21:00, Sa 09:00-21:00",
+   "internet_access": "yes",
+   "outdoor_seating": "yes"
+  }
+ },
+ "1940": {
+  "place_id": "1940",
+  "nome": "Buriti Zen Vegano",
+  "categoria": "restaurant",
+  "lat": -15.7661,
+  "lon": -47.87767,
+  "osm": "node/6236570866",
+  "tags": {
+   "amenity": "restaurant",
+   "diet:vegan": "only"
+  }
+ },
+ "1944": {
+  "place_id": "1944",
+  "nome": "Sabor do Café",
+  "categoria": "fast_food",
+  "lat": -15.79897,
+  "lon": -47.88692,
+  "osm": "node/6247734224",
+  "tags": {
+   "amenity": "fast_food"
+  }
+ },
+ "1945": {
+  "place_id": "1945",
+  "nome": "Cafeteria Metrô",
+  "categoria": "fast_food",
+  "lat": -15.79822,
+  "lon": -47.88674,
+  "osm": "node/6247734412",
+  "tags": {
+   "amenity": "fast_food"
+  }
+ },
+ "2089": {
+  "place_id": "2089",
+  "nome": "Cozinha do Salim",
+  "categoria": "restaurant",
+  "lat": -15.76551,
+  "lon": -47.88624,
+  "osm": "node/6496495586",
+  "tags": {
+   "phone": "+55 61 3347-2007",
+   "amenity": "restaurant",
+   "cuisine": "brazilian;arab",
+   "diet:vegan": "yes",
+   "addr:street": "SQN 107 Bloco D",
+   "opening_hours": "Mo-Su 17:00-00:00",
+   "diet:vegetarian": "only",
+   "addr:housenumber": "33"
+  }
+ },
+ "2149": {
+  "place_id": "2149",
+  "nome": "Espaço do Servidor",
+  "categoria": "food_court",
+  "lat": -15.7956,
+  "lon": -47.8612,
+  "osm": "node/6587306453",
+  "tags": {
+   "amenity": "food_court"
+  }
+ },
+ "2156": {
+  "place_id": "2156",
+  "nome": "Espaco Brasilia Eventos",
+  "categoria": "arts_centre",
+  "lat": -15.80012,
+  "lon": -47.90053,
+  "osm": "node/6641832077",
+  "tags": {
+   "amenity": "arts_centre"
+  }
+ },
+ "2176": {
+  "place_id": "2176",
+  "nome": "Sushi San",
+  "categoria": "restaurant",
+  "lat": -15.81129,
+  "lon": -47.89799,
+  "osm": "node/6779836007",
+  "tags": {
+   "amenity": "restaurant"
+  }
+ },
+ "2184": {
+  "place_id": "2184",
+  "nome": "Quadra Frescobol",
+  "categoria": "pitch",
+  "lat": -15.7937,
+  "lon": -47.89825,
+  "osm": "node/6799979543",
+  "tags": {
+   "sport": "freshnessball",
+   "access": "yes",
+   "leisure": "pitch"
+  }
+ },
+ "2325": {
+  "place_id": "2325",
+  "nome": "Parquinho de madeira",
+  "categoria": "playground",
+  "lat": -15.77966,
+  "lon": -47.88981,
+  "osm": "node/7179049890",
+  "tags": {
+   "leisure": "playground"
+  }
+ },
+ "4329": {
+  "place_id": "4329",
+  "nome": "PRAÇA DE ALIMENTAÇÃO",
+  "categoria": "food_court",
+  "lat": -15.78792,
+  "lon": -47.78018,
+  "osm": "way/1339855513",
+  "tags": {
+   "amenity": "food_court"
+  }
+ },
+ "4332": {
+  "place_id": "4332",
+  "nome": "Casa de Chá",
+  "categoria": "cafe",
+  "lat": -15.80078,
+  "lon": -47.86081,
+  "osm": "way/1340424680",
+  "tags": {
+   "amenity": "cafe",
+   "addr:city": "Brasilia"
+  }
+ },
+ "4374": {
+  "place_id": "4374",
+  "nome": "Quadra poliesportiva",
+  "categoria": "pitch",
+  "lat": -15.80834,
+  "lon": -47.88872,
+  "osm": "way/1356541833",
+  "tags": {
+   "sport": "futsal;basketball",
+   "access": "yes",
+   "leisure": "pitch"
+  }
+ },
+ "4375": {
+  "place_id": "4375",
+  "nome": "Parquinho",
+  "categoria": "playground",
+  "lat": -15.8083,
+  "lon": -47.88901,
+  "osm": "way/1356541834",
+  "tags": {
+   "access": "yes",
+   "leisure": "playground"
+  }
+ },
+ "4376": {
+  "place_id": "4376",
+  "nome": "Quadra de tênis",
+  "categoria": "pitch",
+  "lat": -15.80656,
+  "lon": -47.88655,
+  "osm": "way/1357081471",
+  "tags": {
+   "sport": "tennis",
+   "access": "yes",
+   "leisure": "pitch"
+  }
+ },
+ "4522": {
+  "place_id": "4522",
+  "nome": "Clube do Choro de Brasília",
+  "categoria": "arts_centre",
+  "lat": -15.78932,
+  "lon": -47.89936,
+  "osm": "way/1528284373",
+  "tags": {
+   "phone": "+55 61 99956 7369",
+   "amenity": "arts_centre",
+   "website": "https://clubedochoro.com.br/",
+   "addr:city": "Brasília",
+   "opening_hours": "Mo-Sa 18:00-22:00"
+  }
+ }
+}

@@ -59,6 +59,18 @@ Em vez de forçar a pessoa a preencher formulários frios, o sistema usa LLM par
 >
 > A proporção de pessoas idosas na sociedade aumentou nas últimas décadas, e estima-se que aproximadamente $25\%$ da população terá 60 anos ou mais nos próximos 20 a 40 anos. O isolamento social é predominante entre os idosos e as evidências indicam o efeito prejudicial que ele pode ter na saúde e no bem-estar. O objetivo desta revisão foi avaliar a eficácia de intervenções destinadas a aliviar o isolamento social e a solidão em idosos.
 
+### 2.4. Matriz de Barreiras e Decisões de Domínio (Resolução da Guiding Question #8)
+
+Em resposta direta à **Guiding Question #8** (*"Quais são os reais motivadores da solidão no público e quais barreiras físicas, cognitivas, emocionais ou de letramento digital os impedem de buscar novas conexões sociais na comunidade hoje?"*), o projeto mapeou cinco categorias de barreiras e estabeleceu mecanismos de engenharia e regras de domínio (formalizadas no [`GLOSSARY.md`](../../GLOSSARY.md) e nos ADRs em [`docs/adr/`](../adr/)) para neutralizá-las:
+
+| Dimensão da Barreira | Motivador / Dor Real no Público | Solução Arquitetural e de Domínio Implementada | Referência Normativa |
+| :--- | :--- | :--- | :--- |
+| **1. Física e Motora** | Receio de encontrar escadarias, calçadas inacessíveis ou distâncias incompatíveis com mobilidade reduzida (ex.: Persona Dona Helena). | Separação de **Acessibilidade Física** como atributo persistente no **Perfil Base**, atuando como *Hard Filter* eliminatório contra locais com `wheelchair=no` e priorizando locais planos e próximos via `PostGIS`. | [ADR-0002](../adr/0002-privacidade-barreiras-e-hard-filters.md) |
+| **2. Sensorial e Acústica** | Desconforto auditivo (presbiacusia em idosos) e sobrecarga sensorial de introvertidos em ambientes ruidosos ou superlotados. | Mapeamento explícito de **Tolerância Sensorial**; quando solicitada tolerância `baixo`, locais com `nivel_ruido=Alto` sofrem bloqueio eliminatório (*Hard Filter*). | [ADR-0002](../adr/0002-privacidade-barreiras-e-hard-filters.md) |
+| **3. Cognitiva (Fadiga de Decisão)** | Exaustão ao preencher formulários longos, negociar horários em chats de grupo ou responder a múltiplas perguntas de desambiguação. | **Slot de Pareamento** automático (sem negociação manual) e recomendação proativa *Zero-Turn* (exibição imediata de 3 cards variados a partir do **Perfil Base** mesmo quando o pedido inicial é vago). | [ADR-0001](../adr/0001-rag-vetorial-sem-clusters.md), [ADR-0003](../adr/0003-mediacao-passiva-e-quorum-seguro.md) |
+| **4. Letramento Digital** | Dificuldade de idosos com digitação em teclados móveis pequenos e fluxos de navegação complexos. | Entrada multimodal permitindo áudio livre transcrito (*Speech-to-Text*) integrado ao NLU e apresentação visual do Top-3 em cards de alto contraste com adesão em 1 toque. | [ADR-0003](../adr/0003-mediacao-passiva-e-quorum-seguro.md) |
+| **5. Emocional e Estigma Social** | Medo do "silêncio constrangedor" no primeiro encontro, receio de ficar sozinho com 1 desconhecido por desistências, ansiedade de última hora e aversão ao rótulo de "solitário". | Vocabulário positivo livre de estigma ([`GLOSSARY.md`](../../GLOSSARY.md)), descarte imediato de relatos emocionais em memória (LGPD), **Pauta Quebra-Gelo** passiva liberada 30 min antes, piso inegociável de **Quórum Mínimo** de 3 confirmados no **Check-in Final** e isenção de penalidade para **Desistência Prévia**. | [ADR-0002](../adr/0002-privacidade-barreiras-e-hard-filters.md), [ADR-0003](../adr/0003-mediacao-passiva-e-quorum-seguro.md) |
+
 ## 3. Mapa de Stakeholders e Personas
 
 ### 3.1. Personas

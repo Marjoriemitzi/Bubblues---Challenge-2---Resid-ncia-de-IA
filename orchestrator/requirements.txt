@@ -1,3 +1,9 @@
+# Orquestrador + agentes reais (Retrieval e Validation sobre PostgreSQL com PostGIS e pgvector).
+# O banco sobe e e populado por data-pipeline/setup_db.sh.
 langgraph>=1.0
 pydantic>=2.7
+psycopg[binary]>=3.1
+python-dotenv
+# Embedding da consulta (gerar_embeddings.py); baixa o modelo na primeira execucao.
+sentence-transformers
 pytest

@@ -328,7 +328,18 @@ Em código, `buscar(conexao, latitude, longitude, embedding_consulta, raio_m, ti
 
 Cada resultado do registro contém o local, o link do OSM, as etiquetas usadas e os fatores com valor, peso, contribuição e origem.
 
-### 10.2. Testes
+### 10.2. Regiões do DF
+
+A tabela `regioes` converte um nome ("Asa Sul") em coordenadas para a busca. Ela vem do OSM: regiões administrativas (`admin_level` 8 a 11) e `place=` (cidade, bairro, quadra).
+
+```bash
+python extract_regioes.py   # data/raw/regioes.json (Overpass; repete com espera se estiver ocupada)
+python load_regioes.py      # recria o conteudo da tabela regioes
+```
+
+Quando o mesmo nome aparece mais de uma vez, vale a `prioridade` (pontos `place=` antes do centro da relação administrativa). `regioes.resolver_regiao` tenta nome exato, nome contido no de uma região e região contida no texto. Se nada casar, o `RetrievalPipeline` não busca e pede esclarecimento ao usuário.
+
+### 10.3. Testes
 
 ```bash
 pip install -r requirements-dev.txt

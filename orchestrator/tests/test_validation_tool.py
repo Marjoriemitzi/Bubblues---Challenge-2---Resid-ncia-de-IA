@@ -10,10 +10,8 @@ Critérios de Aceite testados:
 """
 
 import os
-import sqlite3
 import pytest
 
-from orchestrator import build_graph, run
 from orchestrator.contracts import (
     AppliedFilters,
     EvidenceRecord,
@@ -23,21 +21,34 @@ from orchestrator.contracts import (
     StructuredRequest,
     ValidationFeedback,
 )
-from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION
-from orchestrator.stubs import _request, stub_communication, stub_nlu
-from orchestrator.validation_agent import ValidationAgent, validation_agent
+from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
+from orchestrator.stubs import _request
+from orchestrator.evidence_store import MemoryEvidenceStore
+from orchestrator.validation_tool import EvidenceValidator
+
+
+def _osm_do_item(place_id: str) -> dict:
+    """Campos de OSM que o Retrieval real anexaria ao SearchItem (vindos de `places`)."""
+    poi = BASE_POIS_CATALOG.get(place_id)
+    if not poi:
+        return {}  # lugar sem dado de OSM: o RNF01 tem que reprova-lo
+    tags = {k: poi[k] for k in ("wheelchair", "noise_level", "opening_hours") if poi.get(k)}
+    return {
+        "osm_id": poi["osm_id"],
+        "osm_type": poi["osm_type"],
+        "osm_tags": tags,
+        "is_public_verified": poi["is_public_verified"],
+    }
 
 
 @pytest.fixture
-def temp_db(tmp_path):
-    """Cria um banco SQLite temporário isolado para os testes."""
-    db_file = str(tmp_path / "test_evidencias.db")
-    return db_file
+def store():
+    return MemoryEvidenceStore()
 
 
 @pytest.fixture
-def agent(temp_db):
-    return ValidationAgent(db_path=temp_db)
+def agent(store):
+    return EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
 
 @pytest.fixture
@@ -84,6 +95,7 @@ def _search_item(
             compatibility_contribution=c_comp,
             sum_check=sum_val,
         ),
+        **_osm_do_item(place_id),
     )
 
 
@@ -311,141 +323,172 @@ def test_auditar_search_response_aprova_top3_valido_e_gera_evidence_records(agen
 
 
 # =========================================================================
-# 5. Persistência em SQLite (100% das buscas auditadas gravadas)
+# 5. Persistência da auditoria (Contrato 4) via EvidenceStore
 # =========================================================================
 
-def test_persistencia_100_porcento_em_evidencias_busca(temp_db, base_request):
-    custom_agent = ValidationAgent(db_path=temp_db)
-    item1 = _search_item(place_id="POI-01", rank=1)
-    item2 = _search_item(place_id="POI-02", rank=2)
-
-    sr = SearchResponse(
+def _response(base_request, items, consulta_id=None):
+    return SearchResponse(
         query_id=base_request.request_id,
+        consulta_id=consulta_id,
         status="SUCCESS",
         applied_filters=AppliedFilters(radius_km=3.0, expanded_once=False, amenities=["cafe"]),
-        results_count=2,
-        items=[item1, item2],
+        results_count=len(items),
+        items=items,
     )
 
-    fb, records = custom_agent.auditar_search_response(base_request, sr)
-    assert fb.approved is True
-    assert len(records) == 2
 
-    conn = sqlite3.connect(temp_db)
-    cur = conn.cursor()
-    cur.execute("SELECT evidence_id, candidate_name, approved, rnf01_passed, math_integrity_passed FROM evidencias_busca")
-    linhas = cur.fetchall()
-    conn.close()
+def test_top_aprovado_persiste_todas_as_evidencias(agent, store, base_request):
+    cid = "56c6f629-21e8-4014-80fe-e8c0a1b2c3d4"
+    sr = _response(base_request, [_search_item("POI-01", rank=1), _search_item("POI-02", rank=2)], cid)
+    fb, records = agent.auditar_search_response(base_request, sr)
+    assert fb.approved and len(records) == 2
+    assert len(store.linhas) == 2
+    assert all(l["approved"] and l["rnf01_passed"] and l["math_integrity_passed"] for l in store.linhas)
+    assert {l["consulta_id"] for l in store.linhas} == {cid}
 
-    assert len(linhas) == 2
-    for row in linhas:
-        assert row[2] == 1  # approved == True
-        assert row[3] == 1  # rnf01_passed == True
-        assert row[4] == 1  # math_integrity_passed == True
+
+def test_top_reprovado_grava_so_os_reprovados(agent, store, base_request):
+    ruim = SearchItem(
+        rank=2, place_id="POI-FANTASMA", name="Lugar Inexistente", distance_km=0.5,
+        cosine_similarity=0.9, final_score=0.8,
+        score_decomposition=ScoreDecomposition(
+            vector_contribution=0.3, distance_contribution=0.2,
+            reputation_contribution=0.15, compatibility_contribution=0.15, sum_check=0.8,
+        ),
+    )
+    sr = _response(base_request, [_search_item("POI-01", rank=1), ruim])
+    fb, records = agent.auditar_search_response(base_request, sr)
+    assert fb.approved is False and records == []
+    # POI-01 era bom, mas nao foi entregue: nao vira evidencia aprovada.
+    assert [l["place_id"] for l in store.linhas] == ["POI-FANTASMA"]
+    assert store.linhas[0]["approved"] is False and store.linhas[0]["rejection_reasons"]
+
+
+def test_sem_store_nao_persiste_e_nao_quebra(base_request):
+    ag = EvidenceValidator(metadata_catalog=BASE_POIS_CATALOG)
+    fb, _ = ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
+    assert fb.approved
+
+
+def test_falha_ao_gravar_sobe_a_excecao(base_request):
+    class Quebrada:
+        def salvar(self, auditorias, consulta_id=None):
+            raise ConnectionError("db fora")
+
+    ag = EvidenceValidator(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG)
+    with pytest.raises(ConnectionError):
+        ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
+
+
 
 
 # =========================================================================
-# 6. Integração com o Grafo LangGraph do Orquestrador
+# 7. Contrato 3 estendido: metadados de OSM vem no proprio SearchItem
 # =========================================================================
 
-def test_langgraph_integracao_fluxo_normal_com_validation_agent():
-    # Retrieval retorna candidato válido
-    def retrieval_bom(state):
-        return {
-            "search_response": {
-                "query_id": state["request_id"],
-                "status": "SUCCESS",
-                "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-                "results_count": 1,
-                "items": [
-                    {
-                        "rank": 1,
-                        "place_id": "POI-01",
-                        "name": "Ernesto Cafés Especiais",
-                        "distance_km": 1.2,
-                        "cosine_similarity": 0.9,
-                        "final_score": 0.86,
-                        "score_decomposition": {
-                            "vector_contribution": 0.36,
-                            "distance_contribution": 0.20,
-                            "reputation_contribution": 0.15,
-                            "compatibility_contribution": 0.15,
-                            "sum_check": 0.86,
-                        },
-                    }
-                ],
-            }
-        }
+def _item_osm(place_id="POI-X", **osm):
+    return _search_item(place_id=place_id, name="Local X").model_copy(update=osm)
 
-    graph = build_graph(
-        nlu=stub_nlu(),
-        retrieval=retrieval_bom,
-        validation=validation_agent,
-        communication=stub_communication,
+
+def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
+    agent_sem_catalogo = EvidenceValidator()
+    item = _item_osm(
+        osm_id=123456, osm_type="way",
+        osm_tags={"wheelchair": "yes", "noise_level": "baixo", "amenity": "cafe"},
+        is_public_verified=True,
     )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is True
+    ev = EvidenceRecord.model_validate(r["evidence_payload"])
+    assert ev.osm_reference.osm_link == "https://www.openstreetmap.org/way/123456"
+    # matched_tags vem das tags reais, sem valores inventados
+    assert ev.matched_tags == ["amenity=cafe", "wheelchair=yes", "noise_level=baixo"]
 
-    state = run(graph, "Quero um café calmo na Asa Sul", "req-graph-01")
-    trace_agents = [t.agent for t in state["agent_trace"]]
-    assert trace_agents == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert state["validation_feedback"].approved is True
-    assert len(state["evidence_records"]) == 1
-    assert state["final_response"] == "top-3 auditado"
+
+def test_item_sem_metadados_osm_e_reprovado_pelo_rnf01(base_request):
+    agent_sem_catalogo = EvidenceValidator()
+    r = agent_sem_catalogo.auditar_candidato(base_request, _item_osm())
+    assert r["approved"] is False
+    assert r["rnf01_passed"] is False
 
 
-def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
-    tentativas = {"n": 0}
-
-    def retrieval_com_correcao(state):
-        tentativas["n"] += 1
-        fb: ValidationFeedback = state.get("validation_feedback")
-        # Na primeira tentativa, envia candidato sem osm_id
-        if tentativas["n"] == 1:
-            pid = "POI-INVALIDO"
-            name = "Inexistente"
-        else:
-            # Na segunda tentativa, corrigiu e enviou POI-01
-            assert fb is not None
-            assert fb.approved is False
-            assert "POI-INVALIDO" in fb.rejected_place_ids
-            pid = "POI-01"
-            name = "Ernesto Cafés Especiais"
-
-        return {
-            "search_response": {
-                "query_id": state["request_id"],
-                "status": "SUCCESS",
-                "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-                "results_count": 1,
-                "items": [
-                    {
-                        "rank": 1,
-                        "place_id": pid,
-                        "name": name,
-                        "distance_km": 1.0,
-                        "cosine_similarity": 0.9,
-                        "final_score": 0.86,
-                        "score_decomposition": {
-                            "vector_contribution": 0.36,
-                            "distance_contribution": 0.20,
-                            "reputation_contribution": 0.15,
-                            "compatibility_contribution": 0.15,
-                            "sum_check": 0.86,
-                        },
-                    }
-                ],
-            }
-        }
-
-    graph = build_graph(
-        nlu=stub_nlu(),
-        retrieval=retrieval_com_correcao,
-        validation=validation_agent,
-        communication=stub_communication,
+def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
+    agent_sem_catalogo = EvidenceValidator()
+    item = _item_osm(
+        osm_id=99, osm_type="node", osm_tags={"wheelchair": "no"}, is_public_verified=True
     )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is False
+    assert r["hard_filters"] == {"wheelchair": "yes"}
 
-    state = run(graph, "Quero um café calmo na Asa Sul", "req-graph-02")
-    trace_agents = [t.agent for t in state["agent_trace"]]
-    assert trace_agents == [NLU, RETRIEVAL, VALIDATION, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert state["retry_count"] == 1
-    assert state["validation_feedback"].approved is True
-    assert state["final_response"] == "top-3 auditado"
+
+def test_osm_tags_ruido_alto_reprova_com_tolerancia_baixa(base_request):
+    agent_sem_catalogo = EvidenceValidator()
+    item = _item_osm(
+        osm_id=99, osm_type="node",
+        osm_tags={"wheelchair": "yes", "noise_level": "alto"}, is_public_verified=True,
+    )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is False
+    assert r["hard_filters"].get("noise_level") == "baixo"
+
+
+# =========================================================================
+# 8. Horario de funcionamento (OSM) contra o pedido: so reprova com evidencia
+# =========================================================================
+
+def _req_horario(slot=None, horas=None, **over):
+    return StructuredRequest.model_validate(_request(
+        "req-horario", temporal_constraints={"preferred_time_slot": slot, "specific_hours": horas},
+        accessibility_requirements={"wheelchair_required": False}, **over))
+
+
+def _item_com_horario(opening_hours):
+    tags = {"amenity": "cafe"}
+    if opening_hours is not None:
+        tags["opening_hours"] = opening_hours
+    return _search_item(place_id="POI-H", name="Lugar H").model_copy(
+        update={"osm_id": 4242, "osm_type": "node", "osm_tags": tags, "is_public_verified": True})
+
+
+@pytest.mark.parametrize("horas,txt", [
+    ("09:00-17:00", "até 22h"),                  # TC-15: Entre Eixos
+    ("Mo-Fr 08:15-17:30", "até 22h"),            # TC-15: Melbourne
+    ("Tu-Th 09:00-17:00", "sábado à noite"),     # TC-06: so abre dias uteis, de dia
+])
+def test_horario_incompativel_reprova_com_motivo_e_hard_filter(horas, txt):
+    r = EvidenceValidator().auditar_candidato(_req_horario(horas=txt), _item_com_horario(horas))
+    assert r["approved"] is False and r["constraints_passed"] is False
+    assert any("Horário" in m and horas in m for m in r["rejection_reasons"])
+    assert r["hard_filters"]["specific_hours"] == txt
+
+
+@pytest.mark.parametrize("horas,slot,txt", [
+    ("Mo-Su 06:00-22:00", None, "até 22h"),
+    ("Tu-Su 09:00-17:00", "manha", "manhã de domingo"),                 # TC-14: Jardim Botanico
+    ("Tu-Th 18:00-24:00; Fr-Sa 18:00-01:00", "tarde", None),            # TC-02: pub que abre as 18h
+    ("24/7", "madrugada", "03:30"),
+])
+def test_horario_compativel_aprova_e_registra_na_evidencia(horas, slot, txt):
+    r = EvidenceValidator().auditar_candidato(_req_horario(slot, txt), _item_com_horario(horas))
+    assert r["approved"] is True
+    assert any("compatível com o pedido" in n for n in r["evidence_payload"]["grounding_notes"])
+
+
+@pytest.mark.parametrize("horas", [None, "restricted", "Seg-Sab 11h-18h", "May-Sep Th-Fr 18:00-00:00"])
+def test_horario_ausente_ou_ilegivel_nao_reprova(horas):
+    r = EvidenceValidator().auditar_candidato(_req_horario(horas="até 22h"), _item_com_horario(horas))
+    assert r["approved"] is True and r["constraints_passed"] is True
+
+
+def test_pedido_sem_horario_nao_olha_o_opening_hours():
+    r = EvidenceValidator().auditar_candidato(_req_horario(), _item_com_horario("09:00-10:00"))
+    assert r["approved"] is True
+    assert any("não restringe horário" in n for n in r["evidence_payload"]["grounding_notes"])
+
+
+def test_horario_no_lote_reprova_so_quem_viola_e_pede_nova_busca():
+    bom, ruim = _item_com_horario("Mo-Su 06:00-23:00"), _item_com_horario("09:00-17:00").model_copy(update={"place_id": "POI-R", "name": "Ruim", "osm_id": 7})
+    lote = EvidenceValidator().auditar_lote(_req_horario(horas="até 22h"), [bom, ruim])
+    assert [a["place_id"] for a in lote["aprovados"]] == ["POI-H"] and [r["place_id"] for r in lote["reprovados"]] == ["POI-R"]
+    assert lote["requer_nova_busca"] is True
