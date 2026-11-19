@@ -16,10 +16,18 @@ import sys
 from pathlib import Path
 
 import requests
-from dotenv import find_dotenv, load_dotenv
+from dotenv import load_dotenv
 
 RAIZ = Path(__file__).resolve().parents[2]
 AV = RAIZ / "docs" / "avaliacao"
+
+
+def carregar_envs():
+    """Carrega TODOS os .env do cwd e dos pais (o primeiro valor definido vence).
+    find_dotenv() para no primeiro .env; em data-pipeline/ ele so tem as credenciais do banco."""
+    for pasta in [Path.cwd(), RAIZ, *RAIZ.parents]:
+        if (pasta / ".env").is_file():
+            load_dotenv(pasta / ".env")
 NOME = "bubbles-retrieval-osm-v1"
 DESCRICAO = (
     "Pedidos de teste do Bubbles com structured_request (NLU DeepSeek revisado) e relevancia graduada 0/1/2 "
@@ -73,7 +81,7 @@ def main():
         print(json.dumps(itens[0], ensure_ascii=False, indent=1)[:2500])
         return
 
-    load_dotenv(find_dotenv(usecwd=True))
+    carregar_envs()
     base, auth = os.environ["LANGFUSE_BASE_URL"].rstrip("/"), (os.environ["LANGFUSE_PUBLIC_KEY"], os.environ["LANGFUSE_SECRET_KEY"])
     api = lambda m, p, **kw: requests.request(m, f"{base}/api/public/{p}", auth=auth, timeout=60, **kw)
 

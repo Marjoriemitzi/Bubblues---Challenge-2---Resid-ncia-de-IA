@@ -25,9 +25,18 @@ from pathlib import Path
 RAIZ = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RAIZ))
 
-from dotenv import find_dotenv, load_dotenv  # noqa: E402
+from dotenv import load_dotenv  # noqa: E402
 
-load_dotenv(find_dotenv(usecwd=True))
+
+def carregar_envs():
+    """Carrega TODOS os .env do cwd e dos pais (o primeiro valor definido vence).
+    find_dotenv() para no primeiro .env; em data-pipeline/ ele so tem as credenciais do banco."""
+    for pasta in [Path.cwd(), RAIZ, *RAIZ.parents]:
+        if (pasta / ".env").is_file():
+            load_dotenv(pasta / ".env")
+
+
+carregar_envs()
 os.environ.setdefault("LANGFUSE_HOST", os.environ.get("LANGFUSE_BASE_URL", ""))
 
 from langfuse import Evaluation, get_client  # noqa: E402
