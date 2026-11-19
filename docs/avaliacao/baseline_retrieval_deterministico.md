@@ -51,3 +51,16 @@
 5. O `place_id` não é estável entre curadorias; os rótulos e a comparação usam o id do OSM (`node/123`).
 
 Para repetir: `python scripts/avaliacao/rodar_experimento.py --nome <nome-da-variante>` (o nome do run inclui o hash do commit).
+## Não-regressão da Fase B (Validation como ferramenta; nova topologia do grafo)
+
+Run `retrieval-pipeline-gate-588ecd5` (mesmo dataset, mesmos avaliadores), depois de mover a auditoria para dentro do
+Retrieval (`NLU → Retrieval → Communication`) e renomear Validation → `EvidenceValidator`.
+https://us.cloud.langfuse.com/project/cmwdi3aqt016pad0kkhqyj0qp/experiments/results?baseline=996927922d74ff38
+
+- **18 de 18 itens com entrega e scores idênticos** ao baseline (mesmos lugares, mesma ordem, P@3 0,756 e nDCG@3 0,628).
+- A única métrica que mudou foi a latência média do grafo: 0,054 s → 0,062 s (+8 ms: as tools abrem conexões extras
+  para listar categorias e resolver região).
+- A trilha do grafo encurtou: `nlu → retrieval → communication` (antes `nlu → retrieval → validation → communication`).
+- **O que este experimento não cobre:** nenhum item precisou de reconsulta (`reconsultas = 0` em todos), então o laço
+  busca → gate → reconsulta só é exercitado pelos testes (com `buscar` falso e contra o Postgres real em schema
+  temporário), não por dados reais do dataset.
