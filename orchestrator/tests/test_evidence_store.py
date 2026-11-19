@@ -10,8 +10,8 @@ import pytest
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.contracts import AppliedFilters, SearchResponse
 from orchestrator.evidence_store import PostgresEvidenceStore
-from orchestrator.tests.test_validation_agent import _search_item, base_request  # noqa: F401 (fixture)
-from orchestrator.validation_agent import ValidationAgent
+from orchestrator.tests.test_validation_tool import _search_item, base_request  # noqa: F401 (fixture)
+from orchestrator.validation_tool import EvidenceValidator
 
 RAIZ = Path(__file__).resolve().parents[2]
 SCHEMA = RAIZ / "data-pipeline" / "db" / "schema.sql"
@@ -37,7 +37,7 @@ def conexao():
 
 def _agente(conexao):
     store = PostgresEvidenceStore(conexao_factory=lambda: nullcontext(conexao))
-    return ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG)
+    return EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
 
 def _resposta(req, items, consulta_id):
@@ -78,7 +78,7 @@ def test_reprovado_grava_motivos_e_osm_nulo(conexao, base_request):
 
 def test_regravar_a_mesma_auditoria_nao_duplica(conexao, base_request):
     store = PostgresEvidenceStore(conexao_factory=lambda: nullcontext(conexao))
-    ag = ValidationAgent(metadata_catalog=BASE_POIS_CATALOG)
+    ag = EvidenceValidator(metadata_catalog=BASE_POIS_CATALOG)
     auditoria = ag.auditar_candidato(base_request, _search_item("POI-01"))
     store.salvar([auditoria], None)
     store.salvar([auditoria], None)

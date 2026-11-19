@@ -26,7 +26,7 @@ from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
 from orchestrator.retrieval_agent import RetrievalAgent, _pipeline  # noqa: E402
 from orchestrator.stubs import stub_communication, stub_nlu  # noqa: E402
-from orchestrator.validation_agent import ValidationAgent  # noqa: E402
+from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
 
 def _embedding_de_lugar(categoria):
@@ -72,7 +72,7 @@ def main():
             accessibility_requirements={"wheelchair_required": not args.sem_acessibilidade},
         ),
         retrieval=retrieval,
-        validation=ValidationAgent(store=PostgresEvidenceStore()),
+        validation=EvidenceValidator(store=PostgresEvidenceStore()),
         communication=stub_communication,
     )
     s = run(grafo, "(texto livre nao usado: NLU e stub)", args.request_id)

@@ -26,7 +26,7 @@ from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION
 from orchestrator.stubs import _request, stub_communication, stub_nlu
 from orchestrator.evidence_store import MemoryEvidenceStore
-from orchestrator.validation_agent import ValidationAgent
+from orchestrator.validation_tool import EvidenceValidator
 
 
 def _osm_do_item(place_id: str) -> dict:
@@ -50,7 +50,7 @@ def store():
 
 @pytest.fixture
 def agent(store):
-    return ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG)
+    return EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
 
 @pytest.fixture
@@ -367,7 +367,7 @@ def test_top_reprovado_grava_so_os_reprovados(agent, store, base_request):
 
 
 def test_sem_store_nao_persiste_e_nao_quebra(base_request):
-    ag = ValidationAgent(metadata_catalog=BASE_POIS_CATALOG)
+    ag = EvidenceValidator(metadata_catalog=BASE_POIS_CATALOG)
     fb, _ = ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
     assert fb.approved
 
@@ -377,7 +377,7 @@ def test_falha_ao_gravar_sobe_a_excecao(base_request):
         def salvar(self, auditorias, consulta_id=None):
             raise ConnectionError("db fora")
 
-    ag = ValidationAgent(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG)
+    ag = EvidenceValidator(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG)
     with pytest.raises(ConnectionError):
         ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
 
@@ -397,7 +397,7 @@ def test_grafo_vira_abstencao_segura_se_gravacao_falhar():
 
     graph = build_graph(
         nlu=stub_nlu(), retrieval=retrieval,
-        validation=ValidationAgent(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG),
+        validation=EvidenceValidator(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG),
         communication=stub_communication,
     )
     state = run(graph, "q", "req-falha-store")
@@ -443,7 +443,7 @@ def test_langgraph_integracao_fluxo_normal_com_validation_agent():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_bom,
-        validation=ValidationAgent(),
+        validation=EvidenceValidator(),
         communication=stub_communication,
     )
 
@@ -503,7 +503,7 @@ def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_com_correcao,
-        validation=ValidationAgent(),
+        validation=EvidenceValidator(),
         communication=stub_communication,
     )
 
@@ -524,7 +524,7 @@ def _item_osm(place_id="POI-X", **osm):
 
 
 def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
-    agent_sem_catalogo = ValidationAgent()
+    agent_sem_catalogo = EvidenceValidator()
     item = _item_osm(
         osm_id=123456, osm_type="way",
         osm_tags={"wheelchair": "yes", "noise_level": "baixo", "amenity": "cafe"},
@@ -539,14 +539,14 @@ def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
 
 
 def test_item_sem_metadados_osm_e_reprovado_pelo_rnf01(base_request):
-    agent_sem_catalogo = ValidationAgent()
+    agent_sem_catalogo = EvidenceValidator()
     r = agent_sem_catalogo.auditar_candidato(base_request, _item_osm())
     assert r["approved"] is False
     assert r["rnf01_passed"] is False
 
 
 def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
-    agent_sem_catalogo = ValidationAgent()
+    agent_sem_catalogo = EvidenceValidator()
     item = _item_osm(
         osm_id=99, osm_type="node", osm_tags={"wheelchair": "no"}, is_public_verified=True
     )
@@ -556,7 +556,7 @@ def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
 
 
 def test_osm_tags_ruido_alto_reprova_com_tolerancia_baixa(base_request):
-    agent_sem_catalogo = ValidationAgent()
+    agent_sem_catalogo = EvidenceValidator()
     item = _item_osm(
         osm_id=99, osm_type="node",
         osm_tags={"wheelchair": "yes", "noise_level": "alto"}, is_public_verified=True,

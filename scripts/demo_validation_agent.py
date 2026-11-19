@@ -30,7 +30,7 @@ from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_
 from orchestrator.stubs import _request, stub_communication, stub_nlu
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.evidence_store import MemoryEvidenceStore
-from orchestrator.validation_agent import ValidationAgent
+from orchestrator.validation_tool import EvidenceValidator
 
 
 def print_header(title: str):
@@ -42,7 +42,7 @@ def print_header(title: str):
 def main():
     # Demo sem banco: a auditoria vai para um store em memoria. Em producao e PostgresEvidenceStore.
     store = MemoryEvidenceStore()
-    agent = ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG)
+    agent = EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
     # -------------------------------------------------------------------------
     # CENÁRIO 1: Auditoria RNF01 (Zero Alucinação)
@@ -253,7 +253,7 @@ def main():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_com_feedback,
-        validation=ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG),
+        validation=EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG),
         communication=stub_communication,
     )
 
