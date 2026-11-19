@@ -1,9 +1,10 @@
 """Tools de busca do Retrieval: o que um agente LLM pode chamar (e so isso).
 
-Tres tools, todas deterministicas e sem LLM:
+Quatro tools, todas deterministicas e sem LLM:
   resolver_regiao(nome)       -> candidatos da tabela `regioes`
   listar_categorias()         -> valores reais de places.categoria
   buscar_lugares(...)         -> top-k real (busca.buscar), com filtros obrigatorios
+  validar_candidatos(busca_id)-> audita uma busca ja feita (EvidenceValidator): RNF01, restricoes, matematica
 
 GARANTIAS (nao dependem do prompt nem do que o LLM mandar):
   - Filtros obrigatorios (wheelchair, tolerancia de ruido, hard_filters do validador, lugares ja
@@ -24,8 +25,9 @@ import json
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Set
 
-from .contracts import SearchResponse, StructuredRequest, ValidationFeedback
+from .contracts import SearchItem, SearchResponse, StructuredRequest, ValidationFeedback
 from .retrieval_common import K_PADRAO, _pipeline, montar_parametros, registro_para_search_response
+from .validation_tool import EvidenceValidator
 
 MAX_BUSCAS = 4
 K_MAXIMO = 10
@@ -182,6 +184,13 @@ SCHEMAS: List[Dict[str, Any]] = [
             "k": {"type": "integer", "description": f"Quantos resultados (1 a {K_MAXIMO})."},
         },
     ),
+    _tool(
+        "validar_candidatos",
+        "Audita os candidatos de uma busca ja feita (busca_id de buscar_lugares): existencia no OpenStreetMap, "
+        "restricoes do pedido (acessibilidade, ruido, horario) e integridade do score. Os lugares reprovados e "
+        "os filtros sugeridos passam a valer AUTOMATICAMENTE nas proximas buscas. So audita o que veio do banco.",
+        {"busca_id": {"type": "string", "description": "Id devolvido por buscar_lugares, ex.: 'B1'."}},
+    ),
 ]
 
 
@@ -208,9 +217,13 @@ class RetrievalTools:
         buscar_fn: Optional[Callable[..., dict]] = None,
         regioes_fn: Optional[Callable[..., list]] = None,
         max_buscas: int = MAX_BUSCAS,
+        req: Optional[StructuredRequest] = None,
+        validator: Optional[EvidenceValidator] = None,
     ):
         self.contexto = contexto
         self.request_id = request_id
+        self.req = req
+        self.validator = validator
         self.runlog = runlog or RunLog()
         self.max_buscas = max_buscas
         self._conexao_factory = conexao_factory
@@ -240,7 +253,10 @@ class RetrievalTools:
 
     # -- despacho ------------------------------------------------------------------------
     def schemas(self) -> List[Dict[str, Any]]:
-        return SCHEMAS
+        """Schemas das tools disponiveis nesta execucao (validar_candidatos exige req e validator)."""
+        if self.validator is not None and self.req is not None:
+            return SCHEMAS
+        return [s for s in SCHEMAS if s["function"]["name"] != "validar_candidatos"]
 
     def executar(self, nome: str, argumentos: Any) -> Dict[str, Any]:
         """Executa uma tool. Erros de uso viram {"erro": ...}; falha de infra sobe."""
@@ -264,6 +280,7 @@ class RetrievalTools:
         "resolver_regiao": "resolver_regiao",
         "listar_categorias": "listar_categorias",
         "buscar_lugares": "buscar_lugares",
+        "validar_candidatos": "validar_candidatos",
     }
 
     @staticmethod
@@ -388,6 +405,43 @@ class RetrievalTools:
         SearchResponse.model_validate(resposta)  # falha cedo se o adaptador divergir do Contrato 3
         busca = self.runlog.registrar(registro.get("consulta_id"), resposta)
         return self._para_llm(busca, ajustes)
+
+    # -- tool 4 --------------------------------------------------------------------------
+    def validar_candidatos(self, busca_id: str) -> Dict[str, Any]:
+        """Auditoria CONSULTIVA de uma busca do RunLog (nao grava nada; o gate grava o que e entregue).
+
+        Reprovados e hard_filters sugeridos viram filtros obrigatorios das proximas buscas.
+        """
+        if self.validator is None or self.req is None:
+            raise ErroDeUso("validar_candidatos indisponivel nesta execucao")
+        try:
+            busca = self.runlog.obter(busca_id if isinstance(busca_id, str) else "")
+        except BuscaDesconhecida:
+            raise ErroDeUso(f"busca_id desconhecido: {busca_id!r}. Use um id devolvido por buscar_lugares") from None
+        itens = [SearchItem.model_validate(i) for i in busca.search_response["items"]]
+        if not itens:
+            raise ErroDeUso(f"a busca {busca.busca_id} nao tem candidatos para validar")
+        lote = self.validator.auditar_lote(self.req, itens)
+        reprovados = [
+            {"place_id": r["place_id"], "nome": r["candidate_name"], "motivos": r["rejection_reasons"]}
+            for r in lote["reprovados"]
+        ]
+        if reprovados:
+            self.contexto.aplicar_feedback(
+                ValidationFeedback(
+                    approved=False,
+                    rejected_place_ids=[r["place_id"] for r in reprovados],
+                    hard_filters=lote["hard_filters"],
+                    diagnostics=lote["diagnostics"],
+                )
+            )
+        return {
+            "busca_id": busca.busca_id,
+            "todos_aprovados": not reprovados,
+            "aprovados": [{"place_id": a["place_id"], "nome": a["candidate_name"]} for a in lote["aprovados"]],
+            "reprovados": reprovados,
+            "filtros_adicionados_as_proximas_buscas": lote["hard_filters"],
+        }
 
     @staticmethod
     def _para_llm(busca: BuscaRegistrada, ajustes: List[str]) -> Dict[str, Any]:

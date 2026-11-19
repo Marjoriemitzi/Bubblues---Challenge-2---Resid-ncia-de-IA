@@ -15,7 +15,9 @@ from orchestrator.retrieval_tools import (
     RetrievalTools,
     RunLog,
 )
+from orchestrator.evidence_store import MemoryEvidenceStore
 from orchestrator.stubs import _request
+from orchestrator.validation_tool import EvidenceValidator
 from orchestrator.tests.test_retrieval_pipeline import CAFE_OK, FakeBusca, _linha, _registro
 
 CATEGORIAS = [("cafe", 174), ("park", 442), ("restaurant", 1246)]
@@ -64,7 +66,7 @@ def _buscar(t, **over):
 # ------------------------------------------------------------------ schemas
 def test_schemas_sao_estritos_e_completos():
     nomes = [s["function"]["name"] for s in SCHEMAS]
-    assert nomes == ["resolver_regiao", "listar_categorias", "buscar_lugares"]
+    assert nomes == ["resolver_regiao", "listar_categorias", "buscar_lugares", "validar_candidatos"]
     for s in SCHEMAS:
         p = s["function"]["parameters"]
         assert s["function"]["strict"] is True and p["additionalProperties"] is False
@@ -266,3 +268,65 @@ def test_falha_de_infraestrutura_sobe_a_excecao():
     t._buscar_fn = quebrada
     with pytest.raises(ConnectionError):
         _buscar(t)
+
+
+
+# ------------------------------------------------------------------ tool 4: validar_candidatos
+def _com_validador(fake=None, req=None, feedback=None, store=None):
+    req = req or _req()
+    fake = fake or FakeBusca(_registro([_linha(1, "A", 111, CAFE_OK), _linha(2, "B", 222, CAFE_OK)]))
+    t = RetrievalTools(
+        ContextoBusca.de_pedido(req, feedback), "r1", conexao_factory=_conexao, embedder=lambda x: [0.1] * 768,
+        buscar_fn=fake, regioes_fn=lambda c, n, l: [], req=req, validator=EvidenceValidator(store=store),
+    )
+    return t, fake
+
+
+def test_schemas_so_inclui_validar_quando_ha_validador():
+    sem, _ = _tools()
+    com, _ = _com_validador()
+    assert [s["function"]["name"] for s in sem.schemas()] == ["resolver_regiao", "listar_categorias", "buscar_lugares"]
+    assert "validar_candidatos" in [s["function"]["name"] for s in com.schemas()]
+    assert "indisponivel" in sem.executar("validar_candidatos", {"busca_id": "B1"})["erro"]
+
+
+def test_validar_aprova_busca_conforme_e_nao_muda_o_contexto():
+    t, _ = _com_validador()
+    b = _buscar(t)["busca_id"]
+    r = t.executar("validar_candidatos", {"busca_id": b})
+    assert r["todos_aprovados"] is True and [x["place_id"] for x in r["aprovados"]] == ["1", "2"]
+    assert r["reprovados"] == [] and t.contexto.rejeitados == set()
+
+
+def test_validar_reprovados_viram_filtros_obrigatorios_das_proximas_buscas():
+    ruim = _linha(1, "Sem rampa", 111, {"amenity": "cafe", "wheelchair": "no"})
+    bom = _linha(2, "Com rampa", 222, CAFE_OK)
+    fake = FakeBusca(_registro([ruim, bom]), _registro([bom]))
+    t, fake = _com_validador(fake)
+    b = _buscar(t)["busca_id"]
+    r = t.executar("validar_candidatos", {"busca_id": b})
+    assert r["todos_aprovados"] is False
+    assert [x["place_id"] for x in r["reprovados"]] == ["1"] and r["reprovados"][0]["motivos"]
+    assert r["filtros_adicionados_as_proximas_buscas"] == {"wheelchair": "yes"}
+    assert t.contexto.rejeitados == {"1"}
+    _buscar(t)  # a proxima busca ja sai com o rejeitado excluido (k repoe)
+    assert fake.chamadas[1]["k"] == 4 and fake.chamadas[1]["etiquetas_desejadas"] == {"wheelchair": "yes"}
+
+
+def test_validar_nao_grava_nada_no_store():
+    store = MemoryEvidenceStore()
+    t, _ = _com_validador(store=store)
+    t.executar("validar_candidatos", {"busca_id": _buscar(t)["busca_id"]})
+    assert store.linhas == []  # consultivo: quem grava e o gate
+
+
+def test_validar_so_aceita_busca_do_runlog():
+    t, _ = _com_validador()
+    assert "desconhecido" in t.executar("validar_candidatos", {"busca_id": "B99"})["erro"]
+    assert "desconhecido" in t.executar("validar_candidatos", {"busca_id": 7})["erro"]
+
+
+def test_validar_busca_vazia_e_erro_de_uso():
+    t, _ = _com_validador(FakeBusca(_registro([])))
+    b = _buscar(t)["busca_id"]
+    assert "nao tem candidatos" in t.executar("validar_candidatos", {"busca_id": b})["erro"]
