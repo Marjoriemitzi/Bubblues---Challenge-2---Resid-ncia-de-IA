@@ -6,13 +6,15 @@ Este documento descreve **quem faz o quê**, **como os componentes colaboram** e
 
 O Bubbles recebe um pedido em português ("quero um café calmo e acessível na Asa Sul") e devolve **lugares públicos reais do Distrito Federal**, cada um com a prova de onde veio (OpenStreetMap) e uma auditoria. Um orquestrador **LangGraph** coordena três etapas:
 
-> **NLU** (entende o pedido) → **Retrieval** (busca e audita) → **Communication** (responde ao usuário)
+> **NLU Agent** (entende o pedido) → **Retrieval** (busca e audita) → **Communication Agent** (responde ao usuário)
+
+**Requisito de projeto:** os pontos de decisão sobre linguagem são **agentes LLM**: o NLU, o Retrieval (opcional, com fallback determinístico) e o **Communication**. Os três já existem como agentes.
 
 **Convenção de nomes.** Chamamos de **agente** só o que usa um LLM e decide por conta própria. O que é determinístico é **ferramenta**, **gate** ou **pipeline**:
 
 | Tipo | Usa LLM? | Exemplos |
 |---|---|---|
-| **Agente** | sim | NLU Agent; Retrieval Agent |
+| **Agente** | sim | NLU Agent; Retrieval Agent; **Communication Agent** |
 | **Ferramenta** | não | `resolver_regiao`, `listar_categorias`, `buscar_lugares`, `validar_candidatos` |
 | **Gate** | não | `RetrievalGate` (auditoria obrigatória) |
 | **Pipeline** | não | `RetrievalPipeline` (o Retrieval sem LLM; também é o fallback do agente) |
@@ -37,7 +39,7 @@ flowchart LR
             AG -->|"decisão final"| GATE
             PIPE -->|"seleção"| GATE
         end
-        COM["Communication<br/>resposta ao usuário"]
+        COM["Communication Agent<br/>LLM, com fallback"]
         NLU -->|"structured_request"| RET
         RET -->|"evidence_records"| COM
         NLU -.->|"fora de escopo,<br/>impossível ou ambíguo"| COM
@@ -90,9 +92,12 @@ Os **filtros obrigatórios** (acessibilidade, ruído, lugares já reprovados) s�
 ### RetrievalPipeline (sem LLM) · `retrieval_pipeline.py`
 - **Faz** a mesma coisa que o agente, mas de forma fixa: região → busca → gate → reconsulta com os filtros do feedback (até 2 vezes). É o **padrão** (`RETRIEVAL_MODE=deterministic`) e o **fallback** do agente.
 
-### Communication · `stubs.py` (hoje)
-- **Faz:** monta a resposta final a partir de `evidence_records` (ou a pergunta de esclarecimento, ou a abstenção).
-- **Estado atual:** no grafo padrão ainda é um **stub**. O PR #15 traz um formatador determinístico (`communication.py`) compatível com o nosso estado; **um Communication com LLM ainda não existe**. Os guardrails que ele deve respeitar: usar só dados dos `evidence_records` e citar a fonte OSM.
+### Communication Agent (LLM) · `communication_agent.py`
+- **Faz:** escreve a resposta final em linguagem natural a partir dos `evidence_records` e do `search_response`, no tom do perfil (Helena, Carla ou neutro).
+- **Evolui o PR #15:** o formatador determinístico dele (`communication.py`) continua no código como **fallback** e como caminho dos **desvios** (fora de escopo, impossível, esclarecimento, sem evidência aprovada), onde a mensagem já vem pronta do NLU e o LLM não é chamado.
+- **Avisos obrigatórios calculados em código:** raio ampliado (3 km → 6 km) e horário pedido que não pôde ser confirmado no OSM. O modelo precisa incorporá-los.
+- **Verificação em código antes de entregar** (RNF01): todo lugar e todo link existem nas evidências, nenhuma URL fora delas, toda distância em km bate com os dados e cada aviso aparece. Reprovou: o modelo recebe o motivo e tenta de novo (até 2 vezes); depois disso, ou se o LLM falhar, entra o formatador **mais** os avisos escritos em código.
+- **Configuração:** `COMMUNICATION_MODE=llm` (padrão em `criar_comunicacao`) ou `deterministic`.
 
 ### Orquestrador · `graph.py`
 - **Faz:** passa o estado entre os nós, decide o próximo (`route_after_nlu`, `route_after_retrieval`), valida cada contrato com Pydantic e registra o `agent_trace` (para onde foi e por quê). Uma falha de qualquer nó vira **abstenção segura**, sem vazar texto do usuário.
@@ -192,9 +197,7 @@ Na avaliação formal (`docs/avaliacao/fase_f_resultados.md`, 15 casos, 3 repeti
 
 ## 9. Limitações conhecidas
 
-- O **Communication ainda não usa LLM** e, no grafo padrão, é um stub.
+- O **Communication Agent existe e está testado, mas não está plugado no grafo padrão** (`scripts/run_orquestrador.py` ainda usa o stub); a demonstração o usa via `criar_comunicacao()`. Falta também validar o tom com pessoas e com os perfis Helena e Carla.
 - O **NLU com LLM existe, mas não está plugado no grafo padrão** (os scripts de avaliação injetam o `structured_request`).
-- Quando a busca **amplia o raio sozinha** (até 2x), o usuário **não é avisado** na resposta.
-- Quando o horário **não está no OSM** (só ~10% dos lugares têm), a resposta não diz que o pedido de horário **não foi confirmado**.
 - Só ~3,7% dos lugares têm `wheelchair=yes`, e nenhum tem `noise_level`: a busca acessível devolve poucas opções.
 - Região administrativa inteira (ex.: "Plano Piloto") usa o centro da caixa da relação OSM, que pode ficar longe do que o usuário imagina.

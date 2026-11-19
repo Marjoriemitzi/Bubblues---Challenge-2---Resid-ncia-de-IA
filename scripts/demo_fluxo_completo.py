@@ -9,7 +9,7 @@ e gera um relato em Markdown. Grava a consulta e a auditoria no banco (evidencia
   python scripts/demo_fluxo_completo.py "Quero um cafe calmo e acessivel para cadeirante na Asa Sul, de manha, para ler"
   python scripts/demo_fluxo_completo.py "..." --modo deterministic            # Retrieval sem LLM
   python scripts/demo_fluxo_completo.py "..." --md docs/demo_fluxo_completo.md  # grava o relato
-  python scripts/demo_fluxo_completo.py "..." --comunicacao /caminho/communication.py:communication_agent
+  python scripts/demo_fluxo_completo.py "..." --comunicacao orchestrator.communication:communication_agent   # formatador sem LLM
 """
 
 import argparse
@@ -34,6 +34,7 @@ def carregar_envs():
 
 carregar_envs()
 
+from orchestrator.communication_agent import criar_comunicacao  # noqa: E402
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
 from orchestrator.llm_client import LLMClient, extrair_chamadas  # noqa: E402
@@ -43,7 +44,6 @@ from orchestrator.retrieval_common import _pipeline  # noqa: E402
 from orchestrator.retrieval_factory import criar_retrieval, modo_atual  # noqa: E402
 from orchestrator.retrieval_gate import RetrievalGate  # noqa: E402
 from orchestrator.retrieval_tools import RetrievalTools, _resumo_tool, aquecer_modelo  # noqa: E402
-from orchestrator.stubs import stub_communication  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
 EVENTOS: list = []
@@ -66,7 +66,7 @@ def instrumentar():
     def chat(self, messages, **kw):
         t = time.time()
         msg = chat_orig(self, messages, **kw)
-        quem = "nlu" if kw.get("json_mode") else "retrieval"
+        quem = "nlu" if kw.get("json_mode") else ("retrieval" if kw.get("tools") else "communication")
         _gravar("llm", quem=quem, dur=time.time() - t, chamadas=[(c.nome, c.argumentos) for c in extrair_chamadas(msg)],
                 texto=(msg.content or "") if not extrair_chamadas(msg) else "")
         return msg
@@ -83,7 +83,7 @@ def instrumentar():
 
 def carregar_comunicacao(spec):
     if not spec:
-        return stub_communication, "stub (orchestrator/stubs.py)"
+        return criar_comunicacao(), "Communication Agent (LLM, com fallback deterministico)"
     alvo, _, fn = spec.partition(":")
     if alvo.endswith(".py"):
         s = importlib.util.spec_from_file_location("comunicacao_externa", alvo)
@@ -103,7 +103,7 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("pergunta")
     ap.add_argument("--modo", choices=("deterministic", "llm"), default="llm")
-    ap.add_argument("--comunicacao", help="'arquivo.py:funcao' ou 'modulo:funcao' (padrao: stub)")
+    ap.add_argument("--comunicacao", help="'arquivo.py:funcao' ou 'modulo:funcao' (padrao: Communication Agent LLM)")
     ap.add_argument("--md", help="grava o relato em Markdown neste arquivo")
     ap.add_argument("--request-id", default="demo-fluxo")
     a = ap.parse_args()
@@ -148,6 +148,8 @@ def montar_relato(a, estado, nome_com):
     for e in EVENTOS:
         if e["tipo"] == "llm" and e["quem"] == "nlu":
             L.append(f"- `{e['t']:5.1f}s` **NLU** chamou o LLM ({e['dur']:.1f} s) e devolveu o JSON validado pelo contrato.")
+        elif e["tipo"] == "llm" and e["quem"] == "communication":
+            L.append(f"- `{e['t']:5.1f}s` **Communication** chamou o LLM ({e['dur']:.1f} s) para redigir a resposta; o texto passa por verificação em código.")
         elif e["tipo"] == "llm":
             n_llm += 1
             if e["chamadas"]:
