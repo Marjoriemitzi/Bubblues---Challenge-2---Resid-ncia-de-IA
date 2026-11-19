@@ -113,6 +113,8 @@ class SearchItem(Contract):
 
 class SearchResponse(Contract):
     query_id: str
+    # Liga esta resposta ao registro da busca em evidencias_busca (UUID gerado pelo Retrieval).
+    consulta_id: str | None = None
     timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     status: Literal["SUCCESS", "NO_RESULTS", "OUT_OF_SCOPE", "EXPANDED_RADIUS"]
     applied_filters: AppliedFilters

@@ -10,7 +10,6 @@ Critérios de Aceite testados:
 """
 
 import os
-import sqlite3
 import pytest
 
 from orchestrator import build_graph, run
@@ -26,7 +25,8 @@ from orchestrator.contracts import (
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION
 from orchestrator.stubs import _request, stub_communication, stub_nlu
-from orchestrator.validation_agent import ValidationAgent, validation_agent
+from orchestrator.evidence_store import MemoryEvidenceStore
+from orchestrator.validation_agent import ValidationAgent
 
 
 def _osm_do_item(place_id: str) -> dict:
@@ -44,15 +44,13 @@ def _osm_do_item(place_id: str) -> dict:
 
 
 @pytest.fixture
-def temp_db(tmp_path):
-    """Cria um banco SQLite temporário isolado para os testes."""
-    db_file = str(tmp_path / "test_evidencias.db")
-    return db_file
+def store():
+    return MemoryEvidenceStore()
 
 
 @pytest.fixture
-def agent(temp_db):
-    return ValidationAgent(db_path=temp_db)
+def agent(store):
+    return ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
 
 @pytest.fixture
@@ -327,37 +325,85 @@ def test_auditar_search_response_aprova_top3_valido_e_gera_evidence_records(agen
 
 
 # =========================================================================
-# 5. Persistência em SQLite (100% das buscas auditadas gravadas)
+# 5. Persistência da auditoria (Contrato 4) via EvidenceStore
 # =========================================================================
 
-def test_persistencia_100_porcento_em_evidencias_busca(temp_db, base_request):
-    custom_agent = ValidationAgent(db_path=temp_db)
-    item1 = _search_item(place_id="POI-01", rank=1)
-    item2 = _search_item(place_id="POI-02", rank=2)
-
-    sr = SearchResponse(
+def _response(base_request, items, consulta_id=None):
+    return SearchResponse(
         query_id=base_request.request_id,
+        consulta_id=consulta_id,
         status="SUCCESS",
         applied_filters=AppliedFilters(radius_km=3.0, expanded_once=False, amenities=["cafe"]),
-        results_count=2,
-        items=[item1, item2],
+        results_count=len(items),
+        items=items,
     )
 
-    fb, records = custom_agent.auditar_search_response(base_request, sr)
-    assert fb.approved is True
-    assert len(records) == 2
 
-    conn = sqlite3.connect(temp_db)
-    cur = conn.cursor()
-    cur.execute("SELECT evidence_id, candidate_name, approved, rnf01_passed, math_integrity_passed FROM evidencias_busca")
-    linhas = cur.fetchall()
-    conn.close()
+def test_top_aprovado_persiste_todas_as_evidencias(agent, store, base_request):
+    cid = "56c6f629-21e8-4014-80fe-e8c0a1b2c3d4"
+    sr = _response(base_request, [_search_item("POI-01", rank=1), _search_item("POI-02", rank=2)], cid)
+    fb, records = agent.auditar_search_response(base_request, sr)
+    assert fb.approved and len(records) == 2
+    assert len(store.linhas) == 2
+    assert all(l["approved"] and l["rnf01_passed"] and l["math_integrity_passed"] for l in store.linhas)
+    assert {l["consulta_id"] for l in store.linhas} == {cid}
 
-    assert len(linhas) == 2
-    for row in linhas:
-        assert row[2] == 1  # approved == True
-        assert row[3] == 1  # rnf01_passed == True
-        assert row[4] == 1  # math_integrity_passed == True
+
+def test_top_reprovado_grava_so_os_reprovados(agent, store, base_request):
+    ruim = SearchItem(
+        rank=2, place_id="POI-FANTASMA", name="Lugar Inexistente", distance_km=0.5,
+        cosine_similarity=0.9, final_score=0.8,
+        score_decomposition=ScoreDecomposition(
+            vector_contribution=0.3, distance_contribution=0.2,
+            reputation_contribution=0.15, compatibility_contribution=0.15, sum_check=0.8,
+        ),
+    )
+    sr = _response(base_request, [_search_item("POI-01", rank=1), ruim])
+    fb, records = agent.auditar_search_response(base_request, sr)
+    assert fb.approved is False and records == []
+    # POI-01 era bom, mas nao foi entregue: nao vira evidencia aprovada.
+    assert [l["place_id"] for l in store.linhas] == ["POI-FANTASMA"]
+    assert store.linhas[0]["approved"] is False and store.linhas[0]["rejection_reasons"]
+
+
+def test_sem_store_nao_persiste_e_nao_quebra(base_request):
+    ag = ValidationAgent(metadata_catalog=BASE_POIS_CATALOG)
+    fb, _ = ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
+    assert fb.approved
+
+
+def test_falha_ao_gravar_sobe_a_excecao(base_request):
+    class Quebrada:
+        def salvar(self, auditorias, consulta_id=None):
+            raise ConnectionError("db fora")
+
+    ag = ValidationAgent(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG)
+    with pytest.raises(ConnectionError):
+        ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
+
+
+def test_grafo_vira_abstencao_segura_se_gravacao_falhar():
+    class Quebrada:
+        def salvar(self, auditorias, consulta_id=None):
+            raise ConnectionError("db fora")
+
+    def retrieval(state):
+        return {"search_response": {
+            "query_id": state["request_id"], "status": "SUCCESS",
+            "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
+            "results_count": 1,
+            "items": [_search_item("POI-01").model_dump()],
+        }}
+
+    graph = build_graph(
+        nlu=stub_nlu(), retrieval=retrieval,
+        validation=ValidationAgent(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG),
+        communication=stub_communication,
+    )
+    state = run(graph, "q", "req-falha-store")
+    assert state["error"] == "validation_agent: ConnectionError"
+    assert state["final_response"] == "abstencao"
+    assert not state.get("evidence_records")
 
 
 # =========================================================================
@@ -397,7 +443,7 @@ def test_langgraph_integracao_fluxo_normal_com_validation_agent():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_bom,
-        validation=validation_agent,
+        validation=ValidationAgent(),
         communication=stub_communication,
     )
 
@@ -457,7 +503,7 @@ def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_com_correcao,
-        validation=validation_agent,
+        validation=ValidationAgent(),
         communication=stub_communication,
     )
 
@@ -478,7 +524,7 @@ def _item_osm(place_id="POI-X", **osm):
 
 
 def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
-    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    agent_sem_catalogo = ValidationAgent()
     item = _item_osm(
         osm_id=123456, osm_type="way",
         osm_tags={"wheelchair": "yes", "noise_level": "baixo", "amenity": "cafe"},
@@ -493,14 +539,14 @@ def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
 
 
 def test_item_sem_metadados_osm_e_reprovado_pelo_rnf01(base_request):
-    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    agent_sem_catalogo = ValidationAgent()
     r = agent_sem_catalogo.auditar_candidato(base_request, _item_osm())
     assert r["approved"] is False
     assert r["rnf01_passed"] is False
 
 
 def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
-    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    agent_sem_catalogo = ValidationAgent()
     item = _item_osm(
         osm_id=99, osm_type="node", osm_tags={"wheelchair": "no"}, is_public_verified=True
     )
@@ -510,7 +556,7 @@ def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
 
 
 def test_osm_tags_ruido_alto_reprova_com_tolerancia_baixa(base_request):
-    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    agent_sem_catalogo = ValidationAgent()
     item = _item_osm(
         osm_id=99, osm_type="node",
         osm_tags={"wheelchair": "yes", "noise_level": "alto"}, is_public_verified=True,

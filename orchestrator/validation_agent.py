@@ -9,8 +9,7 @@ ao usuário final, garantindo:
      e adequação para idosos (`elder_friendly`).
   3. Integridade Matemática: valida que |sum(contribuições) - score_total| < 1e-5
      e que fatores estão no intervalo [0, 1].
-  4. Persistência: persiste 100% dos evidence_records aprovados (Contrato 4) na tabela
-     `evidencias_busca`.
+  4. Persistência: grava a auditoria (Contrato 4) em `evidencias_auditoria` (PostgreSQL), via EvidenceStore.
   5. Diagnóstico Estruturado e Hard Filters para o Retrieval_Agent em caso de reprovação.
 
 Compatível com o orquestrador LangGraph (AgentState -> dict) e utilizável como módulo
@@ -19,11 +18,9 @@ autônomo em scripts e protótipos legados.
 
 from __future__ import annotations
 
-import json
 import math
 import os
 import re
-import sqlite3
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -39,6 +36,7 @@ from .contracts import (
     StructuredRequest,
     ValidationFeedback,
 )
+from .evidence_store import EvidenceStore, PostgresEvidenceStore
 from .state import AgentState
 
 
@@ -137,49 +135,17 @@ class ValidationAgent:
 
     def __init__(
         self,
-        db_path: str = "banco_inicial.db",
+        store: Optional[EvidenceStore] = None,
         metadata_catalog: Optional[Dict[str, Dict[str, Any]]] = None,
         min_approved: int = 1,
     ):
-        self.db_path = db_path
+        # store=None: nao persiste (so testes/demos). Em producao use PostgresEvidenceStore;
+        # `validation_agent` (abaixo) ja vem configurado assim.
+        self.store = store
         self.min_approved = min_approved
         # Catalogo opcional, SO para testes/demos legados. Em producao os metadados
         # vem no proprio SearchItem (osm_id, osm_tags, is_public_verified).
         self.metadata_catalog = dict(metadata_catalog or {})
-        self._inicializar_tabela_evidencias()
-
-    def _inicializar_tabela_evidencias(self):
-        """Cria a tabela SQLite evidencias_busca se não existir."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute(
-                """
-                CREATE TABLE IF NOT EXISTS evidencias_busca (
-                    evidence_id TEXT PRIMARY KEY,
-                    request_id TEXT NOT NULL,
-                    osm_id TEXT,
-                    candidate_name TEXT,
-                    rnf01_passed INTEGER NOT NULL,
-                    constraints_passed INTEGER NOT NULL,
-                    math_integrity_passed INTEGER NOT NULL,
-                    approved INTEGER NOT NULL,
-                    score_total REAL,
-                    soma_contribuicoes REAL,
-                    erro_matematico REAL,
-                    score_contributions_json TEXT,
-                    rejection_reasons_json TEXT,
-                    retry_instruction TEXT,
-                    timestamp_utc TEXT NOT NULL,
-                    raw_evidence_json TEXT
-                );
-                """
-            )
-            conn.commit()
-            conn.close()
-        except Exception:
-            # Em ambientes sem escrita em disco no caminho default, segue sem crash
-            pass
 
     def _obter_metadados(self, place_id: Optional[str], nome: Optional[str]) -> Dict[str, Any]:
         """Recupera metadados adicionais do catálogo local para validação."""
@@ -475,52 +441,12 @@ class ValidationAgent:
             "evidence_payload": evidence_payload,
         }
 
-    def _persistir_evidencia(self, audit_result: Dict[str, Any]):
-        """Persiste o registro auditado na tabela SQLite evidencias_busca."""
-        try:
-            conn = sqlite3.connect(self.db_path)
-            cur = conn.cursor()
-            cur.execute(
-                """
-                INSERT OR REPLACE INTO evidencias_busca (
-                    evidence_id, request_id, osm_id, candidate_name,
-                    rnf01_passed, constraints_passed, math_integrity_passed, approved,
-                    score_total, soma_contribuicoes, erro_matematico,
-                    score_contributions_json, rejection_reasons_json, retry_instruction,
-                    timestamp_utc, raw_evidence_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    audit_result["evidence_id"],
-                    audit_result["request_id"],
-                    audit_result["osm_id"],
-                    audit_result["candidate_name"],
-                    int(audit_result["rnf01_passed"]),
-                    int(audit_result["constraints_passed"]),
-                    int(audit_result["math_integrity_passed"]),
-                    int(audit_result["approved"]),
-                    audit_result["score_total"],
-                    audit_result["soma_contribuicoes"],
-                    audit_result["erro_matematico"],
-                    json.dumps(audit_result["score_contributions"], ensure_ascii=False),
-                    json.dumps(audit_result["rejection_reasons"], ensure_ascii=False),
-                    audit_result["retry_instruction"],
-                    audit_result["timestamp_utc"],
-                    json.dumps(audit_result["evidence_payload"], ensure_ascii=False),
-                ),
-            )
-            conn.commit()
-            conn.close()
-        except Exception:
-            # Não interrompe a execução caso banco esteja em modo de leitura
-            pass
-
     def auditar_lote(
         self,
         structured_request: Union[Dict[str, Any], StructuredRequest],
         candidatos: List[Union[Dict[str, Any], SearchItem]],
     ) -> Dict[str, Any]:
-        """Audita uma lista de candidatos, persistindo e consolidando instruções de correção."""
+        """Audita uma lista de candidatos e consolida instruções de correção (nao persiste)."""
         aprovados = []
         reprovados = []
         instrucoes_para_retrieval = []
@@ -537,12 +463,8 @@ class ValidationAgent:
             auditoria = self.auditar_candidato(structured_request, cand)
             if auditoria["approved"]:
                 aprovados.append(auditoria)
-                # Persiste 100% das evidências aprovadas
-                self._persistir_evidencia(auditoria)
             else:
                 reprovados.append(auditoria)
-                # Persiste também candidatos auditados reprovados para rastreabilidade
-                self._persistir_evidencia(auditoria)
                 if auditoria["retry_instruction"]:
                     instrucoes_para_retrieval.append(
                         {
@@ -582,6 +504,12 @@ class ValidationAgent:
         lote = self.auditar_lote(structured_request, search_response.items)
         aprovados = lote["aprovados"]
         reprovados = lote["reprovados"]
+
+        # Rastro de auditoria, numa transacao so. Reprovados sempre; aprovados so se o top
+        # inteiro foi aprovado (so entao viram EvidenceRecord entregue). Falha de gravacao sobe.
+        if self.store is not None:
+            gravar = reprovados + (aprovados if not reprovados else [])
+            self.store.salvar(gravar, search_response.consulta_id)
 
         # Se houver qualquer candidato reprovado no lote avaliado:
         if reprovados:
@@ -640,10 +568,12 @@ class ValidationAgent:
         }
 
 
-# Instância padrão e função callable para build_graph
-_default_agent = ValidationAgent()
+_default_agent: Optional[ValidationAgent] = None
 
 
 def validation_agent(state: AgentState) -> Dict[str, Any]:
-    """Função de agente injetável diretamente no build_graph do LangGraph."""
+    """Função de agente injetável diretamente no build_graph (grava em PostgreSQL)."""
+    global _default_agent
+    if _default_agent is None:
+        _default_agent = ValidationAgent(store=PostgresEvidenceStore())
     return _default_agent(state)

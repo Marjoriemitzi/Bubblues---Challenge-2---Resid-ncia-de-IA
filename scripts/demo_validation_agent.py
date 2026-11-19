@@ -5,12 +5,11 @@ Executa a validação auditada dos critérios de aceite:
   1. Verificação RNF01: osm_id válido e is_public_verified == true.
   2. Auditoria de Restrições: wheelchair, ruído, horário.
   3. Integridade Matemática: |sum(contribuições) - score_total| < 1e-5.
-  4. Persistência do Contrato 4 (evidence_record) na tabela evidencias_busca.
+  4. Persistência da auditoria (Contrato 4) via EvidenceStore (aqui, em memória).
   5. Integração com o orquestrador LangGraph em caso de reconsulta e aprovação.
 """
 
 import json
-import sqlite3
 import sys
 from pathlib import Path
 
@@ -30,6 +29,7 @@ from orchestrator.contracts import (
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
 from orchestrator.stubs import _request, stub_communication, stub_nlu
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
+from orchestrator.evidence_store import MemoryEvidenceStore
 from orchestrator.validation_agent import ValidationAgent
 
 
@@ -40,11 +40,9 @@ def print_header(title: str):
 
 
 def main():
-    db_path = "evidencias_demo.db"
-    if Path(db_path).exists():
-        Path(db_path).unlink()
-
-    agent = ValidationAgent(db_path=db_path, metadata_catalog=BASE_POIS_CATALOG)
+    # Demo sem banco: a auditoria vai para um store em memoria. Em producao e PostgresEvidenceStore.
+    store = MemoryEvidenceStore()
+    agent = ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG)
 
     # -------------------------------------------------------------------------
     # CENÁRIO 1: Auditoria RNF01 (Zero Alucinação)
@@ -128,7 +126,7 @@ def main():
     # -------------------------------------------------------------------------
     # CENÁRIO 4: Aprovação de Top-3 Válido e Persistência do Contrato 4
     # -------------------------------------------------------------------------
-    print_header("CENÁRIO 4: Aprovação de Top-3 Conforme e Persistência de 100% em evidencias_busca")
+    print_header("CENÁRIO 4: Aprovação de Top-3 Conforme e Persistência da auditoria")
     candidatos_validos = [
         SearchItem(
             rank=1,
@@ -201,16 +199,10 @@ def main():
         print(f"      Score Total: {ev.total_score:.4f} | Teste Integridade: {ev.integrity_test.passed}")
         print(f"      Notas de Fundamentação (RNF01): {ev.grounding_notes[0]}")
 
-    # Verificando registros no banco SQLite
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-    cur.execute("SELECT evidence_id, candidate_name, approved, math_integrity_passed, rnf01_passed FROM evidencias_busca")
-    linhas = cur.fetchall()
-    conn.close()
-
-    print(f"\n🗄️  Registros Persistidos na Tabela 'evidencias_busca': {len(linhas)}")
+    linhas = store.linhas
+    print(f"\n🗄️  Registros de auditoria gravados (store): {len(linhas)}")
     for r in linhas:
-        print(f"   • [{r[0]}] {r[1]} -> Aprovado={bool(r[2])} (RNF01={bool(r[4])}, Math={bool(r[3])})")
+        print(f"   • [{r['evidence_id']}] {r['candidate_name']} -> Aprovado={r['approved']} (RNF01={r['rnf01_passed']}, Math={r['math_integrity_passed']})")
 
     # -------------------------------------------------------------------------
     # CENÁRIO 5: Integração no Orquestrador LangGraph (Loop de Reconsulta)
@@ -261,7 +253,7 @@ def main():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_com_feedback,
-        validation=ValidationAgent(db_path=db_path, metadata_catalog=BASE_POIS_CATALOG),
+        validation=ValidationAgent(store=store, metadata_catalog=BASE_POIS_CATALOG),
         communication=stub_communication,
     )
 

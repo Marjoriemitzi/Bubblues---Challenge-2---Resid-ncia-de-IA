@@ -205,7 +205,7 @@ def _grafo(fake, req_overrides=None):
     return build_graph(
         nlu=stub_nlu(spatial_constraints={"target_region": None, "max_radius_km": 3.0}, **(req_overrides or {})),
         retrieval=_agente(fake),
-        validation=ValidationAgent(db_path=":memory:"),
+        validation=ValidationAgent(),
         communication=stub_communication,
     )
 
@@ -242,7 +242,7 @@ def test_grafo_regiao_desconhecida_pergunta_ao_usuario():
     g = build_graph(
         nlu=stub_nlu(spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}),
         retrieval=_agente(fake, resolver_local=lambda regiao, con: None),
-        validation=ValidationAgent(db_path=":memory:"),
+        validation=ValidationAgent(),
         communication=stub_communication,
     )
     s = run(g, "q", "r-narnia")

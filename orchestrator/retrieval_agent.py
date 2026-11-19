@@ -155,6 +155,7 @@ def registro_para_search_response(
 
     return {
         "query_id": request_id,
+        "consulta_id": registro.get("consulta_id"),
         "status": status,
         "applied_filters": {
             "radius_km": registro["raio"]["final_m"] / 1000,
