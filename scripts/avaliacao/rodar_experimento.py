@@ -235,13 +235,14 @@ def main():
     ap.add_argument("--nome", default="baseline-retrieval-deterministico")
     ap.add_argument("--so", help="ids separados por virgula (teste rapido)")
     ap.add_argument("--modo", choices=("pipeline", "llm"), default="pipeline")
+    ap.add_argument("--prompt", choices=("v1", "v2"), default="v1", help="modo llm: versao do prompt do agente")
     ap.add_argument("--sem-fallback", action="store_true", help="modo llm: mede o agente cru (sem cair no pipeline)")
     args = ap.parse_args()
 
     global RETRIEVAL
     validador = EvidenceValidator(store=MemoryEvidenceStore())
     if args.modo == "llm":
-        RETRIEVAL = RetrievalAgent(validator=validador, fallback=None if args.sem_fallback else _AUTO_FALLBACK)
+        RETRIEVAL = RetrievalAgent(validator=validador, fallback=None if args.sem_fallback else _AUTO_FALLBACK, prompt=args.prompt)
     else:
         RETRIEVAL = RetrievalPipeline(validator=validador)
     aquecer_modelo()  # carrega o modelo antes de cronometrar (a latencia nao inclui o download/carga)
@@ -255,6 +256,8 @@ def main():
     meta = {
         "commit": sha + ("+alteracoes-locais" if sujo else ""), "branch": ramo, "dataset": DATASET, "gabarito": "osm_v1",
         "retrieval": ("agente LLM (DeepSeek)" + (" SEM fallback" if args.sem_fallback else " com fallback ao pipeline")) if args.modo == "llm" else "RetrievalPipeline determinístico (busca -> gate -> reconsulta interna)", "validation": "EvidenceValidator como ferramenta/gate, MAX_RETRIES=2", "llm": os.getenv("DEEPSEEK_MODEL", "deepseek-flash") if args.modo == "llm" else "-",
+        "llm_reasoning_effort": os.getenv("DEEPSEEK_REASONING_EFFORT", "none") if args.modo == "llm" else "-",
+        "llm_strict": os.getenv("DEEPSEEK_STRICT", "0") if args.modo == "llm" else "-", "prompt": args.prompt if args.modo == "llm" else "-",
         "embedding": "paraphrase-multilingual-mpnet-base-v2", "nlu": "structured_request do dataset (DeepSeek deepseek-chat revisado)",
         "politica_acessibilidade": "wheelchair=yes explicito", "k": "3", "anotador": "Claude (unico, nao cego)",
     }

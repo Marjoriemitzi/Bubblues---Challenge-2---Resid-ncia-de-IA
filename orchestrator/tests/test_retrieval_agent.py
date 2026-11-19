@@ -89,6 +89,18 @@ def test_o_modelo_ve_o_pedido_estruturado_sem_raw_query_e_as_quatro_tools():
     assert llm.parametros[0]["prazo"] is not None  # prazo total propagado ao cliente
 
 
+def test_prompt_v2_acrescenta_a_conferencia_e_o_padrao_continua_v1():
+    fake = FakeBusca(_registro([_bom(1, "A", 111)]))
+    v1 = LLMFalso(chamar(("buscar_lugares", BUSCA)), FINAL_B1)
+    v2 = LLMFalso(chamar(("buscar_lugares", BUSCA)), FINAL_B1)
+    _agente(v1, fake)[0](_estado())
+    _agente(v2, FakeBusca(_registro([_bom(1, "A", 111)])), prompt="v2")[0](_estado())
+    s1, s2 = v1.mensagens_recebidas[0][0]["content"], v2.mensagens_recebidas[0][0]["content"]
+    assert "CONFERENCIA ANTES DE ESCOLHER" not in s1 and "CONFERENCIA ANTES DE ESCOLHER" in s2 and s2.startswith(s1)
+    with pytest.raises(ValueError, match="prompt desconhecido"):
+        _agente(LLMFalso(), fake, prompt="v9")
+
+
 def test_o_historico_devolve_o_reasoning_content_ao_modelo():
     fake = FakeBusca(_registro([_bom(1, "A", 111)]))
     llm = LLMFalso(chamar(("buscar_lugares", BUSCA), raciocinio="vou buscar cafes na Asa Sul"), FINAL_B1)

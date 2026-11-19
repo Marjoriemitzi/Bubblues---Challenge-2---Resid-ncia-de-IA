@@ -66,6 +66,18 @@ REGRAS
 - Voce nao decide se um lugar pode ser entregue: o gate de auditoria decide depois da sua escolha.
 - Nao copie nem peca dados pessoais. Responda em portugues."""
 
+# v2: manda conferir os campos que a tool devolve ANTES de escolher. Escrito depois de ver as falhas do v1 nos casos
+# de avaliacao (TC-13: cozinha errada; TC-15: horario), entao os resultados dele no mesmo dataset sao otimistas.
+CONFERENCIA_V2 = """
+CONFERENCIA ANTES DE ESCOLHER (obrigatoria)
+- Para cada candidato, confira o que a ferramenta devolveu: `tags.opening_hours` contra o horario e o dia pedidos;
+  `tags.cuisine` e o `nome` contra a culinaria ou o tipo de lugar pedido (ex.: pedido de sushi nao aceita cozinha indiana);
+  `distancia_km` contra o raio do pedido.
+- Descarte quem contradiz o pedido COM EVIDENCIA nesses campos. Campo ausente NAO e motivo para descartar.
+- Prefira entregar menos lugares (use place_ids) a entregar um que contradiz o pedido."""
+
+PROMPTS = {"v1": SISTEMA, "v2": SISTEMA + CONFERENCIA_V2}
+
 FORMATO_FINAL = (
     'Responda agora SO com o JSON final: {"busca_escolhida": "B1" ou null, "place_ids": ["..."] (opcional), "motivo": "..."}.'
 )
@@ -120,8 +132,12 @@ class RetrievalAgent:
         max_retries: int = MAX_RETRIES,
         timeout_s: float = 60.0,
         max_tokens: int = 1500,
+        prompt: str = "v1",
         relogio: Callable[[], float] = time.monotonic,
     ):
+        if prompt not in PROMPTS:
+            raise ValueError(f"prompt desconhecido: {prompt!r}; use {sorted(PROMPTS)}")
+        self.prompt = prompt
         self._llm = llm
         self._colab = dict(conexao_factory=conexao_factory, embedder=embedder, buscar_fn=buscar_fn, regioes_fn=regioes_fn)
         self._validator = validator
@@ -175,7 +191,7 @@ class RetrievalAgent:
 
         pedido = req.model_dump(exclude={"raw_query"})
         mensagens: List[Dict[str, Any]] = [
-            {"role": "system", "content": SISTEMA},
+            {"role": "system", "content": PROMPTS[self.prompt]},
             {"role": "user", "content": "Pedido estruturado (k final = %d): %s" % (self.k, json.dumps(pedido, ensure_ascii=False))},
         ]
         usadas: Counter = Counter()
