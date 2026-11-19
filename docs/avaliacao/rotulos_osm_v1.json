@@ -1,5 +1,6 @@
 {
   "anotador": "Claude (unico, nao cego)",
+  "versao": "v1.1 (v1 + 3 lugares entregues pelo agente LLM)",
   "escala": "0/1/2",
   "casos": {
     "TC-01": {
@@ -1684,6 +1685,19 @@
           "motivo": "contraste; clube privado"
         },
         {
+          "place_id": "3471",
+          "osm": "way/227022746",
+          "nome": "Parque Ana Lídia",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 1.4,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: parque; mesas de jogos sem fonte"
+        },
+        {
           "place_id": "3764",
           "osm": "way/495849346",
           "nome": "Deck Sul",
@@ -2119,6 +2133,32 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "contraste; sem fonte"
+        },
+        {
+          "place_id": "1489",
+          "osm": "node/4716974234",
+          "nome": "Entre Eixos",
+          "categoria": "fast_food",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.52,
+          "grau": 0,
+          "evidencia": "osm",
+          "confianca": "M",
+          "motivo": "AGENTE LLM: Entre Eixos; OSM abre 09:00-17:00, nao atende 'aberto ate 22h'"
+        },
+        {
+          "place_id": "1783",
+          "osm": "node/5416977721",
+          "nome": "Melbourne Café & Co.",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.46,
+          "grau": 0,
+          "evidencia": "osm",
+          "confianca": "M",
+          "motivo": "AGENTE LLM: Melbourne Cafe; OSM Seg-Sex 08:15-17:30, nao atende 'aberto ate 22h'"
         }
       ]
     },

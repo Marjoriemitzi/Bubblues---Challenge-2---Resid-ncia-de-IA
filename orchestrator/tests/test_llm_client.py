@@ -188,6 +188,21 @@ def test_prazo_total_limita_as_tentativas_e_a_espera():
     assert llm.chamadas == 2
 
 
+def test_cada_requisicao_recebe_o_timeout_do_tempo_restante_do_prazo():
+    t = {"agora": 100.0}
+    fake = FakeOpenAI(ErroHTTP(503), _resp("ok"))
+    llm = LLMClient(client=fake, model="m", timeout=90.0, sleep=lambda s: t.__setitem__("agora", t["agora"] + s), relogio=lambda: t["agora"])
+    llm.chat([], prazo=160.0)  # 60 s de prazo, bem abaixo do timeout de 90 s
+    assert fake.chamadas[0]["timeout"] == 60.0
+    assert fake.chamadas[1]["timeout"] == pytest.approx(58.5)  # depois da espera de 1,5 s
+
+
+def test_sem_prazo_nao_define_timeout_por_requisicao():
+    fake = FakeOpenAI(_resp("ok"))
+    _llm(fake)[0].chat([])
+    assert "timeout" not in fake.chamadas[0]
+
+
 def test_prazo_ja_vencido_nem_chama_a_api():
     fake = FakeOpenAI(_resp("x"))
     llm = LLMClient(client=fake, model="m", relogio=lambda: 10.0)

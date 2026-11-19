@@ -324,3 +324,16 @@ _Sem candidatos rotulados._
 - Deck Sul (mesas de jogos): Diário do Poder. Jardim Botânico (orquidário): Catraca Livre, Agência Brasília, Quinto Andar.
 - Saboretto: Wanderlog. SESI Lab: Portal da Indústria.
 - Muitas fontes são antigas (2013–2025) e as próprias respostas recomendam confirmar horário e endereço atuais.
+## Revisão v1.1 (19/11/2026): 3 lugares entregues pelo agente LLM
+
+O experimento do agente LLM entregou 3 lugares que não estavam no pool. Foram rotulados com o mesmo protocolo e entram no gabarito
+(`rotulos_osm_v1.json`, `versao = v1.1`), para que pipeline e agente sejam comparados com os mesmos rótulos:
+
+| Caso | Lugar | Grau | Motivo |
+|---|---|:-:|---|
+| TC-12 | Parque Ana Lídia (`way/227022746`) | 1 | parque; mesas de jogos sem fonte |
+| TC-15 | Entre Eixos (`node/4716974234`) | 0 | OSM abre 09:00-17:00; o pedido é "aberto até às 22h" |
+| TC-15 | Melbourne Café & Co. (`node/5416977721`) | 0 | OSM Seg-Sex 08:15-17:30; idem |
+
+Os scores gravados no Langfuse para os runs anteriores foram calculados com os rótulos da época. Para comparar com o gabarito atual use
+`python scripts/avaliacao/recalcular_scores.py <run> <run>`.

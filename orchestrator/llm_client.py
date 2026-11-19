@@ -13,7 +13,8 @@ Configuracao (variaveis de ambiente; os .env da arvore sao carregados automatica
 
 Erros transitorios (429, 5xx, rede, resposta JSON vazia, `aborted`) sao repetidos com espera crescente.
 Erros definitivos (400, 401, 402, 422, resposta truncada...) falham na hora. A chave nunca entra em mensagens
-de erro. `prazo` (relogio monotonico) limita o tempo total de uma chamada, retries incluidos.
+de erro. `prazo` (relogio monotonico) limita o tempo total de uma chamada, retries incluidos: cada requisicao recebe
+o timeout `min(timeout, tempo restante)`, entao uma resposta lenta nao passa do prazo.
 
 Thinking + tools: a API EXIGE devolver o `reasoning_content` em todas as requisicoes seguintes (senao 400).
 `mensagem_para_dict` preserva esse campo; use-a para montar o historico.
@@ -159,6 +160,7 @@ class LLMClient:
         if reasoning_effort is not None and reasoning_effort not in ESFORCOS:
             raise LLMError(f"reasoning_effort invalido: {reasoning_effort!r}; use {sorted(ESFORCOS)}")
         self._client = client
+        self.timeout = timeout
         self.model = model or os.getenv("DEEPSEEK_MODEL", MODELO_PADRAO)
         self.reasoning_effort = reasoning_effort
         self.max_tentativas = max_tentativas
@@ -207,6 +209,8 @@ class LLMClient:
             if prazo is not None and self._relogio() >= prazo:
                 raise LLMError(f"tempo total excedido antes da tentativa {tentativa}: {ultimo}")
             self.uso.chamadas += 1
+            if prazo is not None:  # uma requisicao lenta tambem nao pode estourar o prazo total
+                kwargs["timeout"] = max(1.0, min(self.timeout, prazo - self._relogio()))
             try:
                 resp = self._client.chat.completions.create(**kwargs)
             except Exception as exc:  # noqa: BLE001 (classificamos abaixo)
