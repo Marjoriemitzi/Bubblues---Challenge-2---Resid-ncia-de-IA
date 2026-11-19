@@ -29,7 +29,8 @@ from orchestrator.contracts import (
 )
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
 from orchestrator.stubs import _request, stub_communication, stub_nlu
-from orchestrator.validation_agent import ValidationAgent, validation_agent
+from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
+from orchestrator.validation_agent import ValidationAgent
 
 
 def print_header(title: str):
@@ -43,7 +44,7 @@ def main():
     if Path(db_path).exists():
         Path(db_path).unlink()
 
-    agent = ValidationAgent(db_path=db_path)
+    agent = ValidationAgent(db_path=db_path, metadata_catalog=BASE_POIS_CATALOG)
 
     # -------------------------------------------------------------------------
     # CENÁRIO 1: Auditoria RNF01 (Zero Alucinação)
@@ -260,7 +261,7 @@ def main():
     graph = build_graph(
         nlu=stub_nlu(),
         retrieval=retrieval_com_feedback,
-        validation=validation_agent,
+        validation=ValidationAgent(db_path=db_path, metadata_catalog=BASE_POIS_CATALOG),
         communication=stub_communication,
     )
 

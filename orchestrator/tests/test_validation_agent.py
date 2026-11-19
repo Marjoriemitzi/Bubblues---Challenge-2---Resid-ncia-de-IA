@@ -23,9 +23,24 @@ from orchestrator.contracts import (
     StructuredRequest,
     ValidationFeedback,
 )
+from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION
 from orchestrator.stubs import _request, stub_communication, stub_nlu
 from orchestrator.validation_agent import ValidationAgent, validation_agent
+
+
+def _osm_do_item(place_id: str) -> dict:
+    """Campos de OSM que o Retrieval real anexaria ao SearchItem (vindos de `places`)."""
+    poi = BASE_POIS_CATALOG.get(place_id)
+    if not poi:
+        return {}  # lugar sem dado de OSM: o RNF01 tem que reprova-lo
+    tags = {k: poi[k] for k in ("wheelchair", "noise_level", "opening_hours") if poi.get(k)}
+    return {
+        "osm_id": poi["osm_id"],
+        "osm_type": poi["osm_type"],
+        "osm_tags": tags,
+        "is_public_verified": poi["is_public_verified"],
+    }
 
 
 @pytest.fixture
@@ -84,6 +99,7 @@ def _search_item(
             compatibility_contribution=c_comp,
             sum_check=sum_val,
         ),
+        **_osm_do_item(place_id),
     )
 
 
@@ -372,6 +388,7 @@ def test_langgraph_integracao_fluxo_normal_com_validation_agent():
                             "compatibility_contribution": 0.15,
                             "sum_check": 0.86,
                         },
+                        **_osm_do_item("POI-01"),
                     }
                 ],
             }
@@ -431,6 +448,7 @@ def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
                             "compatibility_contribution": 0.15,
                             "sum_check": 0.86,
                         },
+                        **_osm_do_item(pid),
                     }
                 ],
             }
@@ -449,3 +467,54 @@ def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
     assert state["retry_count"] == 1
     assert state["validation_feedback"].approved is True
     assert state["final_response"] == "top-3 auditado"
+
+
+# =========================================================================
+# 7. Contrato 3 estendido: metadados de OSM vem no proprio SearchItem
+# =========================================================================
+
+def _item_osm(place_id="POI-X", **osm):
+    return _search_item(place_id=place_id, name="Local X").model_copy(update=osm)
+
+
+def test_item_com_osm_no_proprio_item_aprova_sem_catalogo(base_request):
+    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    item = _item_osm(
+        osm_id=123456, osm_type="way",
+        osm_tags={"wheelchair": "yes", "noise_level": "baixo", "amenity": "cafe"},
+        is_public_verified=True,
+    )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is True
+    ev = EvidenceRecord.model_validate(r["evidence_payload"])
+    assert ev.osm_reference.osm_link == "https://www.openstreetmap.org/way/123456"
+    # matched_tags vem das tags reais, sem valores inventados
+    assert ev.matched_tags == ["amenity=cafe", "wheelchair=yes", "noise_level=baixo"]
+
+
+def test_item_sem_metadados_osm_e_reprovado_pelo_rnf01(base_request):
+    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    r = agent_sem_catalogo.auditar_candidato(base_request, _item_osm())
+    assert r["approved"] is False
+    assert r["rnf01_passed"] is False
+
+
+def test_osm_tags_wheelchair_no_gera_hard_filter(base_request):
+    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    item = _item_osm(
+        osm_id=99, osm_type="node", osm_tags={"wheelchair": "no"}, is_public_verified=True
+    )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is False
+    assert r["hard_filters"] == {"wheelchair": "yes"}
+
+
+def test_osm_tags_ruido_alto_reprova_com_tolerancia_baixa(base_request):
+    agent_sem_catalogo = ValidationAgent(db_path=":memory:")
+    item = _item_osm(
+        osm_id=99, osm_type="node",
+        osm_tags={"wheelchair": "yes", "noise_level": "alto"}, is_public_verified=True,
+    )
+    r = agent_sem_catalogo.auditar_candidato(base_request, item)
+    assert r["approved"] is False
+    assert r["hard_filters"].get("noise_level") == "baixo"

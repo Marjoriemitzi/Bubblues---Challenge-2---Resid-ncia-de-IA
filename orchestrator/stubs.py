@@ -60,6 +60,11 @@ def stub_retrieval(state):
             "compatibility_contribution": 0.13,
             "sum_check": 0.8,
         },
+        # Metadados de OSM como o Retrieval real os devolveria (ids ficticios de teste).
+        "osm_id": 1 if pid == "POI-01" else 2,
+        "osm_type": "node",
+        "osm_tags": {"wheelchair": "yes", "noise_level": "baixo"},
+        "is_public_verified": True,
     }
     return {
         "search_response": {

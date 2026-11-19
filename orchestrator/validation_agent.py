@@ -41,81 +41,35 @@ from .contracts import (
 )
 from .state import AgentState
 
-# Catálogo padrão de Brasília com dados OSM para enriquecimento de POIs conhecidos
-BASE_POIS_CATALOG: Dict[str, Dict[str, Any]] = {
-    "POI-01": {
-        "place_id": "POI-01",
-        "name": "Ernesto Cafés Especiais",
-        "osm_id": 482910482,
-        "osm_type": "node",
-        "is_public_verified": True,
-        "wheelchair": "yes",
-        "elder_friendly": True,
-        "noise_level": "baixo",
-        "opening_hours": "07:00-20:00",
-        "tags": ["cafe", "calmo", "acessivel", "leitura", "conversa", "brunch", "asa sul"],
-    },
-    "POI-02": {
-        "place_id": "POI-02",
-        "name": "Parque da Cidade Dona Sarah Kubitschek",
-        "osm_id": 918237412,
-        "osm_type": "way",
-        "is_public_verified": True,
-        "wheelchair": "yes",
-        "elder_friendly": True,
-        "noise_level": "moderado",
-        "opening_hours": "06:00-22:00",
-        "tags": ["parque", "ar livre", "caminhada", "pista plana", "acessivel", "pet", "xadrez", "sombra"],
-    },
-    "POI-03": {
-        "place_id": "POI-03",
-        "name": "Sephinah Casa de Chá e Cafeteria",
-        "osm_id": 593817261,
-        "osm_type": "node",
-        "is_public_verified": True,
-        "wheelchair": "yes",
-        "elder_friendly": True,
-        "noise_level": "baixo",
-        "opening_hours": "08:00-19:00",
-        "tags": ["cafe", "casa de cha", "calmo", "acessivel", "leitura", "conversa", "asa sul"],
-    },
-    "Sebinho Livraria Café e Bistrô Asa Norte": {
-        "place_id": "POI-SEBINHO",
-        "name": "Sebinho Livraria Café e Bistrô Asa Norte",
-        "osm_id": 1849203941,
-        "osm_type": "node",
-        "is_public_verified": True,
-        "wheelchair": "yes",
-        "elder_friendly": True,
-        "noise_level": "baixo",
-        "opening_hours": "09:00-22:00",
-        "tags": ["livraria", "cafe", "bistro", "calmo", "acessivel", "leitura", "asa norte"],
-    },
-    "Parque da Cidade Sarah Kubitschek": {
-        "place_id": "POI-02",
-        "name": "Parque da Cidade Sarah Kubitschek",
-        "osm_id": 2938475610,
-        "osm_type": "way",
-        "is_public_verified": True,
-        "wheelchair": "yes",
-        "elder_friendly": True,
-        "noise_level": "moderado",
-        "opening_hours": "06:00-22:00",
-        "tags": ["parque", "ar livre", "caminhada", "acessivel"],
-    },
-    "Ernesto Cafés Especiais Asa Sul": {
-        "place_id": "POI-01",
-        "name": "Ernesto Cafés Especiais Asa Sul",
-        "osm_id": 4455667788,
-        "osm_type": "node",
-        "is_public_verified": True,
-        "wheelchair": "no",  # Configurado propositalmente para testar reprovação
-        "elder_friendly": True,
-        "noise_level": "baixo",
-        "opening_hours": "07:00-20:00",
-        "tags": ["cafe", "calmo", "asa sul"],
-    },
-}
+
+# Tags do OSM que entram em `matched_tags` do Contrato 4 (so as que o item realmente tem).
+_TAGS_RELEVANTES = (
+    "amenity", "leisure", "shop", "cuisine", "wheelchair",
+    "noise_level", "nivel_ruido", "outdoor_seating", "elder_friendly",
+)
+
+
+def _metadados_do_item(cand: Dict[str, Any]) -> Dict[str, Any]:
+    """Deriva wheelchair/noise_level/opening_hours/elder_friendly das `osm_tags` do item.
+
+    So preenche o que a tag realmente informa; nada e inventado.
+    """
+    tags = cand.get("osm_tags") or {}
+    out: Dict[str, Any] = {}
+    if tags.get("wheelchair"):
+        out["wheelchair"] = tags["wheelchair"]
+    noise = tags.get("noise_level") or tags.get("nivel_ruido")
+    if noise:
+        out["noise_level"] = noise
+    if tags.get("opening_hours"):
+        out["opening_hours"] = tags["opening_hours"]
+    elder = str(tags.get("elder_friendly", "")).strip().lower()
+    if elder in ("yes", "true", "sim"):
+        out["elder_friendly"] = True
+    elif elder in ("no", "false", "nao", "não"):
+        out["elder_friendly"] = False
+    out["matched_tags"] = [f"{k}={tags[k]}" for k in _TAGS_RELEVANTES if tags.get(k)]
+    return out
 
 
 def _extrair_osm_id_e_tipo(osm_id_raw: Any, osm_type_raw: Optional[str] = None) -> Tuple[Optional[int], str]:
@@ -189,9 +143,9 @@ class ValidationAgent:
     ):
         self.db_path = db_path
         self.min_approved = min_approved
-        self.metadata_catalog = dict(BASE_POIS_CATALOG)
-        if metadata_catalog:
-            self.metadata_catalog.update(metadata_catalog)
+        # Catalogo opcional, SO para testes/demos legados. Em producao os metadados
+        # vem no proprio SearchItem (osm_id, osm_tags, is_public_verified).
+        self.metadata_catalog = dict(metadata_catalog or {})
         self._inicializar_tabela_evidencias()
 
     def _inicializar_tabela_evidencias(self):
@@ -264,7 +218,11 @@ class ValidationAgent:
 
         # Mescla metadados do catálogo
         meta = self._obter_metadados(cand_id, nome)
-        merged_candidato = {**meta, **cand_dict}
+        # Ordem de precedencia: catalogo (so testes) < tags do item < campos explicitos do item.
+        # Valores None nao sobrescrevem: ausencia de dado nao pode apagar dado conhecido.
+        derivados = _metadados_do_item(cand_dict)
+        explicitos = {k: v for k, v in cand_dict.items() if v is not None}
+        merged_candidato = {**meta, **derivados, **explicitos}
 
         osm_id_raw = merged_candidato.get("osm_id")
         osm_type_raw = merged_candidato.get("osm_type")
@@ -463,12 +421,12 @@ class ValidationAgent:
         grounding_notes = [
             f"Estabelecimento verificado e público no OpenStreetMap (https://www.openstreetmap.org/{parsed_osm_type}/{parsed_osm_id or 0}).",
             f"Acessibilidade: wheelchair={cand_wheelchair or 'não especificado'}.",
-            f"Nível de ruído verificado: {cand_noise or 'tranquilo'}.",
+            f"Nível de ruído: {cand_noise or 'não informado'}.",
         ]
         if cand_hours:
             grounding_notes.append(f"Horário de funcionamento: {cand_hours}.")
 
-        matched_tags = merged_candidato.get("tags") or ["cafe", "acessivel", "publico"]
+        matched_tags = merged_candidato.get("tags") or merged_candidato.get("matched_tags") or []
         if not isinstance(matched_tags, list):
             matched_tags = [str(matched_tags)]
 

@@ -102,6 +102,13 @@ class SearchItem(Contract):
     cosine_similarity: float = Field(ge=0, le=1)
     final_score: float = Field(ge=0, le=1)
     score_decomposition: ScoreDecomposition
+    # Metadados do OpenStreetMap, vindos de `places` no PostgreSQL. O Validation_Agent
+    # audita SO o que chega aqui (RNF01): sem osm_id valido ou sem
+    # is_public_verified=True o candidato e reprovado.
+    osm_id: int | None = None
+    osm_type: str | None = None  # node | way | relation
+    osm_tags: dict[str, str] = Field(default_factory=dict)  # wheelchair, noise_level, opening_hours...
+    is_public_verified: bool | None = None
 
 
 class SearchResponse(Contract):
