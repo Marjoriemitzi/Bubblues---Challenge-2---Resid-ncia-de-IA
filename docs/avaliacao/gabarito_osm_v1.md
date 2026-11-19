@@ -335,5 +335,4 @@ O experimento do agente LLM entregou 3 lugares que não estavam no pool. Foram r
 | TC-15 | Entre Eixos (`node/4716974234`) | 0 | OSM abre 09:00-17:00; o pedido é "aberto até às 22h" |
 | TC-15 | Melbourne Café & Co. (`node/5416977721`) | 0 | OSM Seg-Sex 08:15-17:30; idem |
 
-Os scores gravados no Langfuse para os runs anteriores foram calculados com os rótulos da época. Para comparar com o gabarito atual use
-`python scripts/avaliacao/recalcular_scores.py <run> <run>`.
+Os scores gravados no Langfuse para os runs anteriores foram calculados com os rótulos da época.

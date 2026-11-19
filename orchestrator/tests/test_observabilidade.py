@@ -170,14 +170,30 @@ def test_generation_com_retry_conta_as_requisicoes_e_erro_marca_o_span(lf):
 
 
 # ------------------------------------------------------------------ configuracao RETRIEVAL_MODE
-def test_modo_padrao_e_deterministico_e_o_ambiente_vence(monkeypatch):
+def test_modo_padrao_e_llm_e_o_ambiente_vence(monkeypatch):
     monkeypatch.delenv("RETRIEVAL_MODE", raising=False)
-    assert modo_atual() == "deterministic" and isinstance(criar_retrieval(), RetrievalPipeline)
-    monkeypatch.setenv("RETRIEVAL_MODE", "llm")
     assert modo_atual() == "llm" and isinstance(criar_retrieval(llm=LLMFalso()), RetrievalAgent)
-    assert modo_atual("deterministic") == "deterministic"  # argumento explicito vence o ambiente
+    monkeypatch.setenv("RETRIEVAL_MODE", "deterministic")
+    assert modo_atual() == "deterministic" and isinstance(criar_retrieval(), RetrievalPipeline)
+    assert modo_atual("llm") == "llm"  # argumento explicito vence o ambiente
     monkeypatch.setenv("RETRIEVAL_MODE", " LLM ")
     assert modo_atual() == "llm"
+
+
+def test_padrao_sem_chave_degrada_para_o_pipeline_mas_llm_explicito_falha(monkeypatch):
+    from orchestrator.llm_client import LLMError
+
+    def sem_chave(*a, **k):
+        raise LLMError("sem chave")
+
+    monkeypatch.setattr("orchestrator.llm_client.LLMClient", sem_chave)
+    monkeypatch.delenv("RETRIEVAL_MODE", raising=False)
+    assert isinstance(criar_retrieval(), RetrievalPipeline)
+    with pytest.raises(LLMError):
+        criar_retrieval("llm")
+    monkeypatch.setenv("RETRIEVAL_MODE", "llm")
+    with pytest.raises(LLMError):
+        criar_retrieval()
 
 
 def test_modo_invalido_falha_claro(monkeypatch):

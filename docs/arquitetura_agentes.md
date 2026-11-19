@@ -90,7 +90,7 @@ Os **filtros obrigatórios** (acessibilidade, ruído, lugares já reprovados) s�
 - **Devolve:** `validation_feedback` (aprovado, reprovados, filtros novos, diagnóstico) e os `evidence_records` (Contrato 4).
 
 ### RetrievalPipeline (sem LLM) · `retrieval_pipeline.py`
-- **Faz** a mesma coisa que o agente, mas de forma fixa: região → busca → gate → reconsulta com os filtros do feedback (até 2 vezes). É o **padrão** (`RETRIEVAL_MODE=deterministic`) e o **fallback** do agente.
+- **Faz** a mesma coisa que o agente, mas de forma fixa: região → busca → gate → reconsulta com os filtros do feedback (até 2 vezes). É o **fallback** do agente e o modo sem LLM (`RETRIEVAL_MODE=deterministic`).
 
 ### Communication Agent (LLM) · `communication_agent.py`
 - **Faz:** escreve a resposta final em linguagem natural a partir dos `evidence_records` e do `search_response`, no tom do perfil (Helena, Carla ou neutro).
@@ -184,16 +184,16 @@ sequenceDiagram
 
 | Variável | Efeito |
 |---|---|
-| `RETRIEVAL_MODE` | `deterministic` (padrão, sem LLM) ou `llm` (agente, com fallback) |
+| `RETRIEVAL_MODE` | `llm` (padrão: agente oficial, com fallback para o pipeline) ou `deterministic` (só o pipeline, sem LLM) |
 | `DEEPSEEK_API_KEY`, `DEEPSEEK_MODEL`, `DEEPSEEK_REASONING_EFFORT`, `DEEPSEEK_STRICT` | o LLM (padrão: `deepseek-flash`, sem thinking) |
 | `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL` | liga o tracing e os experimentos |
 | `LANGFUSE_LOG_CONTENT` | só depuração: grava o conteúdo das mensagens ao LLM |
 
 Os nomes estão em `.env.example`. **Os valores nunca vão para o repositório.**
 
-## 8. Avaliação: o agente vale o custo?
+## 8. Decisão: o agente é o Retrieval oficial
 
-Na avaliação formal (`docs/avaliacao/fase_f_resultados.md`, 15 casos, 3 repetições), o agente LLM ficou **equivalente ao pipeline em quase tudo**; o ganho vem de um caso que o embedding não resolve (um pedido de "cinema com cafeteria"). Custa ~4 s e ~9,5 mil tokens por pedido, contra 0,1 s do pipeline. Por isso o padrão continua sendo `deterministic`.
+O Retrieval Agent (LLM com tool use) é o Retrieval oficial do sistema. O `RetrievalPipeline` continua no código como **fallback** (LLM fora do ar, sem decisão, gate reprovando tudo) e como modo sem LLM para testes. O custo esperado é de ~4 s e ~9,5 mil tokens de entrada por pedido.
 
 ## 9. Limitações conhecidas
 

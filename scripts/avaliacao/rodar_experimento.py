@@ -10,7 +10,7 @@ Avaliadores (todos em código, sem LLM):
 Rótulos sem id do OSM no gabarito contam como NAO ROTULADOS (grau 0 no P@3/nDCG: limite inferior) e a
 `cobertura_rotulos` mostra quanto do que foi entregue o anotador chegou a ver.
 
-  python scripts/avaliacao/rodar_experimento.py [--nome baseline-retrieval-deterministico] [--so TC-01,TC-07]
+  python scripts/avaliacao/rodar_experimento.py [--nome retrieval-agente-llm] [--so TC-01,TC-07]
 """
 
 import argparse
@@ -232,7 +232,7 @@ def _git(*a):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--nome", default="baseline-retrieval-deterministico")
+    ap.add_argument("--nome", default="retrieval-agente-llm")
     ap.add_argument("--so", help="ids separados por virgula (teste rapido)")
     ap.add_argument("--modo", choices=("pipeline", "llm"), default="pipeline")
     ap.add_argument("--prompt", choices=("v1", "v2"), default="v1", help="modo llm: versao do prompt do agente")

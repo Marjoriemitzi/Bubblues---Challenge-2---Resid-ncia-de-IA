@@ -1,11 +1,11 @@
-"""Escolha do Retrieval por configuracao: RETRIEVAL_MODE=deterministic|llm (padrao deterministic).
+"""Escolha do Retrieval por configuracao: RETRIEVAL_MODE=llm|deterministic (padrao llm: o agente e o oficial).
 
     retrieval = criar_retrieval()                       # le RETRIEVAL_MODE
     retrieval = criar_retrieval("llm", prompt="v2")      # explicito
     grafo = montar_grafo(nlu)                            # Retrieval do RETRIEVAL_MODE + Communication Agent LLM
 
-`deterministic` = RetrievalPipeline (sem LLM). `llm` = RetrievalAgent (DeepSeek) COM fallback para o pipeline,
-que e o que se quer em producao; a avaliacao usa `fallback=None` para medir o agente cru.
+`llm` = RetrievalAgent (DeepSeek) COM fallback para o pipeline, o Retrieval oficial. `deterministic` = RetrievalPipeline
+(sem LLM), util para testes e para rodar sem chave. Sem DEEPSEEK_API_KEY e sem pedir `llm` explicitamente, cai no pipeline.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from .retrieval_agent import _AUTO, RetrievalAgent
 from .retrieval_pipeline import RetrievalPipeline
 
 MODOS = ("deterministic", "llm")
-MODO_PADRAO = "deterministic"
+MODO_PADRAO = "llm"
 
 
 def modo_atual(modo: Optional[str] = None) -> str:
@@ -31,6 +31,15 @@ def modo_atual(modo: Optional[str] = None) -> str:
 def criar_retrieval(modo: Optional[str] = None, *, fallback: Any = _AUTO, prompt: str = "v1", llm: Any = None, **colaboradores: Any) -> Callable:
     """`colaboradores`: validator, conexao_factory, embedder, buscar_fn, regioes_fn (iguais nos dois modos)."""
     if modo_atual(modo) == "llm":
+        if llm is None:
+            from .llm_client import LLMClient, LLMError  # noqa: PLC0415
+
+            try:
+                llm = LLMClient()
+            except LLMError:
+                if modo or os.getenv("RETRIEVAL_MODE"):
+                    raise  # pediu llm explicitamente: sem chave e um erro
+                return RetrievalPipeline(**colaboradores)  # padrao sem chave do DeepSeek: degrada para o pipeline
         return RetrievalAgent(llm=llm, fallback=fallback, prompt=prompt, **colaboradores)
     return RetrievalPipeline(**colaboradores)
 

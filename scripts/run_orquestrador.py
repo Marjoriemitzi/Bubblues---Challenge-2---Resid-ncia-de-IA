@@ -56,7 +56,7 @@ def main():
     ap.add_argument("--horario", help="preferred_time_slot, ex.: madrugada, tarde")
     ap.add_argument("--sem-acessibilidade", action="store_true", help="nao exige wheelchair=yes")
     ap.add_argument("--sem-modelo", action="store_true", help="nao carrega o sentence-transformers")
-    ap.add_argument("--modo", choices=("deterministic", "llm"), default=None, help="padrao: RETRIEVAL_MODE do ambiente (ou deterministic). llm = agente DeepSeek com fallback")
+    ap.add_argument("--modo", choices=("deterministic", "llm"), default=None, help="padrao: RETRIEVAL_MODE do ambiente (ou llm). llm = agente DeepSeek com fallback; deterministic = so o pipeline")
     ap.add_argument("--request-id", default=f"run-{uuid.uuid4().hex[:8]}")
     args = ap.parse_args()
 

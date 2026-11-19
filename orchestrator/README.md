@@ -48,8 +48,8 @@ pytest orchestrator                              # testes de banco são pulados 
 
 ## Configuração e tracing
 
-- **`RETRIEVAL_MODE=deterministic|llm`** (padrão `deterministic`): `criar_retrieval()` / `montar_grafo()` em `retrieval_factory.py`.
-  `llm` usa o agente DeepSeek **com fallback** para o pipeline; a avaliação passa `fallback=None` para medir o agente cru.
+- **`RETRIEVAL_MODE=llm|deterministic`** (padrão `llm`): `criar_retrieval()` / `montar_grafo()` em `retrieval_factory.py`.
+  `llm` é o agente DeepSeek oficial, **com fallback** para o pipeline; `deterministic` é só o pipeline (sem LLM). Sem `DEEPSEEK_API_KEY` e sem pedir `llm`, usa o pipeline.
 - **Tracing no Langfuse** (`observabilidade.py`): liga sozinho se houver `LANGFUSE_PUBLIC_KEY` e `LANGFUSE_SECRET_KEY`; sob pytest fica desligado.
   Árvore por pedido: `pedido` → `no.<nó>` → `tool.*`, `gate.auditar` e `llm.chat` (generation, com tokens).
   **RNF02:** não grava o conteúdo das mensagens (o NLU manda o texto livre do usuário ao LLM), só formato, tokens e nomes de tools;
@@ -63,7 +63,7 @@ e compara configurações; resultados e recomendação em `docs/diagnostico_llm_
 ## Avaliação
 
 `scripts/avaliacao/rodar_experimento.py` roda o grafo sobre o dataset `bubbles-retrieval-osm-v1` no Langfuse
-(P@3, nDCG@3, restrições entregues, latência...). Baseline em `docs/avaliacao/baseline_retrieval_deterministico.md`.
+(P@3, nDCG@3, restrições entregues, latência...), com o gabarito em `docs/avaliacao/gabarito_osm_v1.md`.
 
 ## Limites conhecidos
 
