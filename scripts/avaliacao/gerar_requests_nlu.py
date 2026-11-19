@@ -17,7 +17,7 @@ sys.path.insert(0, str(RAIZ))
 
 from orchestrator.llm_client import LLMClient  # noqa: E402
 from orchestrator.nlu_agent import NLUAgent  # noqa: E402
-from orchestrator.retrieval_agent import _pipeline  # noqa: E402
+from orchestrator.retrieval_common import _pipeline  # noqa: E402
 from orchestrator.verificacao_nlu import ACAO_POR_TIPO, acao_obtida, verificar  # noqa: E402
 
 PEDIDOS = RAIZ / "docs" / "avaliacao" / "pedidos_teste.json"

@@ -11,18 +11,18 @@ import pytest
 
 from orchestrator.contracts import SearchResponse, StructuredRequest, ValidationFeedback
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
-from orchestrator.retrieval_agent import (
-    RetrievalAgent,
+from orchestrator.retrieval_common import (
     montar_parametros,
     registro_para_search_response,
     texto_do_embedding,
 )
+from orchestrator.retrieval_pipeline import RetrievalPipeline
 from orchestrator.stubs import _request, stub_communication, stub_nlu
 from orchestrator.validation_tool import EvidenceValidator
 
 
 def _score():
-    from orchestrator.retrieval_agent import _pipeline
+    from orchestrator.retrieval_common import _pipeline
 
     busca = _pipeline()[0]
     return busca.calcular_score, busca.link_osm
@@ -72,7 +72,7 @@ class FakeBusca:
 
 
 def _agente(fake, **kw):
-    return RetrievalAgent(
+    return RetrievalPipeline(
         conexao_factory=nullcontext, embedder=lambda t: [0.1] * 768, buscar_fn=fake, **kw
     )
 
@@ -191,7 +191,7 @@ def test_regiao_desconhecida_nem_gera_embedding():
         raise AssertionError("nao deveria gerar embedding")
 
     r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))
-    agente = RetrievalAgent(
+    agente = RetrievalPipeline(
         conexao_factory=nullcontext, embedder=embedder, buscar_fn=FakeBusca(_registro([])),
         resolver_local=lambda regiao, con: None,
     )

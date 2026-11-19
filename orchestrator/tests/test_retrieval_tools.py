@@ -16,7 +16,7 @@ from orchestrator.retrieval_tools import (
     RunLog,
 )
 from orchestrator.stubs import _request
-from orchestrator.tests.test_retrieval_agent import CAFE_OK, FakeBusca, _linha, _registro
+from orchestrator.tests.test_retrieval_pipeline import CAFE_OK, FakeBusca, _linha, _registro
 
 CATEGORIAS = [("cafe", 174), ("park", 442), ("restaurant", 1246)]
 

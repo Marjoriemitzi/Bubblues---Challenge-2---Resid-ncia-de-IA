@@ -15,7 +15,7 @@ RAIZ = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(RAIZ))
 
 from orchestrator.contracts import StructuredRequest  # noqa: E402
-from orchestrator.retrieval_agent import texto_do_embedding  # noqa: E402
+from orchestrator.retrieval_common import texto_do_embedding  # noqa: E402
 from orchestrator.retrieval_tools import ContextoBusca, RetrievalTools  # noqa: E402
 
 FINAL = RAIZ / "docs" / "avaliacao" / "structured_requests_final.json"

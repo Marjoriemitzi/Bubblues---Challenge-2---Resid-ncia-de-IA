@@ -14,7 +14,7 @@ import pytest
 
 from orchestrator.evidence_store import PostgresEvidenceStore
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
-from orchestrator.retrieval_agent import RetrievalAgent
+from orchestrator.retrieval_pipeline import RetrievalPipeline
 from orchestrator.stubs import stub_communication, stub_nlu
 from orchestrator.validation_tool import EvidenceValidator
 
@@ -72,7 +72,7 @@ def _grafo(con, **nlu):
     nlu.setdefault("spatial_constraints", {"target_region": "Asa Sul", "max_radius_km": 2.0})
     return build_graph(
         nlu=stub_nlu(**nlu),
-        retrieval=RetrievalAgent(conexao_factory=factory, embedder=lambda t: _vetor()),
+        retrieval=RetrievalPipeline(conexao_factory=factory, embedder=lambda t: _vetor()),
         validation=EvidenceValidator(store=PostgresEvidenceStore(conexao_factory=factory)),
         communication=stub_communication,
     )
@@ -143,7 +143,7 @@ def test_banco_fora_do_ar_vira_abstencao_segura(conexao):
 
     g = build_graph(
         nlu=stub_nlu(spatial_constraints={"target_region": None, "max_radius_km": 2.0}),
-        retrieval=RetrievalAgent(conexao_factory=factory, embedder=lambda t: _vetor()),
+        retrieval=RetrievalPipeline(conexao_factory=factory, embedder=lambda t: _vetor()),
         validation=EvidenceValidator(),
         communication=stub_communication,
     )

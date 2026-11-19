@@ -24,7 +24,8 @@ sys.path.insert(0, str(RAIZ))
 
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
-from orchestrator.retrieval_agent import RetrievalAgent, _pipeline  # noqa: E402
+from orchestrator.retrieval_common import _pipeline  # noqa: E402
+from orchestrator.retrieval_pipeline import RetrievalPipeline  # noqa: E402
 from orchestrator.stubs import stub_communication, stub_nlu  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
@@ -56,10 +57,10 @@ def main():
     ap.add_argument("--request-id", default=f"run-{uuid.uuid4().hex[:8]}")
     args = ap.parse_args()
 
-    retrieval = RetrievalAgent()
+    retrieval = RetrievalPipeline()
     if args.sem_modelo:
         vetor = _embedding_de_lugar(args.categoria)
-        retrieval = RetrievalAgent(embedder=lambda texto: vetor)
+        retrieval = RetrievalPipeline(embedder=lambda texto: vetor)
 
     grafo = build_graph(
         nlu=stub_nlu(

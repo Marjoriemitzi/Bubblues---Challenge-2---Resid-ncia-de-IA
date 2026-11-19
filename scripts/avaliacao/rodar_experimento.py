@@ -43,13 +43,13 @@ from langfuse import Evaluation, get_client  # noqa: E402
 
 from orchestrator.evidence_store import MemoryEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
-from orchestrator.retrieval_agent import RetrievalAgent  # noqa: E402
+from orchestrator.retrieval_pipeline import RetrievalPipeline  # noqa: E402
 from orchestrator.stubs import stub_communication  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
 DATASET = "bubbles-retrieval-osm-v1"
 AV = RAIZ / "docs" / "avaliacao"
-RETRIEVAL = RetrievalAgent()  # uma instancia: o modelo de embedding carrega uma vez
+RETRIEVAL = RetrievalPipeline()  # uma instancia: o modelo de embedding carrega uma vez
 
 
 # --------------------------------------------------------------------------- tarefa
@@ -218,7 +218,7 @@ def main():
     sujo = bool(_git("status", "--porcelain", "--", "orchestrator", "data-pipeline"))
     meta = {
         "commit": sha + ("+alteracoes-locais" if sujo else ""), "branch": ramo, "dataset": DATASET, "gabarito": "osm_v1",
-        "retrieval": "deterministico (RetrievalAgent atual)", "validation": "EvidenceValidator determinístico, MAX_RETRIES=2",
+        "retrieval": "deterministico (RetrievalPipeline atual)", "validation": "EvidenceValidator determinístico, MAX_RETRIES=2",
         "embedding": "paraphrase-multilingual-mpnet-base-v2", "nlu": "structured_request do dataset (DeepSeek deepseek-chat revisado)",
         "politica_acessibilidade": "wheelchair=yes explicito", "k": "3", "anotador": "Claude (unico, nao cego)",
     }

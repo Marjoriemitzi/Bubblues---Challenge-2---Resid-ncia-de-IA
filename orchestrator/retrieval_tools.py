@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Set
 
 from .contracts import SearchResponse, StructuredRequest, ValidationFeedback
-from .retrieval_agent import K_PADRAO, _pipeline, montar_parametros, registro_para_search_response
+from .retrieval_common import K_PADRAO, _pipeline, montar_parametros, registro_para_search_response
 
 MAX_BUSCAS = 4
 K_MAXIMO = 10
