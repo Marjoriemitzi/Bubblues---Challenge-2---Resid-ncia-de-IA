@@ -431,3 +431,64 @@ def test_osm_tags_ruido_alto_reprova_com_tolerancia_baixa(base_request):
     r = agent_sem_catalogo.auditar_candidato(base_request, item)
     assert r["approved"] is False
     assert r["hard_filters"].get("noise_level") == "baixo"
+
+
+# =========================================================================
+# 8. Horario de funcionamento (OSM) contra o pedido: so reprova com evidencia
+# =========================================================================
+
+def _req_horario(slot=None, horas=None, **over):
+    return StructuredRequest.model_validate(_request(
+        "req-horario", temporal_constraints={"preferred_time_slot": slot, "specific_hours": horas},
+        accessibility_requirements={"wheelchair_required": False}, **over))
+
+
+def _item_com_horario(opening_hours):
+    tags = {"amenity": "cafe"}
+    if opening_hours is not None:
+        tags["opening_hours"] = opening_hours
+    return _search_item(place_id="POI-H", name="Lugar H").model_copy(
+        update={"osm_id": 4242, "osm_type": "node", "osm_tags": tags, "is_public_verified": True})
+
+
+@pytest.mark.parametrize("horas,txt", [
+    ("09:00-17:00", "até 22h"),                  # TC-15: Entre Eixos
+    ("Mo-Fr 08:15-17:30", "até 22h"),            # TC-15: Melbourne
+    ("Tu-Th 09:00-17:00", "sábado à noite"),     # TC-06: so abre dias uteis, de dia
+])
+def test_horario_incompativel_reprova_com_motivo_e_hard_filter(horas, txt):
+    r = EvidenceValidator().auditar_candidato(_req_horario(horas=txt), _item_com_horario(horas))
+    assert r["approved"] is False and r["constraints_passed"] is False
+    assert any("Horário" in m and horas in m for m in r["rejection_reasons"])
+    assert r["hard_filters"]["specific_hours"] == txt
+
+
+@pytest.mark.parametrize("horas,slot,txt", [
+    ("Mo-Su 06:00-22:00", None, "até 22h"),
+    ("Tu-Su 09:00-17:00", "manha", "manhã de domingo"),                 # TC-14: Jardim Botanico
+    ("Tu-Th 18:00-24:00; Fr-Sa 18:00-01:00", "tarde", None),            # TC-02: pub que abre as 18h
+    ("24/7", "madrugada", "03:30"),
+])
+def test_horario_compativel_aprova_e_registra_na_evidencia(horas, slot, txt):
+    r = EvidenceValidator().auditar_candidato(_req_horario(slot, txt), _item_com_horario(horas))
+    assert r["approved"] is True
+    assert any("compatível com o pedido" in n for n in r["evidence_payload"]["grounding_notes"])
+
+
+@pytest.mark.parametrize("horas", [None, "restricted", "Seg-Sab 11h-18h", "May-Sep Th-Fr 18:00-00:00"])
+def test_horario_ausente_ou_ilegivel_nao_reprova(horas):
+    r = EvidenceValidator().auditar_candidato(_req_horario(horas="até 22h"), _item_com_horario(horas))
+    assert r["approved"] is True and r["constraints_passed"] is True
+
+
+def test_pedido_sem_horario_nao_olha_o_opening_hours():
+    r = EvidenceValidator().auditar_candidato(_req_horario(), _item_com_horario("09:00-10:00"))
+    assert r["approved"] is True
+    assert any("não restringe horário" in n for n in r["evidence_payload"]["grounding_notes"])
+
+
+def test_horario_no_lote_reprova_so_quem_viola_e_pede_nova_busca():
+    bom, ruim = _item_com_horario("Mo-Su 06:00-23:00"), _item_com_horario("09:00-17:00").model_copy(update={"place_id": "POI-R", "name": "Ruim", "osm_id": 7})
+    lote = EvidenceValidator().auditar_lote(_req_horario(horas="até 22h"), [bom, ruim])
+    assert [a["place_id"] for a in lote["aprovados"]] == ["POI-H"] and [r["place_id"] for r in lote["reprovados"]] == ["POI-R"]
+    assert lote["requer_nova_busca"] is True

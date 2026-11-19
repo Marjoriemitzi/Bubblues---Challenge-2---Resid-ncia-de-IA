@@ -37,6 +37,7 @@ from .contracts import (
     ValidationFeedback,
 )
 from .evidence_store import EvidenceStore
+from .horario import avaliar_horario
 from .state import AgentState
 
 
@@ -104,28 +105,12 @@ def _verificar_horario(
     preferred_slot: Optional[str],
     specific_hours: Optional[str],
 ) -> Tuple[bool, Optional[str]]:
-    """Verifica compatibilidade entre horário de funcionamento e restrição temporal."""
-    if not opening_hours or opening_hours.strip().lower() in ("24/7", "aberto", "unknown"):
-        return True, None
+    """Compatibilidade entre o `opening_hours` do OSM e a restricao temporal do pedido.
 
-    texto_tempo = f"{preferred_slot or ''} {specific_hours or ''}".strip().lower()
-    if not texto_tempo:
-        return True, None
-
-    # Caso especial: madrugada (00:00 - 06:00) ou horários da madrugada
-    if any(k in texto_tempo for k in ("madrugada", "03:30", "03h30", "04:00", "02:00")):
-        # Se opening_hours indica funcionamento diurno convencional (ex: 07:00-20:00)
-        match_hours = re.search(r"(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})", opening_hours)
-        if match_hours:
-            start_h = int(match_hours.group(1))
-            end_h = int(match_hours.group(3))
-            if start_h >= 6 and end_h <= 23:
-                return (
-                    False,
-                    f"Horário de funcionamento '{opening_hours}' incompatível com pedido para a madrugada ({texto_tempo}).",
-                )
-
-    return True, None
+    So reprova com EVIDENCIA (ver orchestrator/horario.py): sem horario, horario ilegivel ou pedido sem
+    exigencia de horario = nao reprova. Cobre "ate 22h", "as 03:30", faixas, turnos e dias da semana."""
+    status, motivo = avaliar_horario(opening_hours, preferred_slot, specific_hours)
+    return status != "incompativel", motivo
 
 
 class EvidenceValidator:
@@ -390,7 +375,10 @@ class EvidenceValidator:
             f"Nível de ruído: {cand_noise or 'não informado'}.",
         ]
         if cand_hours:
-            grounding_notes.append(f"Horário de funcionamento: {cand_hours}.")
+            status_h, _ = avaliar_horario(cand_hours, preferred_slot, specific_hours)
+            situacao = {"compativel": "compatível com o pedido", "nao_confirmado": "não confirmado (formato não interpretado)",
+                        "sem_restricao": "o pedido não restringe horário"}.get(status_h, "")
+            grounding_notes.append(f"Horário de funcionamento: {cand_hours}" + (f" ({situacao})." if situacao else "."))
 
         matched_tags = merged_candidato.get("tags") or merged_candidato.get("matched_tags") or []
         if not isinstance(matched_tags, list):
