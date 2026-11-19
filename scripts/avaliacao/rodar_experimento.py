@@ -17,6 +17,7 @@ import argparse
 import json
 import math
 import os
+import re
 import subprocess
 import sys
 import time
@@ -43,14 +44,16 @@ from langfuse import Evaluation, get_client  # noqa: E402
 
 from orchestrator.evidence_store import MemoryEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
+from orchestrator.retrieval_agent import RetrievalAgent  # noqa: E402
 from orchestrator.retrieval_pipeline import RetrievalPipeline  # noqa: E402
 from orchestrator.retrieval_tools import aquecer_modelo  # noqa: E402
 from orchestrator.stubs import stub_communication  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
+_AUTO_FALLBACK = __import__("orchestrator.retrieval_agent", fromlist=["_AUTO"])._AUTO
 DATASET = "bubbles-retrieval-osm-v1"
 AV = RAIZ / "docs" / "avaliacao"
-RETRIEVAL = RetrievalPipeline(validator=EvidenceValidator(store=MemoryEvidenceStore()))  # uma instancia: o modelo carrega uma vez
+RETRIEVAL = None  # definido em main(): pipeline determinístico ou agente LLM (uma instancia; o modelo carrega uma vez)
 
 
 # --------------------------------------------------------------------------- tarefa
@@ -87,6 +90,7 @@ def tarefa(*, item, **kwargs):
         "n_candidatos": resp.results_count if resp else 0, "retry_count": estado.get("retry_count", 0),
         "validacao_aprovada": fb.approved if fb else None, "erro": estado.get("error"),
         "trilha": [t.agent for t in estado["agent_trace"]], "segundos": seg,
+        "nota_retrieval": next((t.note for t in estado["agent_trace"] if t.agent == "retrieval"), ""),
     }
 
 
@@ -170,7 +174,28 @@ def ev_erro(*, output, **kw):
     return Evaluation(name="erro_de_agente", value=1.0 if output["erro"] else 0.0, comment=output["erro"] or "")
 
 
-ITEM_EVALUATORS = [ev_acao_correta, ev_violacao, ev_fora_raio, ev_evidencia, ev_p3, ev_ndcg, ev_cobertura,
+_NOTA = {"passos": r"passos=(\d+)", "tokens": r"tokens=(\d+)/(\d+)/(\d+)"}
+
+
+def ev_fallback(*, output, **kw):
+    if "agente llm" not in output["nota_retrieval"] and "FALLBACK" not in output["nota_retrieval"]:
+        return []
+    return Evaluation(name="usou_fallback", value=1.0 if "FALLBACK" in output["nota_retrieval"] else 0.0)
+
+
+def ev_passos(*, output, **kw):
+    m = re.search(_NOTA["passos"], output["nota_retrieval"])
+    return Evaluation(name="passos_llm", value=float(m.group(1))) if m else []
+
+
+def ev_tokens(*, output, **kw):
+    m = re.search(_NOTA["tokens"], output["nota_retrieval"])
+    if not m:
+        return []
+    return [Evaluation(name="tokens_prompt", value=float(m.group(1))), Evaluation(name="tokens_saida", value=float(m.group(2)))]
+
+
+ITEM_EVALUATORS = [ev_fallback, ev_passos, ev_tokens, ev_acao_correta, ev_violacao, ev_fora_raio, ev_evidencia, ev_p3, ev_ndcg, ev_cobertura,
                    ev_reconsultas, ev_primeira_rodada, ev_latencia, ev_erro]
 
 
@@ -194,6 +219,8 @@ RUN_EVALUATORS = [
     _agg("aprovado_na_1a_rodada", "taxa_aprovado_na_1a_rodada", media), _agg("reconsultas", "media_reconsultas", media),
     _agg("latencia_s", "media_latencia_s", media), _agg("evidencia_completa", "taxa_evidencia_completa", media),
     _agg("erro_de_agente", "total_erros_de_agente", sum),
+    _agg("usou_fallback", "total_fallbacks", sum), _agg("passos_llm", "media_passos_llm", media),
+    _agg("tokens_prompt", "media_tokens_prompt", media), _agg("tokens_saida", "media_tokens_saida", media),
 ]
 
 
@@ -205,8 +232,16 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--nome", default="baseline-retrieval-deterministico")
     ap.add_argument("--so", help="ids separados por virgula (teste rapido)")
+    ap.add_argument("--modo", choices=("pipeline", "llm"), default="pipeline")
+    ap.add_argument("--sem-fallback", action="store_true", help="modo llm: mede o agente cru (sem cair no pipeline)")
     args = ap.parse_args()
 
+    global RETRIEVAL
+    validador = EvidenceValidator(store=MemoryEvidenceStore())
+    if args.modo == "llm":
+        RETRIEVAL = RetrievalAgent(validator=validador, fallback=None if args.sem_fallback else _AUTO_FALLBACK)
+    else:
+        RETRIEVAL = RetrievalPipeline(validator=validador)
     aquecer_modelo()  # carrega o modelo antes de cronometrar (a latencia nao inclui o download/carga)
     lf = get_client()
     dataset = lf.get_dataset(DATASET)
@@ -217,7 +252,7 @@ def main():
     sujo = bool(_git("status", "--porcelain", "--", "orchestrator", "data-pipeline"))
     meta = {
         "commit": sha + ("+alteracoes-locais" if sujo else ""), "branch": ramo, "dataset": DATASET, "gabarito": "osm_v1",
-        "retrieval": "RetrievalPipeline determinístico (busca -> gate -> reconsulta interna)", "validation": "EvidenceValidator como ferramenta/gate, MAX_RETRIES=2",
+        "retrieval": ("agente LLM (DeepSeek)" + (" SEM fallback" if args.sem_fallback else " com fallback ao pipeline")) if args.modo == "llm" else "RetrievalPipeline determinístico (busca -> gate -> reconsulta interna)", "validation": "EvidenceValidator como ferramenta/gate, MAX_RETRIES=2", "llm": os.getenv("DEEPSEEK_MODEL", "deepseek-flash") if args.modo == "llm" else "-",
         "embedding": "paraphrase-multilingual-mpnet-base-v2", "nlu": "structured_request do dataset (DeepSeek deepseek-chat revisado)",
         "politica_acessibilidade": "wheelchair=yes explicito", "k": "3", "anotador": "Claude (unico, nao cego)",
     }

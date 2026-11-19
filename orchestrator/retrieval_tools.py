@@ -31,6 +31,9 @@ from .validation_tool import EvidenceValidator
 
 MAX_BUSCAS = 4
 K_MAXIMO = 10
+# Caixa que contem o Distrito Federal (com folga). Barra coordenadas alucinadas pelo LLM; nao substitui resolver_regiao.
+DF_LAT = (-16.1, -15.45)
+DF_LON = (-48.35, -47.25)
 FATOR_RAIO_MAXIMO = 2.0  # raio final maximo = 2x o pedido (a ampliacao automatica da busca dobra o raio)
 MAX_TEXTO = 300
 MAX_REGIOES = 5
@@ -358,6 +361,8 @@ class RetrievalTools:
             raise ErroDeUso("`k` deve ser um inteiro")
         if not -90 <= latitude <= 90 or not -180 <= longitude <= 180:
             raise ErroDeUso("latitude/longitude fora do intervalo valido")
+        if not (DF_LAT[0] <= latitude <= DF_LAT[1] and DF_LON[0] <= longitude <= DF_LON[1]):
+            raise ErroDeUso("coordenadas fora do Distrito Federal: use as de resolver_regiao")
         if raio_km <= 0:
             raise ErroDeUso("`raio_km` deve ser maior que zero")
         if not isinstance(texto_consulta, str) or not texto_consulta.strip():

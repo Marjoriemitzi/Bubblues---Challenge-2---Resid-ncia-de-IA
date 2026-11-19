@@ -25,6 +25,7 @@ sys.path.insert(0, str(RAIZ))
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
 from orchestrator.retrieval_common import _pipeline  # noqa: E402
+from orchestrator.retrieval_agent import RetrievalAgent  # noqa: E402
 from orchestrator.retrieval_pipeline import RetrievalPipeline  # noqa: E402
 from orchestrator.stubs import stub_communication, stub_nlu  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
@@ -54,15 +55,18 @@ def main():
     ap.add_argument("--horario", help="preferred_time_slot, ex.: madrugada, tarde")
     ap.add_argument("--sem-acessibilidade", action="store_true", help="nao exige wheelchair=yes")
     ap.add_argument("--sem-modelo", action="store_true", help="nao carrega o sentence-transformers")
+    ap.add_argument("--modo", choices=("pipeline", "llm"), default="pipeline", help="pipeline = determinístico; llm = agente DeepSeek (com fallback)")
     ap.add_argument("--request-id", default=f"run-{uuid.uuid4().hex[:8]}")
     args = ap.parse_args()
 
     # Auditoria (gate) gravada no PostgreSQL; o laco busca -> auditoria -> reconsulta e interno ao Retrieval.
     validator = EvidenceValidator(store=PostgresEvidenceStore())
-    retrieval = RetrievalPipeline(validator=validator)
+    embedder = None
     if args.sem_modelo:
         vetor = _embedding_de_lugar(args.categoria)
-        retrieval = RetrievalPipeline(embedder=lambda texto: vetor, validator=validator)
+        embedder = lambda texto: vetor  # noqa: E731
+    classe = RetrievalAgent if args.modo == "llm" else RetrievalPipeline
+    retrieval = classe(embedder=embedder, validator=validator)
 
     grafo = build_graph(
         nlu=stub_nlu(
@@ -92,6 +96,7 @@ def main():
     fb = s.get("validation_feedback")
     if fb and not fb.approved:
         print(f"  ✘ reprovados: {fb.rejected_place_ids} | {fb.diagnostics[:2]}")
+    print(f"nota do retrieval: {s['agent_trace'][1].note if len(s['agent_trace']) > 1 else '-'}")
     print(f"resposta: {s.get('final_response')}")
 
 

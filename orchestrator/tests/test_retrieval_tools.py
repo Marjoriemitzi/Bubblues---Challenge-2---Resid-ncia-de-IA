@@ -176,6 +176,8 @@ def test_limite_de_buscas_por_pedido():
 
 @pytest.mark.parametrize("over,trecho", [
     ({"latitude": 91.0}, "fora do intervalo"),
+    ({"latitude": -23.55, "longitude": -46.63}, "fora do Distrito Federal"),  # Sao Paulo
+    ({"latitude": -15.8, "longitude": -47.9 + 5}, "fora do Distrito Federal"),
     ({"raio_km": 0}, "maior que zero"),
     ({"raio_km": "3"}, "numero"),
     ({"texto_consulta": "  "}, "nao vazio"),
