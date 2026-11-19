@@ -1,0 +1,1967 @@
+[
+  {
+    "id": "TC-01",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.8169455,
+      -47.900049,
+      "Asa Sul"
+    ],
+    "raio_km": 5.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1188",
+        "nome": "Tomilla Café",
+        "categoria": "cafe",
+        "distancia_km": 3.78,
+        "score": 0.621,
+        "osm": "node/3958863455",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2723",
+        "nome": "Saboretto Cafés Especiais",
+        "categoria": "cafe",
+        "distancia_km": 3.32,
+        "score": 0.621,
+        "osm": "node/11913506269",
+        "tags": {
+          "cuisine": "coffee_shop;sandwich;breakfast;dessert;crepe",
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Su 09:00-19:00",
+          "internet_access": "wlan",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1066",
+        "nome": "Café das Letras",
+        "categoria": "cafe",
+        "distancia_km": 6.59,
+        "score": 0.597,
+        "osm": "node/3525964203",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "970",
+        "nome": "Caramella",
+        "categoria": "cafe",
+        "distancia_km": 4.29,
+        "score": 0.583,
+        "osm": "node/3222516874",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Su 07:30-21:00",
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "903",
+        "nome": "Candy House",
+        "categoria": "cafe",
+        "distancia_km": 4.99,
+        "score": 0.581,
+        "osm": "node/3093838425",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4186",
+        "nome": "Casa de Biscoitos Mineiros",
+        "categoria": "cafe",
+        "distancia_km": 6.25,
+        "score": 0.579,
+        "osm": "way/1052530850",
+        "tags": {
+          "cuisine": "coffee_shop",
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "868",
+        "nome": "Amor à Torta",
+        "categoria": "cafe",
+        "distancia_km": 6.73,
+        "score": 0.576,
+        "osm": "node/3051977281",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Fr 07:30-19:30; Sa 08:00-18:00",
+          "internet_access": "no"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1010",
+        "nome": "D'Vilella",
+        "categoria": "cafe",
+        "distancia_km": 6.78,
+        "score": 0.557,
+        "osm": "node/3324092861",
+        "tags": {
+          "wheelchair": "yes",
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3097",
+        "nome": "The Coffee",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.681,
+        "osm": "node/13741593001",
+        "tags": {
+          "opening_hours": "Mo-Su 07:00-20:00"
+        },
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1705",
+        "nome": "Nosso Quadrado",
+        "categoria": "cafe",
+        "distancia_km": 1.72,
+        "score": 0.629,
+        "osm": "node/5225539396",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1727",
+        "nome": "Uai Bezinha!",
+        "categoria": "cafe",
+        "distancia_km": 1.33,
+        "score": 0.614,
+        "osm": "node/5299457845",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "2447",
+        "nome": "Café da Mata",
+        "categoria": "cafe",
+        "distancia_km": 1.32,
+        "score": 0.611,
+        "osm": "node/9559046118",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "2388",
+        "nome": "Lugano",
+        "categoria": "cafe",
+        "distancia_km": 0.37,
+        "score": 0.606,
+        "osm": "node/8435477631",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-02",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 10.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "578",
+        "nome": "Beer Selection",
+        "categoria": "bar",
+        "distancia_km": 1.11,
+        "score": 0.566,
+        "osm": "node/2678830162",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3173",
+        "nome": "Conic",
+        "categoria": "pub",
+        "distancia_km": 0.32,
+        "score": 0.56,
+        "osm": "node/14101984401",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "775",
+        "nome": "Barulho",
+        "categoria": "bar",
+        "distancia_km": 1.97,
+        "score": 0.553,
+        "osm": "node/2712055074",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1783",
+        "nome": "Melbourne Café & Co.",
+        "categoria": "cafe",
+        "distancia_km": 0.45,
+        "score": 0.545,
+        "osm": "node/5416977721",
+        "tags": {
+          "opening_hours": "Mo-Fr 08:15-17:30",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "599",
+        "nome": "Só Drinks Bar dos Botafoguenses",
+        "categoria": "bar",
+        "distancia_km": 1.75,
+        "score": 0.542,
+        "osm": "node/2678830198",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2454",
+        "nome": "Starbucks",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.541,
+        "osm": "node/9577464680",
+        "tags": {
+          "cuisine": "coffee_shop"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1705",
+        "nome": "Nosso Quadrado",
+        "categoria": "cafe",
+        "distancia_km": 1.49,
+        "score": 0.538,
+        "osm": "node/5225539396",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "577",
+        "nome": "Bar e Café do Brasil",
+        "categoria": "bar",
+        "distancia_km": 1.24,
+        "score": 0.537,
+        "osm": "node/2678830161",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2938",
+        "nome": "Biricutico",
+        "categoria": "bar",
+        "distancia_km": 2.61,
+        "score": 0.536,
+        "osm": "node/13252502255",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "903",
+        "nome": "Candy House",
+        "categoria": "cafe",
+        "distancia_km": 1.92,
+        "score": 0.534,
+        "osm": "node/3093838425",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-03",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 8.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "3281",
+        "nome": "Biblioteca Nacional de Brasília Leonel de Moura Brizola",
+        "categoria": "library",
+        "distancia_km": 0.42,
+        "score": 0.602,
+        "osm": "way/124199196",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1656",
+        "nome": "Espaço Cultural Canteiro Central",
+        "categoria": "arts_centre",
+        "distancia_km": 0.67,
+        "score": 0.58,
+        "osm": "node/5116146130",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3319",
+        "nome": "Biblioteca Infantil",
+        "categoria": "library",
+        "distancia_km": 2.02,
+        "score": 0.577,
+        "osm": "way/140931474",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1257",
+        "nome": "Cursos de Artes",
+        "categoria": "arts_centre",
+        "distancia_km": 1.18,
+        "score": 0.571,
+        "osm": "node/4185561285",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3453",
+        "nome": "Caixa Cultural",
+        "categoria": "arts_centre",
+        "distancia_km": 1.12,
+        "score": 0.556,
+        "osm": "way/222399169",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2648",
+        "nome": "Biblioteca Pedro Aleixo",
+        "categoria": "library",
+        "distancia_km": 2.13,
+        "score": 0.549,
+        "osm": "node/10959640838",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Th 09:00-19:00; Fr 09:00-18:00",
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2524",
+        "nome": "Biblioteca do Senado Federal",
+        "categoria": "library",
+        "distancia_km": 2.07,
+        "score": 0.541,
+        "osm": "node/9975325964",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3283",
+        "nome": "Centro de Convenções Ulysses Guimarães",
+        "categoria": "arts_centre",
+        "distancia_km": 1.98,
+        "score": 0.538,
+        "osm": "way/124696695",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3298",
+        "nome": "Espaço Cultural Renato Guerreiro - Anatel",
+        "categoria": "arts_centre",
+        "distancia_km": 1.25,
+        "score": 0.536,
+        "osm": "way/133334933",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "restricted"
+        },
+        "origem": "contraste"
+      },
+      {
+        "place_id": "3245",
+        "nome": "Biblioteca Demonstrativa de Brasília",
+        "categoria": "library",
+        "distancia_km": 2.82,
+        "score": 0.532,
+        "osm": "way/43376766",
+        "tags": {
+          "opening_hours": "Mo-Fr 07:30-23:00; Sa 08:00-14:00"
+        },
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-04",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 6.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "3471",
+        "nome": "Parque Ana Lídia",
+        "categoria": "park",
+        "distancia_km": 1.41,
+        "score": 0.638,
+        "osm": "way/227022746",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3843",
+        "nome": "Praça Galeria",
+        "categoria": "park",
+        "distancia_km": 0.67,
+        "score": 0.622,
+        "osm": "way/555952785",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2875",
+        "nome": "Praça dos artistas",
+        "categoria": "park",
+        "distancia_km": 0.9,
+        "score": 0.621,
+        "osm": "node/13040446322",
+        "tags": {
+          "opening_hours": "24/7"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4029",
+        "nome": "Ponto de Convivência",
+        "categoria": "park",
+        "distancia_km": 3.23,
+        "score": 0.596,
+        "osm": "way/696050217",
+        "tags": {
+          "opening_hours": "24/7"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3596",
+        "nome": "Galeria dos Estados",
+        "categoria": "park",
+        "distancia_km": 0.6,
+        "score": 0.59,
+        "osm": "way/280578983",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3193",
+        "nome": "Parquinho",
+        "categoria": "park",
+        "distancia_km": 2.06,
+        "score": 0.581,
+        "osm": "node/14334436643",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3212",
+        "nome": "Parque da 202/203 Sul",
+        "categoria": "park",
+        "distancia_km": 1.57,
+        "score": 0.577,
+        "osm": "relation/18686900",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3925",
+        "nome": "Praça dos Cogumelos",
+        "categoria": "park",
+        "distancia_km": 3.36,
+        "score": 0.575,
+        "osm": "way/625633658",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3677",
+        "nome": "Bosque dos Constituintes",
+        "categoria": "park",
+        "distancia_km": 2.46,
+        "score": 0.574,
+        "osm": "way/378658513",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "3194",
+        "nome": "Parquinho Infantil",
+        "categoria": "park",
+        "distancia_km": 2.12,
+        "score": 0.57,
+        "osm": "node/14334436644",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-05",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 7.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1843",
+        "nome": "Quanto",
+        "categoria": "cafe",
+        "distancia_km": 1.81,
+        "score": 0.535,
+        "osm": "node/5766574433",
+        "tags": {
+          "opening_hours": "Mo-Fr 11:00-21:00, Sa 09:00-21:00",
+          "internet_access": "yes",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1783",
+        "nome": "Melbourne Café & Co.",
+        "categoria": "cafe",
+        "distancia_km": 0.45,
+        "score": 0.526,
+        "osm": "node/5416977721",
+        "tags": {
+          "opening_hours": "Mo-Fr 08:15-17:30",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "970",
+        "nome": "Caramella",
+        "categoria": "cafe",
+        "distancia_km": 1.51,
+        "score": 0.513,
+        "osm": "node/3222516874",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "Mo-Su 07:30-21:00",
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1188",
+        "nome": "Tomilla Café",
+        "categoria": "cafe",
+        "distancia_km": 0.75,
+        "score": 0.507,
+        "osm": "node/3958863455",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1657",
+        "nome": "Café Civitá",
+        "categoria": "cafe",
+        "distancia_km": 1.1,
+        "score": 0.505,
+        "osm": "node/5124575930",
+        "tags": {
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1629",
+        "nome": "Oficina Café",
+        "categoria": "cafe",
+        "distancia_km": 1.6,
+        "score": 0.495,
+        "osm": "node/5029115521",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1554",
+        "nome": "Gaudi Café",
+        "categoria": "cafe",
+        "distancia_km": 0.36,
+        "score": 0.495,
+        "osm": "node/4908141129",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2454",
+        "nome": "Starbucks",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.493,
+        "osm": "node/9577464680",
+        "tags": {
+          "cuisine": "coffee_shop"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1420",
+        "nome": "Grande Café",
+        "categoria": "cafe",
+        "distancia_km": 0.76,
+        "score": 0.492,
+        "osm": "node/4585529781",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1187",
+        "nome": "Art Café",
+        "categoria": "cafe",
+        "distancia_km": 0.68,
+        "score": 0.49,
+        "osm": "node/3958863453",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-06",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 9.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "2668",
+        "nome": "Edifício Financial Center Park",
+        "categoria": "food_court",
+        "distancia_km": 0.52,
+        "score": 0.601,
+        "osm": "node/11209188936",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1261",
+        "nome": "Lanchonete Pimenta de Cheiro",
+        "categoria": "food_court",
+        "distancia_km": 0.93,
+        "score": 0.594,
+        "osm": "node/4185562604",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3314",
+        "nome": "Bloco Q",
+        "categoria": "food_court",
+        "distancia_km": 1.3,
+        "score": 0.583,
+        "osm": "way/140613908",
+        "tags": {
+          "opening_hours": "Tu-Th 09:00-17:00; Fr-Su 09:00-18:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2149",
+        "nome": "Espaço do Servidor",
+        "categoria": "food_court",
+        "distancia_km": 2.32,
+        "score": 0.581,
+        "osm": "node/6587306453",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3313",
+        "nome": "Bloco R",
+        "categoria": "food_court",
+        "distancia_km": 1.3,
+        "score": 0.565,
+        "osm": "way/140613907",
+        "tags": {
+          "opening_hours": "Tu-Th 09:00-17:00; Fr-Su 09:00-18:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "7",
+        "nome": "Feirinha do anexo do Buriti",
+        "categoria": "food_court",
+        "distancia_km": 3.02,
+        "score": 0.517,
+        "osm": "node/826342664",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4329",
+        "nome": "PRAÇA DE ALIMENTAÇÃO",
+        "categoria": "food_court",
+        "distancia_km": 11.02,
+        "score": 0.494,
+        "osm": "way/1339855513",
+        "tags": {},
+        "origem": "pipeline"
+      }
+    ]
+  },
+  {
+    "id": "TC-07",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7627976,
+      -47.883951,
+      "Asa Norte"
+    ],
+    "raio_km": 6.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1661",
+        "nome": "Apetit Natural",
+        "categoria": "restaurant",
+        "distancia_km": 0.73,
+        "score": 0.693,
+        "osm": "node/5131056525",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "938",
+        "nome": "Churrasgril",
+        "categoria": "restaurant",
+        "distancia_km": 0.83,
+        "score": 0.672,
+        "osm": "node/3200165050",
+        "tags": {
+          "opening_hours": "Mo-Su 11:00-15:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1660",
+        "nome": "A Tribo",
+        "categoria": "restaurant",
+        "distancia_km": 0.95,
+        "score": 0.66,
+        "osm": "node/5129563422",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2089",
+        "nome": "Cozinha do Salim",
+        "categoria": "restaurant",
+        "distancia_km": 0.39,
+        "score": 0.652,
+        "osm": "node/6496495586",
+        "tags": {
+          "cuisine": "brazilian;arab",
+          "opening_hours": "Mo-Su 17:00-00:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "969",
+        "nome": "Greens",
+        "categoria": "restaurant",
+        "distancia_km": 2.0,
+        "score": 0.64,
+        "osm": "node/3222516873",
+        "tags": {
+          "opening_hours": "Mo-Sa 10:00-22:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1800",
+        "nome": "Nutri Vida",
+        "categoria": "restaurant",
+        "distancia_km": 2.06,
+        "score": 0.637,
+        "osm": "node/5461939620",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "883",
+        "nome": "Kikebab",
+        "categoria": "restaurant",
+        "distancia_km": 0.62,
+        "score": 0.635,
+        "osm": "node/3060727064",
+        "tags": {
+          "cuisine": "kebab",
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "990",
+        "nome": "Maori",
+        "categoria": "restaurant",
+        "distancia_km": 0.65,
+        "score": 0.627,
+        "osm": "node/3247591563",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1940",
+        "nome": "Buriti Zen Vegano",
+        "categoria": "restaurant",
+        "distancia_km": 0.77,
+        "score": 0.625,
+        "osm": "node/6236570866",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "964",
+        "nome": "Saborear",
+        "categoria": "restaurant",
+        "distancia_km": 0.63,
+        "score": 0.624,
+        "osm": "node/3217619699",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-08",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 12.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1554",
+        "nome": "Gaudi Café",
+        "categoria": "cafe",
+        "distancia_km": 0.36,
+        "score": 0.605,
+        "osm": "node/4908141129",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1187",
+        "nome": "Art Café",
+        "categoria": "cafe",
+        "distancia_km": 0.68,
+        "score": 0.604,
+        "osm": "node/3958863453",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1420",
+        "nome": "Grande Café",
+        "categoria": "cafe",
+        "distancia_km": 0.76,
+        "score": 0.597,
+        "osm": "node/4585529781",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1029",
+        "nome": "Café com Café",
+        "categoria": "cafe",
+        "distancia_km": 1.48,
+        "score": 0.593,
+        "osm": "node/3362308337",
+        "tags": {
+          "cuisine": "arab"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2454",
+        "nome": "Starbucks",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.592,
+        "osm": "node/9577464680",
+        "tags": {
+          "cuisine": "coffee_shop"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "900",
+        "nome": "Cafezinho Express",
+        "categoria": "cafe",
+        "distancia_km": 0.86,
+        "score": 0.578,
+        "osm": "node/3089963930",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1783",
+        "nome": "Melbourne Café & Co.",
+        "categoria": "cafe",
+        "distancia_km": 0.45,
+        "score": 0.577,
+        "osm": "node/5416977721",
+        "tags": {
+          "opening_hours": "Mo-Fr 08:15-17:30",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1088",
+        "nome": "Café do Ponto",
+        "categoria": "cafe",
+        "distancia_km": 1.2,
+        "score": 0.577,
+        "osm": "node/3634570442",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1705",
+        "nome": "Nosso Quadrado",
+        "categoria": "cafe",
+        "distancia_km": 1.49,
+        "score": 0.574,
+        "osm": "node/5225539396",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "67",
+        "nome": "CineCultura Liberty Mall",
+        "categoria": "cinema",
+        "distancia_km": 0.83,
+        "score": 0.567,
+        "osm": "node/1666249648",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-09",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 8.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1656",
+        "nome": "Espaço Cultural Canteiro Central",
+        "categoria": "arts_centre",
+        "distancia_km": 0.67,
+        "score": 0.669,
+        "osm": "node/5116146130",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1257",
+        "nome": "Cursos de Artes",
+        "categoria": "arts_centre",
+        "distancia_km": 1.18,
+        "score": 0.659,
+        "osm": "node/4185561285",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1244",
+        "nome": "Oficina de Arte",
+        "categoria": "arts_centre",
+        "distancia_km": 1.87,
+        "score": 0.636,
+        "osm": "node/4156223788",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3453",
+        "nome": "Caixa Cultural",
+        "categoria": "arts_centre",
+        "distancia_km": 1.12,
+        "score": 0.621,
+        "osm": "way/222399169",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2947",
+        "nome": "Casa da Cultura Brasília",
+        "categoria": "arts_centre",
+        "distancia_km": 1.75,
+        "score": 0.608,
+        "osm": "node/13291474946",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3298",
+        "nome": "Espaço Cultural Renato Guerreiro - Anatel",
+        "categoria": "arts_centre",
+        "distancia_km": 1.25,
+        "score": 0.597,
+        "osm": "way/133334933",
+        "tags": {
+          "wheelchair": "yes",
+          "opening_hours": "restricted"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3283",
+        "nome": "Centro de Convenções Ulysses Guimarães",
+        "categoria": "arts_centre",
+        "distancia_km": 1.98,
+        "score": 0.594,
+        "osm": "way/124696695",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4522",
+        "nome": "Clube do Choro de Brasília",
+        "categoria": "arts_centre",
+        "distancia_km": 1.85,
+        "score": 0.592,
+        "osm": "way/1528284373",
+        "tags": {
+          "opening_hours": "Mo-Sa 18:00-22:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2156",
+        "nome": "Espaco Brasilia Eventos",
+        "categoria": "arts_centre",
+        "distancia_km": 2.02,
+        "score": 0.583,
+        "osm": "node/6641832077",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "3209",
+        "nome": "SESI Lab",
+        "categoria": "arts_centre",
+        "distancia_km": 0.27,
+        "score": 0.577,
+        "osm": "relation/16031579",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-10",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 7.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "3471",
+        "nome": "Parque Ana Lídia",
+        "categoria": "park",
+        "distancia_km": 1.41,
+        "score": 0.573,
+        "osm": "way/227022746",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2325",
+        "nome": "Parquinho de madeira",
+        "categoria": "playground",
+        "distancia_km": 1.75,
+        "score": 0.563,
+        "osm": "node/7179049890",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3194",
+        "nome": "Parquinho Infantil",
+        "categoria": "park",
+        "distancia_km": 2.12,
+        "score": 0.561,
+        "osm": "node/14334436644",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4107",
+        "nome": "Parquinho",
+        "categoria": "playground",
+        "distancia_km": 1.44,
+        "score": 0.56,
+        "osm": "way/814496082",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3843",
+        "nome": "Praça Galeria",
+        "categoria": "park",
+        "distancia_km": 0.67,
+        "score": 0.555,
+        "osm": "way/555952785",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2875",
+        "nome": "Praça dos artistas",
+        "categoria": "park",
+        "distancia_km": 0.9,
+        "score": 0.554,
+        "osm": "node/13040446322",
+        "tags": {
+          "opening_hours": "24/7"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4375",
+        "nome": "Parquinho",
+        "categoria": "playground",
+        "distancia_km": 1.73,
+        "score": 0.552,
+        "osm": "way/1356541834",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4063",
+        "nome": "Parquinho Infantil do Bloco G da 104 Sul",
+        "categoria": "park",
+        "distancia_km": 2.06,
+        "score": 0.546,
+        "osm": "way/734333868",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3193",
+        "nome": "Parquinho",
+        "categoria": "park",
+        "distancia_km": 2.06,
+        "score": 0.543,
+        "osm": "node/14334436643",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "4029",
+        "nome": "Ponto de Convivência",
+        "categoria": "park",
+        "distancia_km": 3.23,
+        "score": 0.543,
+        "osm": "way/696050217",
+        "tags": {
+          "opening_hours": "24/7"
+        },
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-11",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 5.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "1783",
+        "nome": "Melbourne Café & Co.",
+        "categoria": "cafe",
+        "distancia_km": 0.45,
+        "score": 0.644,
+        "osm": "node/5416977721",
+        "tags": {
+          "opening_hours": "Mo-Fr 08:15-17:30",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2454",
+        "nome": "Starbucks",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.64,
+        "osm": "node/9577464680",
+        "tags": {
+          "cuisine": "coffee_shop"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1420",
+        "nome": "Grande Café",
+        "categoria": "cafe",
+        "distancia_km": 0.76,
+        "score": 0.635,
+        "osm": "node/4585529781",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1554",
+        "nome": "Gaudi Café",
+        "categoria": "cafe",
+        "distancia_km": 0.36,
+        "score": 0.633,
+        "osm": "node/4908141129",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1188",
+        "nome": "Tomilla Café",
+        "categoria": "cafe",
+        "distancia_km": 0.75,
+        "score": 0.627,
+        "osm": "node/3958863455",
+        "tags": {
+          "wheelchair": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1705",
+        "nome": "Nosso Quadrado",
+        "categoria": "cafe",
+        "distancia_km": 1.49,
+        "score": 0.625,
+        "osm": "node/5225539396",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1215",
+        "nome": "Chateau Brasil",
+        "categoria": "cafe",
+        "distancia_km": 0.48,
+        "score": 0.624,
+        "osm": "node/4081269533",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4332",
+        "nome": "Casa de Chá",
+        "categoria": "cafe",
+        "distancia_km": 2.48,
+        "score": 0.622,
+        "osm": "way/1340424680",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1187",
+        "nome": "Art Café",
+        "categoria": "cafe",
+        "distancia_km": 0.68,
+        "score": 0.616,
+        "osm": "node/3958863453",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1088",
+        "nome": "Café do Ponto",
+        "categoria": "cafe",
+        "distancia_km": 1.2,
+        "score": 0.613,
+        "osm": "node/3634570442",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-12",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 8.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "4376",
+        "nome": "Quadra de tênis",
+        "categoria": "pitch",
+        "distancia_km": 1.46,
+        "score": 0.587,
+        "osm": "way/1357081471",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "170",
+        "nome": "Praça das bicicletas",
+        "categoria": "pitch",
+        "distancia_km": 0.48,
+        "score": 0.582,
+        "osm": "node/2524893720",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4374",
+        "nome": "Quadra poliesportiva",
+        "categoria": "pitch",
+        "distancia_km": 1.72,
+        "score": 0.573,
+        "osm": "way/1356541833",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "4208",
+        "nome": "Quadra de esportes",
+        "categoria": "pitch",
+        "distancia_km": 1.73,
+        "score": 0.571,
+        "osm": "way/1082145697",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2507",
+        "nome": "Quadra esportiva",
+        "categoria": "pitch",
+        "distancia_km": 2.04,
+        "score": 0.543,
+        "osm": "node/9917528077",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3291",
+        "nome": "Amigos do Tênis",
+        "categoria": "pitch",
+        "distancia_km": 3.3,
+        "score": 0.528,
+        "osm": "way/125265696",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3726",
+        "nome": "Torre de TV",
+        "categoria": "park",
+        "distancia_km": 1.0,
+        "score": 0.524,
+        "osm": "way/469233908",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2184",
+        "nome": "Quadra Frescobol",
+        "categoria": "pitch",
+        "distancia_km": 1.66,
+        "score": 0.523,
+        "osm": "node/6799979543",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3309",
+        "nome": "NIPPO Club",
+        "categoria": "pitch",
+        "distancia_km": 4.22,
+        "score": 0.521,
+        "osm": "way/139123600",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "3308",
+        "nome": "NIPPO Club",
+        "categoria": "pitch",
+        "distancia_km": 4.24,
+        "score": 0.52,
+        "osm": "way/139123597",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-13",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.8169455,
+      -47.900049,
+      "Asa Sul"
+    ],
+    "raio_km": 6.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "2176",
+        "nome": "Sushi San",
+        "categoria": "restaurant",
+        "distancia_km": 0.66,
+        "score": 0.7,
+        "osm": "node/6779836007",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "730",
+        "nome": "Sushi San",
+        "categoria": "restaurant",
+        "distancia_km": 1.57,
+        "score": 0.675,
+        "osm": "node/2691239583",
+        "tags": {
+          "cuisine": "sushi"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "656",
+        "nome": "OMA Japanese Experience",
+        "categoria": "restaurant",
+        "distancia_km": 1.34,
+        "score": 0.674,
+        "osm": "node/2691239353",
+        "tags": {
+          "cuisine": "japanese;sushi"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "687",
+        "nome": "Hana",
+        "categoria": "restaurant",
+        "distancia_km": 0.66,
+        "score": 0.664,
+        "osm": "node/2691239467",
+        "tags": {
+          "cuisine": "asian"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "728",
+        "nome": "Sumo",
+        "categoria": "restaurant",
+        "distancia_km": 1.35,
+        "score": 0.662,
+        "osm": "node/2691239567",
+        "tags": {
+          "cuisine": "asian;japones"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3092",
+        "nome": "Koji",
+        "categoria": "restaurant",
+        "distancia_km": 0.56,
+        "score": 0.658,
+        "osm": "node/13720731385",
+        "tags": {
+          "cuisine": "japanese"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1083",
+        "nome": "Ashram Zen Lounge",
+        "categoria": "restaurant",
+        "distancia_km": 0.67,
+        "score": 0.655,
+        "osm": "node/3634309334",
+        "tags": {
+          "cuisine": "indian",
+          "opening_hours": "Tu-Fr 10:00-22:00; Sa-Su 09:00-22:00"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2937",
+        "nome": "Yakiton",
+        "categoria": "restaurant",
+        "distancia_km": 0.87,
+        "score": 0.65,
+        "osm": "node/13252502253",
+        "tags": {
+          "cuisine": "oriental"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1703",
+        "nome": "Maxsushi",
+        "categoria": "restaurant",
+        "distancia_km": 1.7,
+        "score": 0.646,
+        "osm": "node/5225096721",
+        "tags": {
+          "cuisine": "japanese;sushi"
+        },
+        "origem": "contraste"
+      },
+      {
+        "place_id": "703",
+        "nome": "Nippon",
+        "categoria": "restaurant",
+        "distancia_km": 2.0,
+        "score": 0.641,
+        "osm": "node/2691239496",
+        "tags": {
+          "cuisine": "asian"
+        },
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-14",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 15.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "3811",
+        "nome": "Área verde",
+        "categoria": "garden",
+        "distancia_km": 0.76,
+        "score": 0.591,
+        "osm": "way/551056721",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3843",
+        "nome": "Praça Galeria",
+        "categoria": "park",
+        "distancia_km": 0.67,
+        "score": 0.575,
+        "osm": "way/555952785",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3471",
+        "nome": "Parque Ana Lídia",
+        "categoria": "park",
+        "distancia_km": 1.41,
+        "score": 0.568,
+        "osm": "way/227022746",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3193",
+        "nome": "Parquinho",
+        "categoria": "park",
+        "distancia_km": 2.06,
+        "score": 0.553,
+        "osm": "node/14334436643",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3515",
+        "nome": "Praça das Fontes",
+        "categoria": "garden",
+        "distancia_km": 3.6,
+        "score": 0.546,
+        "osm": "way/245309987",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3596",
+        "nome": "Galeria dos Estados",
+        "categoria": "park",
+        "distancia_km": 0.6,
+        "score": 0.544,
+        "osm": "way/280578983",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1487",
+        "nome": "Horta Comunitária",
+        "categoria": "garden",
+        "distancia_km": 2.94,
+        "score": 0.539,
+        "osm": "node/4704216080",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1486",
+        "nome": "Horta Comunitária",
+        "categoria": "garden",
+        "distancia_km": 2.96,
+        "score": 0.539,
+        "osm": "node/4704216079",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "3194",
+        "nome": "Parquinho Infantil",
+        "categoria": "park",
+        "distancia_km": 2.12,
+        "score": 0.537,
+        "osm": "node/14334436644",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "3247",
+        "nome": "Praça Índio Pataxó Galdino Jesus dos Santos",
+        "categoria": "park",
+        "distancia_km": 1.9,
+        "score": 0.535,
+        "osm": "way/50321791",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-15",
+    "acao_esperada": "recomendar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 5.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "2547",
+        "nome": "Subway",
+        "categoria": "fast_food",
+        "distancia_km": 0.08,
+        "score": 0.697,
+        "osm": "node/10236270111",
+        "tags": {
+          "cuisine": "sandwich"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2454",
+        "nome": "Starbucks",
+        "categoria": "cafe",
+        "distancia_km": 0.32,
+        "score": 0.695,
+        "osm": "node/9577464680",
+        "tags": {
+          "cuisine": "coffee_shop"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1944",
+        "nome": "Sabor do Café",
+        "categoria": "fast_food",
+        "distancia_km": 0.71,
+        "score": 0.693,
+        "osm": "node/6247734224",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2546",
+        "nome": "Pastelaria Viçosa",
+        "categoria": "fast_food",
+        "distancia_km": 0.09,
+        "score": 0.69,
+        "osm": "node/10236270110",
+        "tags": {
+          "cuisine": "pastel"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1945",
+        "nome": "Cafeteria Metrô",
+        "categoria": "fast_food",
+        "distancia_km": 0.64,
+        "score": 0.688,
+        "osm": "node/6247734412",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1170",
+        "nome": "Subway",
+        "categoria": "fast_food",
+        "distancia_km": 0.53,
+        "score": 0.678,
+        "osm": "node/3944566704",
+        "tags": {
+          "cuisine": "sandwich"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "919",
+        "nome": "Subway",
+        "categoria": "fast_food",
+        "distancia_km": 0.67,
+        "score": 0.672,
+        "osm": "node/3153295654",
+        "tags": {
+          "cuisine": "sandwich"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1420",
+        "nome": "Grande Café",
+        "categoria": "cafe",
+        "distancia_km": 0.76,
+        "score": 0.668,
+        "osm": "node/4585529781",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1422",
+        "nome": "Subway",
+        "categoria": "fast_food",
+        "distancia_km": 0.77,
+        "score": 0.668,
+        "osm": "node/4585529788",
+        "tags": {
+          "cuisine": "sandwich"
+        },
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1280",
+        "nome": "Lanches",
+        "categoria": "fast_food",
+        "distancia_km": 0.62,
+        "score": 0.668,
+        "osm": "node/4195659580",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-16",
+    "acao_esperada": "clarificar",
+    "local_resolvido": [
+      -15.7939,
+      -47.8828,
+      null
+    ],
+    "raio_km": 3.0,
+    "ajustes": [],
+    "candidatos": [
+      {
+        "place_id": "3843",
+        "nome": "Praça Galeria",
+        "categoria": "park",
+        "distancia_km": 0.67,
+        "score": 0.67,
+        "osm": "way/555952785",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1215",
+        "nome": "Chateau Brasil",
+        "categoria": "cafe",
+        "distancia_km": 0.48,
+        "score": 0.664,
+        "osm": "node/4081269533",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1420",
+        "nome": "Grande Café",
+        "categoria": "cafe",
+        "distancia_km": 0.76,
+        "score": 0.658,
+        "osm": "node/4585529781",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "2875",
+        "nome": "Praça dos artistas",
+        "categoria": "park",
+        "distancia_km": 0.9,
+        "score": 0.654,
+        "osm": "node/13040446322",
+        "tags": {
+          "opening_hours": "24/7"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1022",
+        "nome": "Café Cristina Colina da Pedra",
+        "categoria": "cafe",
+        "distancia_km": 1.25,
+        "score": 0.654,
+        "osm": "node/3358345330",
+        "tags": {
+          "opening_hours": "Su 12:00-19:00; Mo-Sa 08:00-19:00",
+          "internet_access": "wlan"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1187",
+        "nome": "Art Café",
+        "categoria": "cafe",
+        "distancia_km": 0.68,
+        "score": 0.652,
+        "osm": "node/3958863453",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1088",
+        "nome": "Café do Ponto",
+        "categoria": "cafe",
+        "distancia_km": 1.2,
+        "score": 0.65,
+        "osm": "node/3634570442",
+        "tags": {},
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "1783",
+        "nome": "Melbourne Café & Co.",
+        "categoria": "cafe",
+        "distancia_km": 0.45,
+        "score": 0.649,
+        "osm": "node/5416977721",
+        "tags": {
+          "opening_hours": "Mo-Fr 08:15-17:30",
+          "outdoor_seating": "yes"
+        },
+        "origem": "pipeline"
+      },
+      {
+        "place_id": "900",
+        "nome": "Cafezinho Express",
+        "categoria": "cafe",
+        "distancia_km": 0.86,
+        "score": 0.645,
+        "osm": "node/3089963930",
+        "tags": {},
+        "origem": "contraste"
+      },
+      {
+        "place_id": "1554",
+        "nome": "Gaudi Café",
+        "categoria": "cafe",
+        "distancia_km": 0.36,
+        "score": 0.643,
+        "osm": "node/4908141129",
+        "tags": {},
+        "origem": "contraste"
+      }
+    ]
+  },
+  {
+    "id": "TC-17",
+    "acao_esperada": "abster",
+    "candidatos": []
+  },
+  {
+    "id": "TC-18",
+    "acao_esperada": "abster",
+    "candidatos": []
+  }
+]

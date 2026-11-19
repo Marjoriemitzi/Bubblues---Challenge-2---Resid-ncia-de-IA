@@ -1,0 +1,842 @@
+{
+  "modelo": "deepseek-chat",
+  "chamadas_llm": 19,
+  "itens": [
+    {
+      "id": "TC-01",
+      "tipo_pedido": "Padrao",
+      "query": "Gostaria de um café calmo e tranquilo na Asa Sul, com boa acessibilidade para caminhar sem escadas, para conversar com pessoas da minha faixa etária pela manhã.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-01",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "tomar café e conversar",
+        "target_amenities": [
+          "cafe"
+        ],
+        "vibe": "calmo e tranquilo",
+        "noise_tolerance": "baixo",
+        "spatial_constraints": {
+          "target_region": "Asa Sul",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "manha",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": true,
+          "elder_friendly": true,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "calmo",
+          "acessível",
+          "sem escadas",
+          "conversa"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 6.0
+    },
+    {
+      "id": "TC-02",
+      "tipo_pedido": "Padrao",
+      "query": "Procuro um lugar descontraído no final de tarde para encontrar um grupo pequeno para jogar jogos de tabuleiro ou bater papo tomando um suco ou cerveja artesanal.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-02",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "jogar jogos de tabuleiro e conversar tomando bebida",
+        "target_amenities": [
+          "bar",
+          "cafe",
+          "pub"
+        ],
+        "vibe": "descontraído",
+        "noise_tolerance": "moderado",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "tarde",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "descontraído",
+          "jogos de tabuleiro",
+          "cerveja artesanal",
+          "suco",
+          "grupo pequeno"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-03",
+      "tipo_pedido": "Padrao",
+      "query": "Um espaço silencioso e aconchegante para leitura em grupo e debate sobre livros de ficção científica, de preferência integrado a uma livraria ou centro cultural.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-03",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "leitura em grupo e debate sobre livros",
+        "target_amenities": [
+          "library",
+          "community_centre",
+          "arts_centre"
+        ],
+        "vibe": "silencioso e aconchegante",
+        "noise_tolerance": "baixo",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "silencioso",
+          "aconchegante",
+          "leitura em grupo",
+          "debate",
+          "livraria"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-04",
+      "tipo_pedido": "Padrao",
+      "query": "Parque aberto com pistas planas e sombras de árvores para uma caminhada leve em grupo no início da manhã, seguido de conversa em banco de praça.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-04",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "caminhada leve em grupo e conversa em banco de praça",
+        "target_amenities": [
+          "park"
+        ],
+        "vibe": "calmo e acolhedor",
+        "noise_tolerance": "baixo",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "manha",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "pistas planas",
+          "sombras de árvores",
+          "bancos",
+          "caminhada leve"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [
+        {
+          "nivel": "ERRO",
+          "campo": "wheelchair_required",
+          "detalhe": "pedido exige acessibilidade e o NLU deixou false"
+        },
+        {
+          "nivel": "REVISAR",
+          "campo": "noise_tolerance",
+          "detalhe": "baixo sem o texto pedir silencio/calma"
+        }
+      ],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-05",
+      "tipo_pedido": "Padrao",
+      "query": "Cafeteria com mesinhas externas e tomadas, onde seja comum ver pessoas estudando ou trabalhando em grupo com laptops.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-05",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "estudar ou trabalhar em grupo com laptops",
+        "target_amenities": [
+          "cafe"
+        ],
+        "vibe": "produtivo e social",
+        "noise_tolerance": "moderado",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "mesas externas",
+          "tomadas",
+          "laptops",
+          "estudo",
+          "trabalho em grupo"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.6
+    },
+    {
+      "id": "TC-06",
+      "tipo_pedido": "Padrao",
+      "query": "Gostaria de uma praça gastronômica ou feirinha ao ar livre com música ambiente moderada no sábado à noite para interagir com novas pessoas.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=2",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-06",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "interagir com novas pessoas em praça gastronômica ou feirinha ao ar livre",
+        "target_amenities": [
+          "food_court",
+          "biergarten",
+          "pub"
+        ],
+        "vibe": "animado e social",
+        "noise_tolerance": "moderado",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "noite",
+          "specific_hours": "sábado à noite"
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "ao ar livre",
+          "música ambiente",
+          "social",
+          "gastronômico"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [
+        {
+          "nivel": "REVISAR",
+          "campo": "target_amenities",
+          "detalhe": "fora do esperado: ['biergarten', 'pub'] (plausivel: ['attraction', 'food_court', 'mall', 'park', 'restaurant'])"
+        }
+      ],
+      "segundos": 3.2
+    },
+    {
+      "id": "TC-07",
+      "tipo_pedido": "Padrao",
+      "query": "Restaurante com culinária saudável e vegetariana/vegana na Asa Norte, com espaço arejado e cardápio vegetal para um almoço de socialização.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-07",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "almoço de socialização com comida saudável vegetariana/vegana",
+        "target_amenities": [
+          "restaurant"
+        ],
+        "vibe": "arejado e social",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": "Asa Norte",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "tarde",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "vegetariano",
+          "vegano",
+          "saudável",
+          "arejado",
+          "social"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-08",
+      "tipo_pedido": "Padrao",
+      "query": "Cinema de rua ou espaço exibidor de filmes alternativos com cafeteria integrada para debate pós-sessão com os outros participantes.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-08",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "assistir filme alternativo e debater após sessão",
+        "target_amenities": [
+          "cinema",
+          "cafe"
+        ],
+        "vibe": "cultural e social",
+        "noise_tolerance": "moderado",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "cinema alternativo",
+          "cafeteria",
+          "debate",
+          "espaço cultural"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.8
+    },
+    {
+      "id": "TC-09",
+      "tipo_pedido": "Padrao",
+      "query": "Ateliê comunitário ou centro de convivência público para oficina de cerâmica ou artesanato em grupo na parte da tarde.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-09",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "oficina de cerâmica ou artesanato em grupo",
+        "target_amenities": [
+          "community_centre",
+          "arts_centre"
+        ],
+        "vibe": "indefinida",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "tarde",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "oficinas",
+          "artesanato",
+          "cerâmica",
+          "espaço comunitário"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-10",
+      "tipo_pedido": "Padrao",
+      "query": "Parque ou praça pet friendly com cercado para cachorros, onde tutores costumam se reunir para deixar os pets brincarem e socializarem.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-10",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "levar cachorro para brincar e socializar com outros tutores",
+        "target_amenities": [
+          "park",
+          "playground"
+        ],
+        "vibe": "animado e social",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": true
+        },
+        "search_vector_focus": [
+          "cercado para cães",
+          "socialização de pets",
+          "encontro de tutores"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.6
+    },
+    {
+      "id": "TC-11",
+      "tipo_pedido": "Padrao",
+      "query": "Quero um chá da tarde em ambiente muito discreto e pouco barulhento, com mesas espaçadas para conversar sem me sentir vigiado.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-11",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "tomar chá da tarde e conversar",
+        "target_amenities": [
+          "cafe"
+        ],
+        "vibe": "discreto e reservado",
+        "noise_tolerance": "baixo",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "tarde",
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "discreto",
+          "pouco barulhento",
+          "mesas espaçadas",
+          "privacidade"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-12",
+      "tipo_pedido": "Padrao",
+      "query": "Quadra pública ou parque com mesas de ping-pong ou xadrez ao ar livre para encontrar parceiros de partida recreativa sem custo.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-12",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "jogar ping-pong ou xadrez ao ar livre e encontrar parceiros",
+        "target_amenities": [
+          "park",
+          "pitch",
+          "playground"
+        ],
+        "vibe": "recreativo e social",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "mesas de jogos",
+          "ping-pong",
+          "xadrez",
+          "gratuito",
+          "social"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.9
+    },
+    {
+      "id": "TC-13",
+      "tipo_pedido": "Padrao",
+      "query": "Quero comer sushi e comida japonesa fresca num restaurante agradável na Asa Sul com mesas coletivas ou tatames aconchegantes.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-13",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "comer sushi e comida japonesa fresca",
+        "target_amenities": [
+          "restaurant"
+        ],
+        "vibe": "agradável e aconchegante",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": "Asa Sul",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "sushi",
+          "comida japonesa",
+          "mesas coletivas",
+          "tatames",
+          "aconchegante"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 2.3
+    },
+    {
+      "id": "TC-14",
+      "tipo_pedido": "Padrao",
+      "query": "Espaço com jardim florido ou orquidário com banquinhos à sombra para conversar e tomar uma água de coco na manhã de domingo.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-14",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "conversar e tomar água de coco em jardim florido com sombra",
+        "target_amenities": [
+          "garden",
+          "park"
+        ],
+        "vibe": "calmo e florido",
+        "noise_tolerance": "baixo",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "manha",
+          "specific_hours": "manhã de domingo"
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "jardim florido",
+          "orquidário",
+          "sombra",
+          "banquinhos",
+          "água de coco"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [
+        {
+          "nivel": "ERRO",
+          "campo": "wheelchair_required",
+          "detalhe": "pedido exige acessibilidade e o NLU deixou false"
+        },
+        {
+          "nivel": "REVISAR",
+          "campo": "noise_tolerance",
+          "detalhe": "baixo sem o texto pedir silencio/calma"
+        }
+      ],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-15",
+      "tipo_pedido": "Padrao",
+      "query": "Lanchonete ou café cultural perto da universidade aberto até às 22h com clima jovem e opções de lanches rápidos e baratos.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-15",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "comer lanches rápidos e baratos em ambiente cultural",
+        "target_amenities": [
+          "cafe",
+          "fast_food"
+        ],
+        "vibe": "jovem e cultural",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": "perto da universidade",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": "até 22h"
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "jovem",
+          "cultural",
+          "lanches rápidos",
+          "barato"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [
+        {
+          "nivel": "REVISAR",
+          "campo": "target_region",
+          "detalhe": "regiao 'perto da universidade' sem aparecer no texto"
+        }
+      ],
+      "segundos": 1.7
+    },
+    {
+      "id": "TC-16",
+      "tipo_pedido": "Ambiguo",
+      "query": "Quero sair para algum lugar legal para espairecer ou encontrar gente, qualquer coisa bacana serve.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-16",
+        "raw_query": null,
+        "intent_valid": true,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "espairecer e encontrar gente",
+        "target_amenities": [
+          "park",
+          "cafe",
+          "community_centre"
+        ],
+        "vibe": "indefinida",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": null,
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "social",
+          "descontraído",
+          "público"
+        ],
+        "clarification_needed": "Você prefere um lugar mais calmo ou mais movimentado?"
+      },
+      "achados": [],
+      "segundos": 1.8
+    },
+    {
+      "id": "TC-17",
+      "tipo_pedido": "Sem_Resultado_Possivel",
+      "query": "Procuro uma cafeteria vegana com pista de patinação no gelo e música ao vivo na Asa Sul aberta às 03:30 da madrugada de segunda-feira.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-17",
+        "raw_query": null,
+        "intent_valid": false,
+        "out_of_scope": false,
+        "out_of_scope_reason": null,
+        "impossible_criteria": true,
+        "impossible_criteria_reason": "Pista de patinação no gelo em cafeteria é inexistente e contraditório com o ambiente.",
+        "activity": "cafeteria vegana com patinação no gelo e música ao vivo",
+        "target_amenities": [],
+        "vibe": "indefinida",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": "Asa Sul",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": "madrugada",
+          "specific_hours": "03:30"
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [
+          "vegano",
+          "música ao vivo",
+          "patinação no gelo"
+        ],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.9
+    },
+    {
+      "id": "TC-18",
+      "tipo_pedido": "Fora_De_Escopo",
+      "query": "Preciso urgente de um frete com caminhão baú e 2 carregadores para transportar meus móveis da Asa Norte até Taguatinga no próximo sábado.",
+      "erro": null,
+      "nota": "nlu llm (deepseek-chat); tentativas=1",
+      "structured_request_nlu": {
+        "request_id": "eval-TC-18",
+        "raw_query": null,
+        "intent_valid": false,
+        "out_of_scope": true,
+        "out_of_scope_reason": "solicitação de serviço de frete e mudança",
+        "impossible_criteria": false,
+        "impossible_criteria_reason": null,
+        "activity": "contratar frete com caminhão e carregadores",
+        "target_amenities": [],
+        "vibe": "indefinida",
+        "noise_tolerance": "indiferente",
+        "spatial_constraints": {
+          "target_region": "Asa Norte",
+          "max_radius_km": 3.0
+        },
+        "temporal_constraints": {
+          "preferred_time_slot": null,
+          "specific_hours": null
+        },
+        "accessibility_requirements": {
+          "wheelchair_required": false,
+          "elder_friendly": false,
+          "pet_friendly": false
+        },
+        "search_vector_focus": [],
+        "clarification_needed": null
+      },
+      "achados": [],
+      "segundos": 1.5
+    }
+  ]
+}
