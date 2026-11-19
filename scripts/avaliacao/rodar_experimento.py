@@ -207,7 +207,9 @@ def _valores(item_results, nome):
 def _agg(nome_item, nome_run, fn):
     def run_ev(*, item_results, **kw):
         v = _valores(item_results, nome_item)
-        return Evaluation(name=nome_run, value=fn(v) if v else None, comment=f"n={len(v)}")
+        if not v:  # sem dados (ex.: passos do LLM no modo pipeline): nao emite o score. O Langfuse REJEITA value=None
+            return []
+        return Evaluation(name=nome_run, value=fn(v), comment=f"n={len(v)}")
     return run_ev
 
 
