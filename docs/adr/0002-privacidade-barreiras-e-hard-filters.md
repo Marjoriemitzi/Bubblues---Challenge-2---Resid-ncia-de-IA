@@ -8,6 +8,6 @@ Ao investigar os motivadores da solidão e as barreiras de acesso (Guiding Quest
 
 ## Consequences
 
-- **Garantia de segurança física e sensorial**: Locais com `wheelchair=no` são excluídos via SQL quando o Membro exige acessibilidade motora, e locais com `nivel_ruido=Alto` são excluídos quando a Tolerância Sensorial é `baixo`.
+- **Garantia de segurança física e sensorial**: Quando o Membro exige acessibilidade motora, só passam locais com `wheelchair=yes` explícito no OSM (tag ausente, `no` ou `limited` são excluídos via SQL; emenda de 19/11/2026, alinhando Retrieval e Validation_Agent ao RNF01), e locais com `nivel_ruido=Alto` são excluídos quando a Tolerância Sensorial é `baixo`.
 - **Conformidade LGPD por design**: O banco de dados nunca armazena histórico de solidão, vulnerabilidade psicológica ou transcrições brutas de áudio/texto dos Membros.
 

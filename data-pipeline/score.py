@@ -57,7 +57,8 @@ def _etiqueta_atende(valor_osm, valor_desejado):
 def atende_barreiras(tags, etiquetas_desejadas, tolerancia_ruido="indiferente", tolerancia_sensorial=None):
     """Filtro eliminatorio (Hard Filter - ADR-0002) para Acessibilidade Fisica e Tolerancia Sensorial.
 
-    - Se wheelchair='yes' for exigido, bloqueia locais com wheelchair='no' (tags ausentes seguem elegiveis).
+    - Se wheelchair='yes' for exigido, so passa quem tem wheelchair='yes' explicito no OSM. Tag ausente,
+      'no', 'limited' etc. sao bloqueados: sem confirmacao nao ha garantia de acessibilidade (RNF01).
     - Se a tolerancia sensorial/ruido for 'baixo' ou 'moderado', bloqueia locais com ruido 'alto'.
     """
     tags = tags or {}
@@ -65,7 +66,7 @@ def atende_barreiras(tags, etiquetas_desejadas, tolerancia_ruido="indiferente", 
 
     if str(etiquetas_desejadas.get("wheelchair", "")).strip().casefold() == "yes":
         valor_wc = str(tags.get("wheelchair", "")).strip().casefold()
-        if valor_wc == "no":
+        if valor_wc != "yes":
             return False
 
     nivel_tolerancia = str(tolerancia_sensorial or tolerancia_ruido or "indiferente").strip().casefold()

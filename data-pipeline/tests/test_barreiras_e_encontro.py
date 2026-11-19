@@ -33,19 +33,23 @@ class Seam1BarreirasTest(unittest.TestCase):
             )
         )
 
-    def test_aceita_local_com_wheelchair_yes_ou_tag_ausente_no_osm(self):
+    def test_aceita_local_so_com_wheelchair_yes_explicito(self):
         self.assertTrue(
             atende_barreiras(
                 tags={"wheelchair": "yes"},
                 etiquetas_desejadas={"wheelchair": "yes"},
             )
         )
-        self.assertTrue(
-            atende_barreiras(
-                tags={"cuisine": "coffee"},
-                etiquetas_desejadas={"wheelchair": "yes"},
-            )
-        )
+
+    def test_bloqueia_wheelchair_ausente_ou_limitado_quando_exigido(self):
+        for tags in ({"cuisine": "coffee"}, {"wheelchair": "limited"}, {"wheelchair": ""}):
+            with self.subTest(tags=tags):
+                self.assertFalse(
+                    atende_barreiras(tags=tags, etiquetas_desejadas={"wheelchair": "yes"})
+                )
+
+    def test_wheelchair_ausente_passa_quando_acessibilidade_nao_e_exigida(self):
+        self.assertTrue(atende_barreiras(tags={"cuisine": "coffee"}, etiquetas_desejadas={}))
 
     def test_bloqueia_local_com_ruido_alto_quando_tolerancia_sensorial_baixa_ou_moderada(self):
         self.assertFalse(

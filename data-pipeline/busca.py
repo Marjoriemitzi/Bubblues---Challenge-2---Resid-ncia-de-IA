@@ -50,7 +50,8 @@ SQL_CANDIDATOS = """
     ) o
     WHERE p.embedding IS NOT NULL
       AND (%(tipos)s::text[] IS NULL OR p.categoria = ANY(%(tipos)s::text[]))
-      AND (NOT %(exigir_acessibilidade)s OR COALESCE(LOWER(p.tags->>'wheelchair'), '') <> 'no')
+      AND p.osm_id IS NOT NULL AND p.osm_type IS NOT NULL
+      AND (NOT %(exigir_acessibilidade)s OR COALESCE(LOWER(p.tags->>'wheelchair'), '') = 'yes')
       AND (NOT %(bloquear_ruido_alto)s OR COALESCE(LOWER(p.tags->>'noise_level'), LOWER(p.tags->>'nivel_ruido'), '') <> 'alto')
       AND ST_DWithin(p.geom::geography, o.ponto, %(raio)s)
 """
@@ -146,6 +147,7 @@ def _resultado(posicao, pontuado, etiquetas_desejadas):
             "distancia_m": linha["distancia_m"],
         },
         "osm_url": link_osm(linha["osm_type"], linha["osm_id"]),
+        "osm": {"osm_id": linha["osm_id"], "osm_type": linha["osm_type"], "tags": linha["tags"]},
         "etiquetas_usadas": etiquetas_usadas(
             linha["tipo_categoria"], linha["categoria"], linha["tags"], etiquetas_desejadas
         ),
