@@ -28,6 +28,7 @@ from typing import Callable
 from langgraph.graph import END, START, StateGraph
 
 from .contracts import EvidenceRecord, SearchResponse, StructuredRequest, ValidationFeedback
+from .observabilidade import observar
 from .state import AgentState, TraceEntry
 
 MAX_RETRIES = 2  # reconsultas que o Retrieval pode fazer apos o gate reprovar a busca
@@ -118,7 +119,7 @@ def _node(
     decide: Callable[[AgentState], Decision] | None,
     post: Callable[[AgentState, dict], dict] | None = None,
 ):
-    def run(state: AgentState) -> dict:
+    def _executar(state: AgentState) -> dict:
         try:
             raw = agent(state)
         except Exception as exc:  # falha de runtime do agente (LLM fora do ar, banco, timeout...)
@@ -152,6 +153,16 @@ def _node(
             )
         ]
         return update
+
+    def run(state: AgentState) -> dict:
+        tipo = "agent" if name in (NLU, COMMUNICATION) else "chain"
+        entrada = sorted(k for k, v in state.items() if v not in (None, [], "") and k != "agent_trace")
+        with observar(f"no.{name}", tipo, metadata={"input_keys": entrada}) as obs:
+            update = _executar(state)
+            t = update["agent_trace"][0]
+            obs.update(output={"output_keys": t.output_keys, "next_agent": t.next_agent, "justificativa": t.justification, "nota": t.note},
+                       **({"level": "ERROR", "status_message": update["error"]} if update.get("error") else {}))
+            return update
 
     return run
 
@@ -197,4 +208,8 @@ def build_graph(
 
 def run(graph, raw_query: str, request_id: str) -> AgentState:
     """Ponto de entrada: monta o estado inicial e executa o grafo."""
-    return graph.invoke({"request_id": request_id, "raw_query": raw_query, "retry_count": 0, "agent_trace": []})
+    with observar("pedido", "agent", metadata={"request_id": request_id}) as obs:  # NUNCA o raw_query (RNF02)
+        estado = graph.invoke({"request_id": request_id, "raw_query": raw_query, "retry_count": 0, "agent_trace": []})
+        obs.update(output={"retry_count": estado.get("retry_count"), "erro": estado.get("error"),
+                           "n_evidencias": len(estado.get("evidence_records") or []), "caminho": [t.agent for t in estado["agent_trace"]]})
+        return estado

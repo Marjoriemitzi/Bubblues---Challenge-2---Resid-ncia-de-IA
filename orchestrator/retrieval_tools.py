@@ -27,6 +27,7 @@ from typing import Any, Callable, Dict, List, Optional, Set
 
 from .contracts import SearchItem, SearchResponse, StructuredRequest, ValidationFeedback
 from .retrieval_common import K_PADRAO, _pipeline, montar_parametros, registro_para_search_response
+from .observabilidade import observar
 from .validation_tool import EvidenceValidator
 
 MAX_BUSCAS = 4
@@ -206,6 +207,22 @@ SCHEMAS: List[Dict[str, Any]] = [
 ]
 
 
+def _resumo_tool(nome: str, res: Dict[str, Any]) -> Dict[str, Any]:
+    """O que vai para o trace sobre o resultado de uma tool (compacto; so dados publicos do OSM)."""
+    if "erro" in res:
+        return {"erro": res["erro"]}
+    if nome == "buscar_lugares":
+        return {k: res[k] for k in ("busca_id", "status", "total", "raio_aplicado_km", "raio_ampliado", "ajustes") if k in res} | {
+            "lugares": [i["nome"] for i in res.get("itens", [])]}
+    if nome == "resolver_regiao":
+        return {"regioes": [r["nome"] for r in res.get("regioes", [])]}
+    if nome == "listar_categorias":
+        return {"n_categorias": len(res.get("categorias", []))}
+    if nome == "validar_candidatos":
+        return {"todos_aprovados": res.get("todos_aprovados"), "reprovados": [r["place_id"] for r in res.get("reprovados", [])]}
+    return {}
+
+
 # --------------------------------------------------------------------------
 # As tools
 # --------------------------------------------------------------------------
@@ -271,7 +288,13 @@ class RetrievalTools:
         return [s for s in SCHEMAS if s["function"]["name"] != "validar_candidatos"]
 
     def executar(self, nome: str, argumentos: Any) -> Dict[str, Any]:
-        """Executa uma tool. Erros de uso viram {"erro": ...}; falha de infra sobe."""
+        """Executa uma tool (uma observacao `tool` no Langfuse). Erros de uso viram {"erro": ...}; falha de infra sobe."""
+        with observar(f"tool.{nome}", "tool", input=argumentos) as obs:
+            res = self._executar(nome, argumentos)
+            obs.update(output=_resumo_tool(nome, res), **({"level": "WARNING", "status_message": "erro de uso"} if "erro" in res else {}))
+            return res
+
+    def _executar(self, nome: str, argumentos: Any) -> Dict[str, Any]:
         try:
             if nome not in self._TOOLS:
                 raise ErroDeUso(f"tool desconhecida: '{nome}'. Disponiveis: {sorted(self._TOOLS)}")
