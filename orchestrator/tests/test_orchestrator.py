@@ -3,26 +3,20 @@ from pydantic import ValidationError
 
 from orchestrator import build_graph, run
 from orchestrator.contracts import EvidenceRecord, SearchResponse, StructuredRequest
-from orchestrator.graph import COMMUNICATION, FALLBACK_MESSAGE, NLU, RETRIEVAL, VALIDATION
+from orchestrator.graph import COMMUNICATION, FALLBACK_MESSAGE, NLU, RETRIEVAL
 from orchestrator.stubs import (
     _request,
     stub_communication,
     stub_nlu,
     stub_retrieval,
-    stub_validation,
+    stub_retrieval_reprovado,
 )
 
 QUERY = "Quero um cafe tranquilo na Asa Sul com acesso para cadeirantes"
 
 
-def make(nlu=None, validation=None, **kw):
-    return build_graph(
-        nlu or stub_nlu(),
-        stub_retrieval,
-        validation or stub_validation(1),
-        stub_communication,
-        **kw,
-    )
+def make(nlu=None, retrieval=None):
+    return build_graph(nlu or stub_nlu(), retrieval or stub_retrieval, stub_communication)
 
 
 def path(state):
@@ -32,7 +26,7 @@ def path(state):
 # ---- 3 caminhos de roteamento --------------------------------------------
 def test_fluxo_normal():
     s = run(make(), QUERY, "req-1")
-    assert path(s) == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
+    assert path(s) == [NLU, RETRIEVAL, COMMUNICATION]
     assert s["final_response"] == "top-3 auditado"
     assert s["retry_count"] == 0
 
@@ -51,22 +45,13 @@ def test_abstencao_precoce_pula_busca(over):
     assert "search_response" not in s
 
 
-def test_reconsulta_e_aprova_na_segunda():
-    s = run(make(validation=stub_validation(approve_on_attempt=2)), QUERY, "req-3")
-    assert path(s) == [NLU, RETRIEVAL, VALIDATION, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert s["retry_count"] == 1
-    # o Retrieval recebeu o feedback e excluiu o POI reprovado
-    assert s["search_response"].items[0].place_id == "POI-02"
-
-
-def test_trava_de_2_reconsultas():
-    s = run(make(validation=stub_validation(approve_on_attempt=None)), QUERY, "req-4")
-    # 1 busca inicial + 2 reconsultas = 3 passagens por retrieval/validation
-    assert path(s).count(RETRIEVAL) == 3
-    assert path(s).count(VALIDATION) == 3
-    assert path(s)[-1] == COMMUNICATION
-    assert s["retry_count"] == 3  # 3 reprovacoes; a ultima nao gerou reconsulta
+def test_gate_reprovado_apos_reconsultas_vai_para_abstencao():
+    # o laco busca -> auditoria -> reconsulta e interno ao Retrieval (ver test_retrieval_pipeline.py)
+    s = run(make(retrieval=stub_retrieval_reprovado), QUERY, "req-3")
+    assert path(s) == [NLU, RETRIEVAL, COMMUNICATION]
+    assert s["retry_count"] == 2
     assert s["final_response"] == "abstencao"
+    assert "reprovado pelo gate" in s["agent_trace"][1].justification
 
 
 # ---- trace ----------------------------------------------------------------
@@ -155,26 +140,22 @@ def retrieval_vazio(state):
     }
 
 
-def test_busca_sem_resultados_pula_validacao():
-    g = build_graph(stub_nlu(), retrieval_vazio, stub_validation(1), stub_communication)
+def test_busca_sem_resultados_vai_para_abstencao():
+    g = build_graph(stub_nlu(), retrieval_vazio, stub_communication)
     s = run(g, QUERY, "req-9")
     assert path(s) == [NLU, RETRIEVAL, COMMUNICATION]
     assert s["retry_count"] == 0
     assert s["final_response"] == "abstencao"
 
 
-@pytest.mark.parametrize("quem", [NLU, RETRIEVAL, VALIDATION])
+@pytest.mark.parametrize("quem", [NLU, RETRIEVAL])
 def test_falha_de_agente_vira_abstencao_segura(quem):
     def quebrado(state):
         raise ConnectionError(f"banco caiu: {state.get('raw_query')}")
 
-    agents = {
-        NLU: stub_nlu(),
-        RETRIEVAL: stub_retrieval,
-        VALIDATION: stub_validation(1),
-    }
+    agents = {NLU: stub_nlu(), RETRIEVAL: stub_retrieval}
     agents[quem] = quebrado
-    g = build_graph(agents[NLU], agents[RETRIEVAL], agents[VALIDATION], stub_communication)
+    g = build_graph(agents[NLU], agents[RETRIEVAL], stub_communication)
     s = run(g, QUERY, "req-10")
     assert path(s)[-1] == COMMUNICATION
     assert s["error"] == f"{quem}: ConnectionError"
@@ -187,6 +168,6 @@ def test_falha_da_propria_communication_usa_mensagem_fixa():
     def comm_quebrada(state):
         raise RuntimeError("llm timeout")
 
-    s = run(build_graph(stub_nlu(), stub_retrieval, stub_validation(1), comm_quebrada), QUERY, "req-11")
+    s = run(build_graph(stub_nlu(), stub_retrieval, comm_quebrada), QUERY, "req-11")
     assert s["final_response"] == FALLBACK_MESSAGE
     assert s["agent_trace"][-1].next_agent == "__end__"

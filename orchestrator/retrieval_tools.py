@@ -41,6 +41,15 @@ TAGS_VISIVEIS = ("wheelchair", "noise_level", "opening_hours", "cuisine", "outdo
 _MODELO = None  # sentence-transformers, carregado na primeira busca real
 
 
+def aquecer_modelo() -> None:
+    """Carrega o modelo de embeddings padrao agora (ex.: antes de cronometrar um experimento)."""
+    global _MODELO
+    emb = _pipeline()[1]
+    if _MODELO is None:
+        _MODELO = emb.carregar_modelo()
+    emb.gerar_embedding_consulta("aquecimento", _MODELO)
+
+
 class ErroDeUso(Exception):
     """O LLM chamou a tool de forma invalida; a mensagem volta para ele corrigir."""
 

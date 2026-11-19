@@ -26,10 +26,12 @@ from orchestrator.contracts import (
     StructuredRequest,
     ValidationFeedback,
 )
-from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
-from orchestrator.stubs import _request, stub_communication, stub_nlu
+
+from orchestrator.stubs import _request
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
 from orchestrator.evidence_store import MemoryEvidenceStore
+from orchestrator.retrieval_gate import RetrievalGate
+from orchestrator.retrieval_tools import BuscaRegistrada
 from orchestrator.validation_tool import EvidenceValidator
 
 
@@ -205,69 +207,36 @@ def main():
         print(f"   • [{r['evidence_id']}] {r['candidate_name']} -> Aprovado={r['approved']} (RNF01={r['rnf01_passed']}, Math={r['math_integrity_passed']})")
 
     # -------------------------------------------------------------------------
-    # CENÁRIO 5: Integração no Orquestrador LangGraph (Loop de Reconsulta)
+    # CENÁRIO 5: Gate do Retrieval (busca -> auditoria -> reconsulta com feedback)
     # -------------------------------------------------------------------------
-    print_header("CENÁRIO 5: Integração Completa com o Orquestrador LangGraph")
-    tentativa = {"count": 0}
-
-    def retrieval_com_feedback(state):
-        tentativa["count"] += 1
-        fb_anterior: ValidationFeedback = state.get("validation_feedback")
-
-        # Tentativa 1: Envia candidato inválido (sem osm_id)
-        if tentativa["count"] == 1:
-            print(f"  -> [Retrieval_Agent Tentativa {tentativa['count']}] Retornando candidato não-verificado...")
-            items = [
-                SearchItem(
-                    rank=1,
-                    place_id="POI-INVALIDO",
-                    name="Espaço Sem Verificação OSM",
-                    distance_km=1.0,
-                    cosine_similarity=0.9,
-                    final_score=0.86,
-                    score_decomposition=ScoreDecomposition(
-                        vector_contribution=0.36,
-                        distance_contribution=0.20,
-                        reputation_contribution=0.15,
-                        compatibility_contribution=0.15,
-                        sum_check=0.86,
-                    ),
-                )
-            ]
-        else:
-            # Tentativa 2: Recebeu diagnóstico e substituiu pelo POI-01 verificado
-            print(f"  -> [Retrieval_Agent Tentativa {tentativa['count']}] Aplicando diagnóstico do Validation_Agent:")
-            print(f"     Feedback recebido: rejected_ids={fb_anterior.rejected_place_ids}")
-            items = [candidatos_validos[0]]
-
-        return {
-            "search_response": {
-                "query_id": state["request_id"],
-                "status": "SUCCESS",
-                "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-                "results_count": len(items),
-                "items": items,
-            }
-        }
-
-    graph = build_graph(
-        nlu=stub_nlu(),
-        retrieval=retrieval_com_feedback,
-        validation=EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG),
-        communication=stub_communication,
+    print_header("CENÁRIO 5: Gate de Auditoria do Retrieval (reconsulta orientada por diagnóstico)")
+    gate = RetrievalGate(EvidenceValidator(store=store, metadata_catalog=BASE_POIS_CATALOG))
+    req_gate = StructuredRequest.model_validate(_request("req-gate-demo"))
+    invalido = SearchItem(
+        rank=1, place_id="POI-INVALIDO", name="Espaço Sem Verificação OSM", distance_km=1.0,
+        cosine_similarity=0.9, final_score=0.86,
+        score_decomposition=ScoreDecomposition(
+            vector_contribution=0.36, distance_contribution=0.20,
+            reputation_contribution=0.15, compatibility_contribution=0.15, sum_check=0.86,
+        ),
     )
+    reconsultas = 0
+    for tentativa, itens in enumerate([[invalido], [candidatos_validos[0]]], start=1):
+        busca = BuscaRegistrada(f"B{tentativa}", None, {
+            "query_id": req_gate.request_id, "status": "SUCCESS",
+            "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
+            "results_count": len(itens), "items": [i.model_dump(mode="json") for i in itens],
+        })
+        res = gate.auditar(req_gate, busca)
+        print(f"  -> [Busca {tentativa}] candidatos={[i.place_id for i in itens]} -> aprovado={res.aprovado}")
+        if res.aprovado:
+            break
+        print(f"     Feedback ao Retrieval: rejected_ids={res.feedback.rejected_place_ids} hard_filters={res.feedback.hard_filters}")
+        reconsultas += 1
 
-    estado_final = run(graph, "Quero um café tranquilo na Asa Sul", "req-langgraph-demo")
-    trace = [f"{t.agent} ({t.justification})" for t in estado_final["agent_trace"]]
-
-    print("\n📈 Trajetória de Execução no Grafo Multiagente (agent_trace):")
-    for step, t in enumerate(trace, start=1):
-        print(f"   Passo {step}: {t}")
-
-    print(f"\n✅ Status Final da Validação: approved={estado_final['validation_feedback'].approved}")
-    print(f"✅ Reconsultas Realizadas (retry_count): {estado_final['retry_count']}")
-    print(f"✅ Resposta Final: {estado_final['final_response']}")
-    print("\n>> VALIDATION_AGENT HOMOLOGADO COM 100% DE CONFORMIDADE! <<")
+    print(f"\n✅ Status Final da Auditoria: approved={res.aprovado} | reconsultas={reconsultas}")
+    print(f"✅ EvidenceRecords entregues: {[e.place_id for e in res.evidence_records]}")
+    print("\n>> VALIDAÇÃO HOMOLOGADA COM 100% DE CONFORMIDADE! <<")
 
 
 if __name__ == "__main__":

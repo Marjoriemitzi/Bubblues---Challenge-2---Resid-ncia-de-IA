@@ -12,7 +12,6 @@ Critérios de Aceite testados:
 import os
 import pytest
 
-from orchestrator import build_graph, run
 from orchestrator.contracts import (
     AppliedFilters,
     EvidenceRecord,
@@ -23,8 +22,7 @@ from orchestrator.contracts import (
     ValidationFeedback,
 )
 from orchestrator.catalogo_exemplo import BASE_POIS_CATALOG
-from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION
-from orchestrator.stubs import _request, stub_communication, stub_nlu
+from orchestrator.stubs import _request
 from orchestrator.evidence_store import MemoryEvidenceStore
 from orchestrator.validation_tool import EvidenceValidator
 
@@ -382,137 +380,6 @@ def test_falha_ao_gravar_sobe_a_excecao(base_request):
         ag.auditar_search_response(base_request, _response(base_request, [_search_item("POI-01")]))
 
 
-def test_grafo_vira_abstencao_segura_se_gravacao_falhar():
-    class Quebrada:
-        def salvar(self, auditorias, consulta_id=None):
-            raise ConnectionError("db fora")
-
-    def retrieval(state):
-        return {"search_response": {
-            "query_id": state["request_id"], "status": "SUCCESS",
-            "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-            "results_count": 1,
-            "items": [_search_item("POI-01").model_dump()],
-        }}
-
-    graph = build_graph(
-        nlu=stub_nlu(), retrieval=retrieval,
-        validation=EvidenceValidator(store=Quebrada(), metadata_catalog=BASE_POIS_CATALOG),
-        communication=stub_communication,
-    )
-    state = run(graph, "q", "req-falha-store")
-    assert state["error"] == "validation_agent: ConnectionError"
-    assert state["final_response"] == "abstencao"
-    assert not state.get("evidence_records")
-
-
-# =========================================================================
-# 6. Integração com o Grafo LangGraph do Orquestrador
-# =========================================================================
-
-def test_langgraph_integracao_fluxo_normal_com_validation_agent():
-    # Retrieval retorna candidato válido
-    def retrieval_bom(state):
-        return {
-            "search_response": {
-                "query_id": state["request_id"],
-                "status": "SUCCESS",
-                "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-                "results_count": 1,
-                "items": [
-                    {
-                        "rank": 1,
-                        "place_id": "POI-01",
-                        "name": "Ernesto Cafés Especiais",
-                        "distance_km": 1.2,
-                        "cosine_similarity": 0.9,
-                        "final_score": 0.86,
-                        "score_decomposition": {
-                            "vector_contribution": 0.36,
-                            "distance_contribution": 0.20,
-                            "reputation_contribution": 0.15,
-                            "compatibility_contribution": 0.15,
-                            "sum_check": 0.86,
-                        },
-                        **_osm_do_item("POI-01"),
-                    }
-                ],
-            }
-        }
-
-    graph = build_graph(
-        nlu=stub_nlu(),
-        retrieval=retrieval_bom,
-        validation=EvidenceValidator(),
-        communication=stub_communication,
-    )
-
-    state = run(graph, "Quero um café calmo na Asa Sul", "req-graph-01")
-    trace_agents = [t.agent for t in state["agent_trace"]]
-    assert trace_agents == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert state["validation_feedback"].approved is True
-    assert len(state["evidence_records"]) == 1
-    assert state["final_response"] == "top-3 auditado"
-
-
-def test_langgraph_integracao_reconsulta_e_aprovacao_segunda_tentativa():
-    tentativas = {"n": 0}
-
-    def retrieval_com_correcao(state):
-        tentativas["n"] += 1
-        fb: ValidationFeedback = state.get("validation_feedback")
-        # Na primeira tentativa, envia candidato sem osm_id
-        if tentativas["n"] == 1:
-            pid = "POI-INVALIDO"
-            name = "Inexistente"
-        else:
-            # Na segunda tentativa, corrigiu e enviou POI-01
-            assert fb is not None
-            assert fb.approved is False
-            assert "POI-INVALIDO" in fb.rejected_place_ids
-            pid = "POI-01"
-            name = "Ernesto Cafés Especiais"
-
-        return {
-            "search_response": {
-                "query_id": state["request_id"],
-                "status": "SUCCESS",
-                "applied_filters": {"radius_km": 3.0, "expanded_once": False, "amenities": ["cafe"]},
-                "results_count": 1,
-                "items": [
-                    {
-                        "rank": 1,
-                        "place_id": pid,
-                        "name": name,
-                        "distance_km": 1.0,
-                        "cosine_similarity": 0.9,
-                        "final_score": 0.86,
-                        "score_decomposition": {
-                            "vector_contribution": 0.36,
-                            "distance_contribution": 0.20,
-                            "reputation_contribution": 0.15,
-                            "compatibility_contribution": 0.15,
-                            "sum_check": 0.86,
-                        },
-                        **_osm_do_item(pid),
-                    }
-                ],
-            }
-        }
-
-    graph = build_graph(
-        nlu=stub_nlu(),
-        retrieval=retrieval_com_correcao,
-        validation=EvidenceValidator(),
-        communication=stub_communication,
-    )
-
-    state = run(graph, "Quero um café calmo na Asa Sul", "req-graph-02")
-    trace_agents = [t.agent for t in state["agent_trace"]]
-    assert trace_agents == [NLU, RETRIEVAL, VALIDATION, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert state["retry_count"] == 1
-    assert state["validation_feedback"].approved is True
-    assert state["final_response"] == "top-3 auditado"
 
 
 # =========================================================================

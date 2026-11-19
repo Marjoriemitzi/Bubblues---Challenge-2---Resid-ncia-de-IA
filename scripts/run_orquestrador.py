@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Executa o orquestrador com os agentes REAIS de Retrieval e Validation (PostgreSQL).
+"""Executa o orquestrador com o Retrieval real (busca + gate de auditoria + reconsulta) sobre o PostgreSQL.
 
 NLU e Communication ainda sao stubs: o pedido vem dos argumentos abaixo, nao de texto livre.
 Grava em evidencias_busca e evidencias_auditoria no banco do .env (data-pipeline/.env).
@@ -57,10 +57,12 @@ def main():
     ap.add_argument("--request-id", default=f"run-{uuid.uuid4().hex[:8]}")
     args = ap.parse_args()
 
-    retrieval = RetrievalPipeline()
+    # Auditoria (gate) gravada no PostgreSQL; o laco busca -> auditoria -> reconsulta e interno ao Retrieval.
+    validator = EvidenceValidator(store=PostgresEvidenceStore())
+    retrieval = RetrievalPipeline(validator=validator)
     if args.sem_modelo:
         vetor = _embedding_de_lugar(args.categoria)
-        retrieval = RetrievalPipeline(embedder=lambda texto: vetor)
+        retrieval = RetrievalPipeline(embedder=lambda texto: vetor, validator=validator)
 
     grafo = build_graph(
         nlu=stub_nlu(
@@ -73,7 +75,6 @@ def main():
             accessibility_requirements={"wheelchair_required": not args.sem_acessibilidade},
         ),
         retrieval=retrieval,
-        validation=EvidenceValidator(store=PostgresEvidenceStore()),
         communication=stub_communication,
     )
     s = run(grafo, "(texto livre nao usado: NLU e stub)", args.request_id)

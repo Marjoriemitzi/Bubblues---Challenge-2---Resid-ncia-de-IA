@@ -2,13 +2,13 @@
 
 Fluxo:
 
-    START -> nlu --(intent_valid=false)------------------------> communication -> END
+    START -> nlu --(intent_valid=false | clarification_needed)--> communication -> END
               |                                                        ^
-              +--(ok)--> retrieval -> validation --(aprovado)----------+
-                            ^             |
-                            +--(reprovado e retry_count < max)
-                                          |
-                                          +--(reprovado, sem tentativas)-> communication (abstencao)
+              +--(ok)--> retrieval ------------------------------------+
+
+O laco busca -> auditoria -> reconsulta NAO e mais do grafo: acontece DENTRO do no `retrieval`
+(RetrievalPipeline ou, depois, o agente LLM), que sempre passa pelo gate de auditoria antes de
+devolver `evidence_records`. O Validation e uma ferramenta, nao um agente (nao usa LLM).
 
 CONCEITOS LANGGRAPH usados aqui
   - Node: uma funcao `estado -> atualizacao parcial`. Cada agente e um no.
@@ -30,11 +30,10 @@ from langgraph.graph import END, START, StateGraph
 from .contracts import EvidenceRecord, SearchResponse, StructuredRequest, ValidationFeedback
 from .state import AgentState, TraceEntry
 
-MAX_RETRIES = 2  # reconsultas ao Retrieval_Agent apos reprovacao do Validation_Agent
+MAX_RETRIES = 2  # reconsultas que o Retrieval pode fazer apos o gate reprovar a busca
 
 NLU = "nlu_guardrail_agent"
-RETRIEVAL = "retrieval_agent"
-VALIDATION = "validation_agent"
+RETRIEVAL = "retrieval"
 COMMUNICATION = "communication_agent"
 
 # Resposta fixa (sem LLM) usada se ate o Communication_Agent falhar.
@@ -70,11 +69,17 @@ def route_after_nlu(state: AgentState) -> Decision:
 
 
 def route_after_retrieval(state: AgentState) -> Decision:
-    resp = state["search_response"]
-    if resp.status in ("NO_RESULTS", "OUT_OF_SCOPE") or resp.results_count == 0:
-        # O Retrieval ja expande o raio sozinho; auditar lista vazia so geraria reconsultas inuteis.
-        return Decision(COMMUNICATION, f"busca sem candidatos ({resp.status}): abstencao")
-    return Decision(VALIDATION, "candidatos prontos para auditoria")
+    """Depois do Retrieval so ha um destino (o Communication); a decisao registra POR QUE."""
+    if state.get("evidence_records"):
+        return Decision(COMMUNICATION, "evidencias aprovadas pelo gate de auditoria")
+    req, resp, fb = state.get("structured_request"), state.get("search_response"), state.get("validation_feedback")
+    if req is not None and req.clarification_needed:
+        return Decision(COMMUNICATION, "clarification_needed: pergunta ao usuario antes de buscar")
+    if fb is not None and not fb.approved:  # antes do "sem candidatos": reprovar e esgotar candidatos tambem cai aqui
+        return Decision(COMMUNICATION, f"reprovado pelo gate apos {state.get('retry_count', 0)} reconsulta(s): abstencao")
+    if resp is None or resp.status in ("NO_RESULTS", "OUT_OF_SCOPE") or resp.results_count == 0:
+        return Decision(COMMUNICATION, f"busca sem candidatos ({resp.status if resp else 'sem resposta'}): abstencao")
+    return Decision(COMMUNICATION, "sem evidencias aprovadas: abstencao")
 
 
 def _guard(route: Callable[[AgentState], Decision]) -> Callable[[AgentState], Decision]:
@@ -86,22 +91,6 @@ def _guard(route: Callable[[AgentState], Decision]) -> Callable[[AgentState], De
         return route(state)
 
     return guarded
-
-
-def make_route_after_validation(max_retries: int) -> Callable[[AgentState], Decision]:
-    def route(state: AgentState) -> Decision:
-        fb = state["validation_feedback"]
-        if fb.approved:
-            return Decision(COMMUNICATION, "Top-3 aprovado pela auditoria")
-        # retry_count ja foi incrementado pelo no de validacao ao reprovar.
-        if state.get("retry_count", 0) <= max_retries:
-            return Decision(
-                RETRIEVAL,
-                f"reprovado; reconsulta {state['retry_count']}/{max_retries}",
-            )
-        return Decision(COMMUNICATION, f"reprovado e {max_retries} reconsultas esgotadas: abstencao")
-
-    return route
 
 
 # --------------------------------------------------------------------------
@@ -176,40 +165,31 @@ def _scrub_raw_query(state: AgentState, update: dict) -> dict:
     return update
 
 
-def _count_retry(state: AgentState, update: dict) -> dict:
-    fb = update["validation_feedback"]
-    if not fb.approved:
-        update["retry_count"] = state.get("retry_count", 0) + 1
-    return update
-
-
 # --------------------------------------------------------------------------
 # Montagem do grafo
 # --------------------------------------------------------------------------
 def build_graph(
     nlu: Agent,
     retrieval: Agent,
-    validation: Agent,
     communication: Agent,
-    max_retries: int = MAX_RETRIES,
 ):
-    """Monta e compila o grafo. Os agentes entram por injecao de dependencia:
-    hoje sao stubs; nas issues #7-#10 trocamos pelos reais sem mexer aqui."""
+    """Monta e compila o grafo (nlu -> retrieval -> communication). Os agentes entram por injecao.
+
+    `retrieval` busca, audita (gate) e reconsulta; devolve search_response, evidence_records,
+    validation_feedback e retry_count prontos. Ver RetrievalPipeline.
+    """
     r_nlu = _guard(route_after_nlu)
     r_retrieval = _guard(route_after_retrieval)
-    r_validation = _guard(make_route_after_validation(max_retries))
 
     g = StateGraph(AgentState)
 
     g.add_node(NLU, _node(NLU, nlu, r_nlu, post=_scrub_raw_query))
     g.add_node(RETRIEVAL, _node(RETRIEVAL, retrieval, r_retrieval))
-    g.add_node(VALIDATION, _node(VALIDATION, validation, r_validation, post=_count_retry))
     g.add_node(COMMUNICATION, _node(COMMUNICATION, communication, None))
 
     g.add_edge(START, NLU)
     g.add_conditional_edges(NLU, lambda s: r_nlu(s).next, [RETRIEVAL, COMMUNICATION])
-    g.add_conditional_edges(RETRIEVAL, lambda s: r_retrieval(s).next, [VALIDATION, COMMUNICATION])
-    g.add_conditional_edges(VALIDATION, lambda s: r_validation(s).next, [RETRIEVAL, COMMUNICATION])
+    g.add_edge(RETRIEVAL, COMMUNICATION)
     g.add_edge(COMMUNICATION, END)
 
     return g.compile()

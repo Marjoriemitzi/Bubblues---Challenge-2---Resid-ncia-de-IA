@@ -5,12 +5,12 @@
 rodam de verdade.
 """
 
-from contextlib import nullcontext
+from contextlib import contextmanager
 
 import pytest
 
 from orchestrator.contracts import SearchResponse, StructuredRequest, ValidationFeedback
-from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
+from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, build_graph, run
 from orchestrator.retrieval_common import (
     montar_parametros,
     registro_para_search_response,
@@ -18,6 +18,7 @@ from orchestrator.retrieval_common import (
 )
 from orchestrator.retrieval_pipeline import RetrievalPipeline
 from orchestrator.stubs import _request, stub_communication, stub_nlu
+from orchestrator.evidence_store import MemoryEvidenceStore
 from orchestrator.validation_tool import EvidenceValidator
 
 
@@ -71,10 +72,25 @@ class FakeBusca:
         return self.respostas.pop(0) if len(self.respostas) > 1 else self.respostas[0]
 
 
+class _Con:
+    """Conexao falsa: so sabe listar as categorias da base."""
+
+    def execute(self, sql, params=()):
+        return self
+
+    def fetchall(self):
+        return [("cafe", 174), ("park", 442), ("restaurant", 1246)]
+
+
+@contextmanager
+def _conexao():
+    yield _Con()
+
+
 def _agente(fake, **kw):
-    return RetrievalPipeline(
-        conexao_factory=nullcontext, embedder=lambda t: [0.1] * 768, buscar_fn=fake, **kw
-    )
+    kw.setdefault("validator", EvidenceValidator(store=MemoryEvidenceStore()))
+    kw.setdefault("regioes_fn", lambda con, nome, limite: [])
+    return RetrievalPipeline(conexao_factory=_conexao, embedder=lambda t: [0.1] * 768, buscar_fn=fake, **kw)
 
 
 @pytest.fixture
@@ -159,52 +175,55 @@ def test_local_sem_osm_nao_e_marcado_verificado():
     assert d["items"][0]["is_public_verified"] is False
 
 
-# ------------------------------------------------------------ agente
-def test_agente_chama_busca_com_parametros_e_pede_k_extra_na_reconsulta(req):
-    fake = FakeBusca(_registro([_linha(2, "B", 2, CAFE_OK)]))
-    fb = ValidationFeedback(approved=False, rejected_place_ids=["1"], hard_filters={"wheelchair": "yes"})
-    out = _agente(fake)(_estado(req, validation_feedback=fb))
+# ------------------------------------------------------------ pipeline: busca -> gate -> reconsulta
+def _bom(pid, nome, osm):
+    return _linha(pid, nome, osm, CAFE_OK)
+
+
+def _ruim(pid, nome, osm):
+    return _linha(pid, nome, osm, {"amenity": "cafe", "wheelchair": "no"})
+
+
+def test_pipeline_busca_com_filtros_obrigatorios_e_entrega_evidencias(req):
+    fake = FakeBusca(_registro([_bom(1, "A", 111), _bom(2, "B", 222)]))
+    out = _agente(fake)(_estado(req))
     c = fake.chamadas[0]
-    assert (c["lat"], c["lon"]) == (-15.7939, -47.8828)
-    assert c["k"] == 4 and c["raio_m"] == 3000.0 and c["tipos"] == ["cafe"]
-    assert c["etiquetas_desejadas"] == {"wheelchair": "yes"}
-    assert "texto_consulta" not in c  # RNF02: nada de texto do usuario no registro de evidencia
-    assert out["search_response"]["items"][0]["place_id"] == "2"
+    assert (c["lat"], c["lon"]) == (-15.7939, -47.8828)  # sem regiao: centro de Brasilia
+    assert c["k"] == 3 and c["raio_m"] == 3000.0 and c["tipos"] == ["cafe"]
+    assert c["etiquetas_desejadas"] == {"wheelchair": "yes"} and c["tolerancia_sensorial"] == "baixo"
+    assert "texto_consulta" not in c  # RNF02
+    assert out["validation_feedback"].approved and out["retry_count"] == 0
+    assert [e.place_id for e in out["evidence_records"]] == ["1", "2"]
+    assert out["search_response"].consulta_id == "c-1"
 
 
-def test_regiao_resolvida_pelo_resolver_injetado():
-    fake = FakeBusca(_registro([_linha(1, "A", 1, CAFE_OK)]))
+def test_regiao_resolvida_pela_tabela_de_regioes():
     r = StructuredRequest.model_validate(_request("r1"))  # target_region = "Asa Sul"
     vistos = []
 
-    def resolver(regiao, conexao):
-        vistos.append(regiao)
-        return (-15.8169, -47.9000)
+    def regioes(con, nome, limite):
+        vistos.append((nome, limite))
+        return [{"nome": "Asa Sul", "tipo": "place=suburb", "latitude": -15.8169, "longitude": -47.9000}]
 
-    _agente(fake, resolver_local=resolver)(_estado(r))
-    assert vistos == ["Asa Sul"]
+    fake = FakeBusca(_registro([_bom(1, "A", 111)]))
+    _agente(fake, regioes_fn=regioes)(_estado(r))
+    assert vistos == [("Asa Sul", 5)]
     assert (fake.chamadas[0]["lat"], fake.chamadas[0]["lon"]) == (-15.8169, -47.9000)
 
 
-def test_regiao_desconhecida_nem_gera_embedding():
+def test_regiao_desconhecida_pede_esclarecimento_sem_buscar_nem_gerar_embedding():
     def embedder(texto):
         raise AssertionError("nao deveria gerar embedding")
 
     r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))
-    agente = RetrievalPipeline(
-        conexao_factory=nullcontext, embedder=embedder, buscar_fn=FakeBusca(_registro([])),
-        resolver_local=lambda regiao, con: None,
-    )
-    assert agente(_estado(r))["search_response"]["status"] == "NO_RESULTS"
-
-
-def test_regiao_desconhecida_pede_esclarecimento_sem_buscar():
-    fake = FakeBusca(_registro([_linha(1, "A", 1, CAFE_OK)]))
-    r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))
-    out = _agente(fake, resolver_local=lambda regiao, con: None)(_estado(r))
-    assert fake.chamadas == []  # nao chutou lugar nenhum
+    fake = FakeBusca(_registro([_bom(1, "A", 111)]))
+    p = RetrievalPipeline(conexao_factory=_conexao, embedder=embedder, buscar_fn=fake, regioes_fn=lambda c, n, l: [],
+                          validator=EvidenceValidator(store=MemoryEvidenceStore()))
+    out = p(_estado(r))
+    assert fake.chamadas == []
     assert out["search_response"]["status"] == "NO_RESULTS"
     assert "Narnia" in out["structured_request"].clarification_needed
+    assert "evidence_records" not in out
 
 
 def test_estado_sem_request_falha_alto():
@@ -212,55 +231,115 @@ def test_estado_sem_request_falha_alto():
         _agente(FakeBusca(_registro([])))({"request_id": "r1"})
 
 
-# ------------------------------------------------------------ grafo completo (agentes reais)
-def _grafo(fake, req_overrides=None):
-    return build_graph(
-        nlu=stub_nlu(spatial_constraints={"target_region": None, "max_radius_km": 3.0}, **(req_overrides or {})),
-        retrieval=_agente(fake),
-        validation=EvidenceValidator(),
-        communication=stub_communication,
-    )
+def test_reconsulta_aplica_os_filtros_do_gate_e_aprova():
+    fake = FakeBusca(_registro([_ruim(1, "Sem rampa", 111), _bom(2, "Com rampa", 222)]), _registro([_bom(2, "Com rampa", 222)]))
+    store = MemoryEvidenceStore()
+    r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": None, "max_radius_km": 3.0}))
+    out = _agente(fake, validator=EvidenceValidator(store=store))(_estado(r))
+    assert out["retry_count"] == 1 and [e.place_id for e in out["evidence_records"]] == ["2"]
+    assert len(fake.chamadas) == 2 and fake.chamadas[1]["k"] == 4  # k + 1 rejeitado
+    # auditoria: a 1a rodada gravou so o reprovado; a 2a gravou o aprovado
+    assert [(l["place_id"], l["approved"]) for l in store.linhas] == [("1", False), ("2", True)]
+
+
+def _sem_regiao():
+    return StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": None, "max_radius_km": 3.0}))
+
+
+def test_trava_de_reconsultas_e_abstencao():
+    # a cada rodada aparece outro candidato ruim: 1 busca + 2 reconsultas, e para
+    fake = FakeBusca(_registro([_ruim(1, "R1", 111)]), _registro([_ruim(2, "R2", 222)]), _registro([_ruim(3, "R3", 333)]))
+    out = _agente(fake, max_retries=2)(_estado(_sem_regiao()))
+    assert len(fake.chamadas) == 3
+    assert out["retry_count"] == 2 and "evidence_records" not in out
+    assert out["validation_feedback"].approved is False
+    assert out["validation_feedback"].hard_filters == {"wheelchair": "yes"}
+
+
+def test_reprovado_e_sem_candidato_novo_para_repor_mantem_o_feedback():
+    # a reconsulta so devolve o lugar ja reprovado (que e excluido): nao sobra nada, mas houve reprovacao
+    fake = FakeBusca(_registro([_ruim(1, "Sem rampa", 111)]))
+    out = _agente(fake, max_retries=2)(_estado(_sem_regiao()))
+    assert len(fake.chamadas) == 2
+    assert out["retry_count"] == 1 and out["validation_feedback"].approved is False
+    assert out["validation_feedback"].rejected_place_ids == ["1"] and out["search_response"]["status"] == "NO_RESULTS"
+    assert "sem novos candidatos" in out["note"]
+
+
+def test_busca_sem_candidatos_nao_aciona_o_gate():
+    store = MemoryEvidenceStore()
+    out = _agente(FakeBusca(_registro([])), validator=EvidenceValidator(store=store))(_estado(StructuredRequest.model_validate(
+        _request("r1", spatial_constraints={"target_region": None, "max_radius_km": 3.0}))))
+    assert out["search_response"]["status"] == "NO_RESULTS" and "validation_feedback" not in out
+    assert store.linhas == [] and out["retry_count"] == 0
+
+
+def test_categoria_que_a_base_nao_tem_vira_sem_resultado_e_nao_erro():
+    r = StructuredRequest.model_validate(_request("r1", target_amenities=["xyz"],
+                                                  spatial_constraints={"target_region": None, "max_radius_km": 3.0}))
+    fake = FakeBusca(_registro([_bom(1, "A", 111)]))
+    out = _agente(fake)(_estado(r))
+    assert fake.chamadas == [] and out["search_response"]["status"] == "NO_RESULTS"
+    assert "nao atendivel" in out["note"]
+
+
+def test_falha_de_infra_sobe_a_excecao():
+    def quebrada(*a, **k):
+        raise ConnectionError("db fora")
+
+    r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": None, "max_radius_km": 3.0}))
+    with pytest.raises(ConnectionError):
+        _agente(quebrada)(_estado(r))
+
+
+# ------------------------------------------------------------ grafo completo (nlu -> retrieval -> communication)
+def _grafo(fake, nlu_over=None, **kw):
+    over = {"spatial_constraints": {"target_region": None, "max_radius_km": 3.0}, **(nlu_over or {})}
+    return build_graph(stub_nlu(**over), _agente(fake, **kw), stub_communication)
+
+
+def _trilha(s):
+    return [t.agent for t in s["agent_trace"]]
 
 
 def test_grafo_aprova_direto():
-    fake = FakeBusca(_registro([_linha(1, "A", 111, CAFE_OK)]))
-    s = run(_grafo(fake), "q", "r-ok")
-    assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert s["validation_feedback"].approved is True
-    ev = s["evidence_records"][0]
-    assert ev.osm_reference.osm_link == "https://www.openstreetmap.org/node/111"
+    s = run(_grafo(FakeBusca(_registro([_bom(1, "A", 111)]))), "q", "r-ok")
+    assert _trilha(s) == [NLU, RETRIEVAL, COMMUNICATION]
+    assert s["validation_feedback"].approved and s["retry_count"] == 0
+    assert s["evidence_records"][0].osm_reference.osm_link == "https://www.openstreetmap.org/node/111"
     assert s["final_response"] == "top-3 auditado"
 
 
-def test_grafo_reconsulta_apos_reprovacao_e_aprova():
-    ruim = _linha(1, "Sem rampa", 111, {"amenity": "cafe", "wheelchair": "no"})
-    bom = _linha(2, "Com rampa", 222, CAFE_OK)
-    fake = FakeBusca(_registro([ruim]), _registro([bom]))
+def test_grafo_reconsulta_e_o_trace_continua_linear():
+    fake = FakeBusca(_registro([_ruim(1, "Sem rampa", 111)]), _registro([_bom(2, "Com rampa", 222)]))
     s = run(_grafo(fake), "q", "r-retry")
-    assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, VALIDATION, RETRIEVAL, VALIDATION, COMMUNICATION]
-    assert s["retry_count"] == 1
-    assert fake.chamadas[1]["k"] == 4  # k + 1 rejeitado
-    assert s["evidence_records"][0].place_id == "2"
+    assert _trilha(s) == [NLU, RETRIEVAL, COMMUNICATION]  # o laco e interno ao Retrieval
+    assert s["retry_count"] == 1 and s["evidence_records"][0].place_id == "2"
+    assert "reconsultas=1" in s["agent_trace"][1].note
+
+
+def test_grafo_gate_reprovado_apos_reconsultas_abstem():
+    fake = FakeBusca(_registro([_ruim(1, "R1", 111)]), _registro([_ruim(2, "R2", 222)]), _registro([_ruim(3, "R3", 333)]))
+    s = run(_grafo(fake), "q", "r-trava")
+    assert s["final_response"] == "abstencao" and s["retry_count"] == 2
+    assert "reprovado pelo gate" in s["agent_trace"][1].justification
+
+
+def test_grafo_reprovado_sem_candidato_novo_tambem_e_reprovado_pelo_gate():
+    s = run(_grafo(FakeBusca(_registro([_ruim(1, "Sem rampa", 111)]))), "q", "r-esgotou")
+    assert s["final_response"] == "abstencao" and s["retry_count"] == 1
+    assert "reprovado pelo gate" in s["agent_trace"][1].justification  # nao "busca sem candidatos"
 
 
 def test_grafo_sem_resultados_abstem():
     s = run(_grafo(FakeBusca(_registro([]))), "q", "r-vazio")
-    assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, COMMUNICATION]
-    assert s["final_response"] == "abstencao"
+    assert _trilha(s) == [NLU, RETRIEVAL, COMMUNICATION] and s["final_response"] == "abstencao"
 
 
 def test_grafo_regiao_desconhecida_pergunta_ao_usuario():
-    fake = FakeBusca(_registro([_linha(1, "A", 111, CAFE_OK)]))
-    g = build_graph(
-        nlu=stub_nlu(spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}),
-        retrieval=_agente(fake, resolver_local=lambda regiao, con: None),
-        validation=EvidenceValidator(),
-        communication=stub_communication,
-    )
-    s = run(g, "q", "r-narnia")
-    assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, COMMUNICATION]
-    assert fake.chamadas == []
-    assert "Narnia" in s["final_response"]  # modo esclarecimento
+    s = run(_grafo(FakeBusca(_registro([_bom(1, "A", 111)])), nlu_over={"spatial_constraints": {"target_region": "Narnia", "max_radius_km": 3.0}}), "q", "r-narnia")
+    assert "Narnia" in s["final_response"]
+    assert "clarification_needed" in s["agent_trace"][1].justification
 
 
 def test_grafo_erro_do_banco_vira_abstencao_segura():
@@ -268,5 +347,17 @@ def test_grafo_erro_do_banco_vira_abstencao_segura():
         raise ConnectionError("db fora")
 
     s = run(_grafo(quebrada), "q", "r-erro")
-    assert s["error"] == "retrieval_agent: ConnectionError"
-    assert s["final_response"] == "abstencao"
+    assert s["error"] == "retrieval: ConnectionError" and s["final_response"] == "abstencao"
+
+
+def test_grafo_falha_ao_gravar_auditoria_nao_entrega_nada():
+    """Fail-closed: sem rastro de auditoria o resultado nao pode ser entregue."""
+
+    class Quebrada:
+        def salvar(self, auditorias, consulta_id=None):
+            raise ConnectionError("db fora")
+
+    fake = FakeBusca(_registro([_bom(1, "A", 111)]))
+    s = run(_grafo(fake, validator=EvidenceValidator(store=Quebrada())), "q", "r-store")
+    assert s["error"] == "retrieval: ConnectionError" and s["final_response"] == "abstencao"
+    assert not s.get("evidence_records")

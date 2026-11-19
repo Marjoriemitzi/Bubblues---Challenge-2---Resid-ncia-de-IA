@@ -337,7 +337,7 @@ python extract_regioes.py   # data/raw/regioes.json (Overpass; repete com espera
 python load_regioes.py      # recria o conteudo da tabela regioes
 ```
 
-Quando o mesmo nome aparece mais de uma vez, vale a `prioridade` (pontos `place=` antes do centro da relação administrativa). `regioes.resolver_regiao` tenta nome exato, nome contido no de uma região e região contida no texto. Se nada casar, o `retrieval_agent` não busca e pede esclarecimento ao usuário.
+Quando o mesmo nome aparece mais de uma vez, vale a `prioridade` (pontos `place=` antes do centro da relação administrativa). `regioes.resolver_regiao` tenta nome exato, nome contido no de uma região e região contida no texto. Se nada casar, o `RetrievalPipeline` não busca e pede esclarecimento ao usuário.
 
 ### 10.3. Testes
 

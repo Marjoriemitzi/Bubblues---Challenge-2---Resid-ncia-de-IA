@@ -7,7 +7,7 @@ import pytest
 
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, build_graph, run
 from orchestrator.nlu_agent import EXEMPLO, NLUAgent, NLUFalhou, montar_prompt
-from orchestrator.stubs import stub_communication, stub_retrieval, stub_validation
+from orchestrator.stubs import stub_communication, stub_retrieval
 
 CATS = ["cafe", "park", "restaurant"]
 
@@ -92,13 +92,13 @@ def test_pedido_ambiguo_mantem_intent_valida_e_pergunta():
 
 def test_no_no_grafo_zera_raw_query_e_roteia():
     nlu = NLUAgent(FakeLLM(_json()), CATS)
-    g = build_graph(nlu, stub_retrieval, stub_validation(1), stub_communication)
+    g = build_graph(nlu, stub_retrieval, stub_communication)
     s = run(g, "quero um cafe calmo", "r-grafo")
     assert s["raw_query"] is None and s["agent_trace"][0].agent == NLU and s["agent_trace"][1].agent == RETRIEVAL
 
 
 def test_fora_de_escopo_vai_direto_ao_communication():
     llm = FakeLLM(_json(intent_valid=False, out_of_scope=True, out_of_scope_reason="servico de frete", target_amenities=[]))
-    g = build_graph(NLUAgent(llm, CATS), stub_retrieval, stub_validation(1), stub_communication)
+    g = build_graph(NLUAgent(llm, CATS), stub_retrieval, stub_communication)
     s = run(g, "preciso de um frete", "r-fora")
     assert [t.agent for t in s["agent_trace"]] == [NLU, COMMUNICATION]

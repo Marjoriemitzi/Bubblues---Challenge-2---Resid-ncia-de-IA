@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 
 from orchestrator.evidence_store import PostgresEvidenceStore
-from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
+from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, build_graph, run
 from orchestrator.retrieval_pipeline import RetrievalPipeline
 from orchestrator.stubs import stub_communication, stub_nlu
 from orchestrator.validation_tool import EvidenceValidator
@@ -68,12 +68,14 @@ def _lugar(con, nome, osm_id, metros=100.0, categoria="cafe", **tags):
 
 
 def _grafo(con, **nlu):
-    factory = lambda: nullcontext(con)  # noqa: E731 (todos os agentes na mesma conexao/schema)
+    factory = lambda: nullcontext(con)  # noqa: E731 (todos os componentes na mesma conexao/schema)
     nlu.setdefault("spatial_constraints", {"target_region": "Asa Sul", "max_radius_km": 2.0})
     return build_graph(
         nlu=stub_nlu(**nlu),
-        retrieval=RetrievalPipeline(conexao_factory=factory, embedder=lambda t: _vetor()),
-        validation=EvidenceValidator(store=PostgresEvidenceStore(conexao_factory=factory)),
+        retrieval=RetrievalPipeline(
+            conexao_factory=factory, embedder=lambda t: _vetor(),
+            validator=EvidenceValidator(store=PostgresEvidenceStore(conexao_factory=factory)),
+        ),
         communication=stub_communication,
     )
 
@@ -90,7 +92,7 @@ def test_aprovacao_direta_persiste_busca_e_auditoria(conexao):
 
     s = run(_grafo(conexao), "texto livre", "req-real-1")
 
-    assert _trilha(s) == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
+    assert _trilha(s) == [NLU, RETRIEVAL, COMMUNICATION]
     assert s["raw_query"] is None
     nomes = {e.place_name for e in s["evidence_records"]}
     assert nomes == {"Cafe A", "Cafe B"}
@@ -112,7 +114,7 @@ def test_reconsulta_real_exclui_rejeitado_e_aprova_o_seguinte(conexao):
         _grafo(conexao, temporal_constraints={"preferred_time_slot": "madrugada"}), "q", "req-real-2"
     )
 
-    assert _trilha(s) == [NLU, RETRIEVAL, VALIDATION, RETRIEVAL, VALIDATION, COMMUNICATION]
+    assert _trilha(s) == [NLU, RETRIEVAL, COMMUNICATION]  # o laco e interno ao Retrieval
     assert s["retry_count"] == 1
     assert [e.place_name for e in s["evidence_records"]] == ["Cafe 24h"]
     reprovado = conexao.execute(
@@ -143,10 +145,10 @@ def test_banco_fora_do_ar_vira_abstencao_segura(conexao):
 
     g = build_graph(
         nlu=stub_nlu(spatial_constraints={"target_region": None, "max_radius_km": 2.0}),
-        retrieval=RetrievalPipeline(conexao_factory=factory, embedder=lambda t: _vetor()),
-        validation=EvidenceValidator(),
+        retrieval=RetrievalPipeline(conexao_factory=factory, embedder=lambda t: _vetor(),
+                                    validator=EvidenceValidator(store=PostgresEvidenceStore(conexao_factory=factory))),
         communication=stub_communication,
     )
     s = run(g, "q", "req-real-5")
-    assert s["error"] == "retrieval_agent: ConnectionError"
+    assert s["error"] == "retrieval: ConnectionError"
     assert s["final_response"] == "abstencao"

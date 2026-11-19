@@ -1,14 +1,15 @@
 # Orquestrador Bubbles
 
-Grafo LangGraph com quatro agentes: `NLU → Retrieval → Validation → Communication`.
-Retrieval e Validation são reais e usam o PostgreSQL (PostGIS + pgvector, OSM do DF). NLU e
-Communication ainda são stubs (`stubs.py`).
+Grafo LangGraph: `NLU → Retrieval → Communication`. **"Agente" é só o que usa LLM** (NLU e Communication,
+e o Retrieval quando virar agente). O Validation não usa LLM: é uma **ferramenta** do Retrieval.
 
 ```
-NLU --(intent_valid=false)------------------------------> Communication
- └─(ok)─> Retrieval ──> Validation ──(aprovado)──────────> Communication
-             ▲              │
-             └──(reprovado, até 2 reconsultas com hard_filters)
+NLU --(intent_valid=false | clarification_needed)--------------> Communication
+ └─(ok)─> Retrieval ───────────────────────────────────────────> Communication
+            │
+            └─ por dentro: regiao → buscar_lugares → GATE (EvidenceValidator) → aprovado? entrega
+                                          ▲                          │
+                                          └── reconsulta com os filtros do feedback (até MAX_RETRIES)
 ```
 
 ## Rodar
@@ -17,28 +18,38 @@ NLU --(intent_valid=false)------------------------------> Communication
 cd data-pipeline && ./setup_db.sh && cd ..      # sobe e popula o banco (idempotente)
 pip install -r orchestrator/requirements.txt
 python scripts/run_orquestrador.py --regiao "Asa Sul" --categoria cafe --raio-km 2 --sem-modelo
-pytest orchestrator                              # testes de banco sao pulados sem Postgres
+pytest orchestrator                              # testes de banco são pulados sem Postgres
 ```
 
-## O que cada agente faz
+## Componentes
 
-| Agente | Arquivo | Entrada → saída |
-|---|---|---|
-| Retrieval | `retrieval_agent.py` | `structured_request` (+ `validation_feedback`) → `search_response` (Contrato 3), via `busca.buscar` |
-| Validation | `validation_agent.py` | `search_response` → `validation_feedback` + `evidence_records` (Contrato 4) |
+| Componente | Arquivo | Usa LLM? | O que faz |
+|---|---|---|---|
+| NLU | `nlu_agent.py` (+ `llm_client.py`) | sim (DeepSeek) | texto livre → `structured_request` (Contrato 2), validado e restrito às categorias da base |
+| Retrieval (hoje) | `retrieval_pipeline.py` | não | busca determinística + gate + reconsulta; devolve `search_response`, `evidence_records` (Contrato 4), `validation_feedback`, `retry_count` |
+| Tools de busca | `retrieval_tools.py` | não | `resolver_regiao`, `listar_categorias`, `buscar_lugares`, `validar_candidatos`; filtros obrigatórios dentro da tool |
+| Gate | `retrieval_gate.py` | não | auditoria **obrigatória** da seleção final; grava a auditoria; recusa lugar que não veio da busca |
+| Validação | `validation_tool.py` (`EvidenceValidator`) | não | RNF01, restrições (acessibilidade, ruído, horário) e integridade matemática do score |
+| Communication | `stubs.py` (stub) | — | em desenvolvimento por outra pessoa |
 
-- **Região:** `target_region` vira coordenada pela tabela `regioes` (OSM). Região desconhecida não
-  busca: preenche `clarification_needed` e o Communication pergunta ao usuário.
+`validation_agent.py` é só um shim de compatibilidade (nomes antigos `ValidationAgent` e `validation_agent`).
+
+- **Região:** `target_region` vira coordenada pela tabela `regioes` (OSM). Região desconhecida não busca:
+  preenche `clarification_needed` e o Communication pergunta ao usuário.
 - **Acessibilidade:** `wheelchair_required` só aceita `wheelchair=yes` explícito no OSM (ADR-0002).
-- **RNF01:** o Validation audita só o que o item traz do OSM (`osm_id`, `osm_tags`,
-  `is_public_verified`). Sem isso, reprova.
-- **Rastro:** `evidencias_busca` (uma linha por busca) e `evidencias_auditoria` (uma por candidato
-  auditado), ligadas por `consulta_id`. Falha de gravação vira abstenção segura.
+- **RNF01:** o validador audita só o que o item traz do OSM (`osm_id`, `osm_tags`, `is_public_verified`).
+- **Rastro:** `evidencias_busca` (uma linha por busca) e `evidencias_auditoria` (uma por candidato auditado),
+  ligadas por `consulta_id`. **Fail-closed:** falha ao gravar a auditoria vira abstenção.
 - **RNF02:** `raw_query` é zerado depois do NLU; nada de texto livre chega ao Retrieval nem ao banco.
+- `retry_count` = reconsultas realizadas (0 = aprovado na primeira busca).
+
+## Avaliação
+
+`scripts/avaliacao/rodar_experimento.py` roda o grafo sobre o dataset `bubbles-retrieval-osm-v1` no Langfuse
+(P@3, nDCG@3, restrições entregues, latência...). Baseline em `docs/avaliacao/baseline_retrieval_deterministico.md`.
 
 ## Limites conhecidos
 
-- A busca não filtra por horário nem por `elder_friendly`; o Validation reprova e a reconsulta
-  exclui o local rejeitado. O estado guarda só o último feedback.
+- A busca não filtra por horário nem por `elder_friendly`; o gate reprova e a reconsulta exclui o lugar rejeitado.
 - Só ~4% dos lugares do DF têm `wheelchair=yes`; nenhum tem `noise_level` no OSM.
 - `is_public_verified` é derivado da presença de `osm_id`/`osm_type` (todo `places` vem do OSM).
