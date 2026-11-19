@@ -25,8 +25,8 @@ sys.path.insert(0, str(RAIZ))
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
 from orchestrator.graph import build_graph, run  # noqa: E402
 from orchestrator.retrieval_common import _pipeline  # noqa: E402
-from orchestrator.retrieval_agent import RetrievalAgent  # noqa: E402
-from orchestrator.retrieval_pipeline import RetrievalPipeline  # noqa: E402
+from orchestrator.observabilidade import descarregar  # noqa: E402
+from orchestrator.retrieval_factory import criar_retrieval, modo_atual  # noqa: E402
 from orchestrator.stubs import stub_communication, stub_nlu  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
@@ -55,7 +55,7 @@ def main():
     ap.add_argument("--horario", help="preferred_time_slot, ex.: madrugada, tarde")
     ap.add_argument("--sem-acessibilidade", action="store_true", help="nao exige wheelchair=yes")
     ap.add_argument("--sem-modelo", action="store_true", help="nao carrega o sentence-transformers")
-    ap.add_argument("--modo", choices=("pipeline", "llm"), default="pipeline", help="pipeline = determinístico; llm = agente DeepSeek (com fallback)")
+    ap.add_argument("--modo", choices=("deterministic", "llm"), default=None, help="padrao: RETRIEVAL_MODE do ambiente (ou deterministic). llm = agente DeepSeek com fallback")
     ap.add_argument("--request-id", default=f"run-{uuid.uuid4().hex[:8]}")
     args = ap.parse_args()
 
@@ -65,8 +65,8 @@ def main():
     if args.sem_modelo:
         vetor = _embedding_de_lugar(args.categoria)
         embedder = lambda texto: vetor  # noqa: E731
-    classe = RetrievalAgent if args.modo == "llm" else RetrievalPipeline
-    retrieval = classe(embedder=embedder, validator=validator)
+    retrieval = criar_retrieval(args.modo, embedder=embedder, validator=validator)
+    print(f"retrieval: {type(retrieval).__name__} (RETRIEVAL_MODE={modo_atual(args.modo)})")
 
     grafo = build_graph(
         nlu=stub_nlu(
@@ -98,6 +98,7 @@ def main():
         print(f"  ✘ reprovados: {fb.rejected_place_ids} | {fb.diagnostics[:2]}")
     print(f"nota do retrieval: {s['agent_trace'][1].note if len(s['agent_trace']) > 1 else '-'}")
     print(f"resposta: {s.get('final_response')}")
+    descarregar()  # envia os traces pendentes antes de o processo terminar
 
 
 if __name__ == "__main__":

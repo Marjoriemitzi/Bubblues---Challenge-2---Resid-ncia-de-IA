@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import List, Optional, Sequence
 
 from .contracts import EvidenceRecord, SearchResponse, StructuredRequest, ValidationFeedback
+from .observabilidade import observar
 from .retrieval_tools import BuscaRegistrada
 from .validation_tool import EvidenceValidator
 
@@ -64,6 +65,14 @@ class RetrievalGate:
         place_ids: Optional[Sequence[str]] = None,
     ) -> ResultadoGate:
         """Audita a busca inteira, ou so a selecao `place_ids` (subconjunto e ordem escolhidos)."""
+        with observar("gate.auditar", "guardrail", input={"busca_id": busca.busca_id, "place_ids": list(place_ids) if place_ids else None}) as obs:
+            resultado = self._auditar(req, busca, place_ids)
+            fb = resultado.feedback
+            obs.update(output={"aprovado": fb.approved, "n_evidencias": len(resultado.evidence_records),
+                               "rejeitados": fb.rejected_place_ids, "hard_filters": fb.hard_filters})
+            return resultado
+
+    def _auditar(self, req: StructuredRequest, busca: BuscaRegistrada, place_ids: Optional[Sequence[str]]) -> ResultadoGate:
         resposta = SearchResponse.model_validate(_selecionar(busca, place_ids))
         if not resposta.items:
             fb = ValidationFeedback(approved=False, diagnostics=["Nenhum candidato retornado pela busca."])

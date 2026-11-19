@@ -44,6 +44,15 @@ pytest orchestrator                              # testes de banco são pulados 
 - **RNF02:** `raw_query` é zerado depois do NLU; nada de texto livre chega ao Retrieval nem ao banco.
 - `retry_count` = reconsultas realizadas (0 = aprovado na primeira busca).
 
+## Configuração e tracing
+
+- **`RETRIEVAL_MODE=deterministic|llm`** (padrão `deterministic`): `criar_retrieval()` / `montar_grafo()` em `retrieval_factory.py`.
+  `llm` usa o agente DeepSeek **com fallback** para o pipeline; a avaliação passa `fallback=None` para medir o agente cru.
+- **Tracing no Langfuse** (`observabilidade.py`): liga sozinho se houver `LANGFUSE_PUBLIC_KEY` e `LANGFUSE_SECRET_KEY`; sob pytest fica desligado.
+  Árvore por pedido: `pedido` → `no.<nó>` → `tool.*`, `gate.auditar` e `llm.chat` (generation, com tokens).
+  **RNF02:** não grava o conteúdo das mensagens (o NLU manda o texto livre do usuário ao LLM), só formato, tokens e nomes de tools;
+  `LANGFUSE_LOG_CONTENT=1` liga o conteúdo, só para depuração. Falha de tracing nunca derruba o sistema.
+
 ## LLM (DeepSeek)
 
 Variáveis em `.env.example`. Padrão: `deepseek-flash`, thinking desligado. `python scripts/diagnostico_llm.py` roda um loop real de tool use

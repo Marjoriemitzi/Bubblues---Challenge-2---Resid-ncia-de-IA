@@ -30,6 +30,8 @@ import time
 from dataclasses import asdict, dataclass
 from typing import Any, Callable, Dict, List, Optional
 
+from .observabilidade import logar_conteudo, observar, resumo_mensagens
+
 RETRYAVEL = {408, 409, 429, 500, 502, 503, 504}
 FINISH_TRANSITORIO = {"insufficient_system_resource", "aborted"}
 MODELO_PADRAO = "deepseek-flash"
@@ -204,7 +206,26 @@ class LLMClient:
     def chamadas(self) -> int:
         return self.uso.chamadas
 
-    def chat(
+    def chat(self, messages: List[Dict[str, Any]], **kw: Any):
+        """Uma chamada ao LLM (retries incluidos) como UMA observacao `generation` no Langfuse, com tokens.
+        O conteudo das mensagens NAO vai para o trace (RNF02) a nao ser com LANGFUSE_LOG_CONTENT=1."""
+        antes = self.uso.como_dict()
+        entrada = messages if logar_conteudo() else resumo_mensagens(messages)
+        meta = {"json_mode": bool(kw.get("json_mode")), "tools": [t["function"]["name"] for t in kw.get("tools") or []],
+                "reasoning_effort": kw.get("reasoning_effort") or self.reasoning_effort}
+        with observar("llm.chat", "generation", input=entrada, metadata=meta, model=self.model) as obs:
+            msg = self._chat(messages, **kw)
+            d = {k: v - antes[k] for k, v in self.uso.como_dict().items()}
+            chamadas = [c.nome for c in extrair_chamadas(msg)]
+            saida = {"tool_calls": chamadas} if chamadas else {"texto_chars": len(msg.content or "")}
+            if logar_conteudo():
+                saida["content"] = msg.content
+            obs.update(output=saida, usage_details={"input": d["prompt_tokens"], "output": d["completion_tokens"],
+                                                    "cache_hit_input": d["cache_hit_tokens"], "reasoning": d["reasoning_tokens"]},
+                       metadata={**meta, "requisicoes": d["chamadas"]})
+            return msg
+
+    def _chat(
         self,
         messages: List[Dict[str, Any]],
         *,
