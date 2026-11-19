@@ -97,7 +97,7 @@ Os **filtros obrigatórios** (acessibilidade, ruído, lugares já reprovados) s�
 - **Evolui o PR #15:** o formatador determinístico dele (`communication.py`) continua no código como **fallback** e como caminho dos **desvios** (fora de escopo, impossível, esclarecimento, sem evidência aprovada), onde a mensagem já vem pronta do NLU e o LLM não é chamado.
 - **Avisos obrigatórios calculados em código:** raio ampliado (3 km → 6 km) e horário pedido que não pôde ser confirmado no OSM. O modelo precisa incorporá-los.
 - **Verificação em código antes de entregar** (RNF01): todo lugar e todo link existem nas evidências, nenhuma URL fora delas, toda distância em km bate com os dados e cada aviso aparece. Reprovou: o modelo recebe o motivo e tenta de novo (até 2 vezes); depois disso, ou se o LLM falhar, entra o formatador **mais** os avisos escritos em código.
-- **Configuração:** `COMMUNICATION_MODE=llm` (padrão em `criar_comunicacao`) ou `deterministic`.
+- **No grafo padrão:** `montar_grafo(nlu)` (`retrieval_factory.py`) já o usa quando nenhum Communication é passado, e `scripts/run_orquestrador.py` também. `COMMUNICATION_MODE=llm` (padrão) ou `deterministic`; sem `DEEPSEEK_API_KEY` e sem pedir `llm`, cai no formatador sem quebrar.
 
 ### Orquestrador · `graph.py`
 - **Faz:** passa o estado entre os nós, decide o próximo (`route_after_nlu`, `route_after_retrieval`), valida cada contrato com Pydantic e registra o `agent_trace` (para onde foi e por quê). Uma falha de qualquer nó vira **abstenção segura**, sem vazar texto do usuário.
@@ -197,7 +197,7 @@ Na avaliação formal (`docs/avaliacao/fase_f_resultados.md`, 15 casos, 3 repeti
 
 ## 9. Limitações conhecidas
 
-- O **Communication Agent existe e está testado, mas não está plugado no grafo padrão** (`scripts/run_orquestrador.py` ainda usa o stub); a demonstração o usa via `criar_comunicacao()`. Falta também validar o tom com pessoas e com os perfis Helena e Carla.
+- O tom do Communication Agent não foi validado com pessoas nem com os perfis Helena e Carla.
 - O **NLU com LLM existe, mas não está plugado no grafo padrão** (os scripts de avaliação injetam o `structured_request`).
 - Só ~3,7% dos lugares têm `wheelchair=yes`, e nenhum tem `noise_level`: a busca acessível devolve poucas opções.
 - Região administrativa inteira (ex.: "Plano Piloto") usa o centro da caixa da relação OSM, que pode ficar longe do que o usuário imagina.

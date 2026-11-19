@@ -174,14 +174,20 @@ class CommunicationAgent:
 
 
 def criar_comunicacao(modo: Optional[str] = None, llm: Any = None) -> Callable[[AgentState], Dict[str, Any]]:
-    """`COMMUNICATION_MODE=llm` (padrao) cria o agente LLM; `deterministic` devolve o formatador do PR #15."""
+    """`COMMUNICATION_MODE=llm` (padrao) cria o agente LLM (sem DEEPSEEK_API_KEY e sem pedir `llm`, cai no formatador); `deterministic` devolve o formatador do PR #15."""
+    explicito = bool(modo or os.getenv("COMMUNICATION_MODE"))
     modo = (modo or os.getenv("COMMUNICATION_MODE") or "llm").strip().lower()
     if modo == "deterministic":
         return formatador
     if modo != "llm":
         raise ValueError(f"COMMUNICATION_MODE invalido: {modo!r}; use 'llm' ou 'deterministic'")
     if llm is None:
-        from .llm_client import LLMClient  # noqa: PLC0415
+        from .llm_client import LLMClient, LLMError  # noqa: PLC0415
 
-        llm = LLMClient()
+        try:
+            llm = LLMClient()
+        except LLMError:
+            if explicito:
+                raise
+            return formatador  # sem chave do DeepSeek e sem pedir llm: degrada para o formatador, sem quebrar
     return CommunicationAgent(llm)

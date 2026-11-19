@@ -103,3 +103,28 @@ def test_modo_deterministico_e_invalido():
     with pytest.raises(ValueError):
         criar_comunicacao("xyz")
     assert isinstance(criar_comunicacao("llm", llm=LLMFalso()), CommunicationAgent)
+
+
+def test_grafo_padrao_usa_o_communication_agent(monkeypatch):
+    from orchestrator.graph import COMMUNICATION, run
+    from orchestrator.retrieval_factory import montar_grafo
+    from orchestrator.stubs import stub_nlu, stub_retrieval
+
+    monkeypatch.setenv("COMMUNICATION_MODE", "deterministic")
+    g = montar_grafo(stub_nlu(), None, "deterministic")
+    assert COMMUNICATION in g.get_graph().nodes
+    monkeypatch.delenv("COMMUNICATION_MODE")
+    monkeypatch.delenv("DEEPSEEK_API_KEY", raising=False)
+    monkeypatch.setattr("orchestrator.llm_client.load_dotenv", lambda *a, **k: None, raising=False)
+    from orchestrator.communication import communication_agent
+    # sem chave e sem pedir llm: degrada para o formatador em vez de quebrar
+    import orchestrator.communication_agent as ca
+    from orchestrator.llm_client import LLMError
+
+    def sem_chave():
+        raise LLMError("sem chave")
+    monkeypatch.setattr("orchestrator.llm_client.LLMClient", lambda *a, **k: sem_chave())
+    assert ca.criar_comunicacao() is communication_agent
+    monkeypatch.setenv("COMMUNICATION_MODE", "llm")
+    with pytest.raises(LLMError):
+        ca.criar_comunicacao()

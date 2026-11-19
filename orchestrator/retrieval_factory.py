@@ -2,7 +2,7 @@
 
     retrieval = criar_retrieval()                       # le RETRIEVAL_MODE
     retrieval = criar_retrieval("llm", prompt="v2")      # explicito
-    grafo = montar_grafo(nlu, comunicacao)               # build_graph com o Retrieval escolhido
+    grafo = montar_grafo(nlu)                            # Retrieval do RETRIEVAL_MODE + Communication Agent LLM
 
 `deterministic` = RetrievalPipeline (sem LLM). `llm` = RetrievalAgent (DeepSeek) COM fallback para o pipeline,
 que e o que se quer em producao; a avaliacao usa `fallback=None` para medir o agente cru.
@@ -35,6 +35,11 @@ def criar_retrieval(modo: Optional[str] = None, *, fallback: Any = _AUTO, prompt
     return RetrievalPipeline(**colaboradores)
 
 
-def montar_grafo(nlu: Callable, comunicacao: Callable, modo: Optional[str] = None, **kw: Any):
-    """`build_graph` com o Retrieval do modo escolhido (ver criar_retrieval)."""
+def montar_grafo(nlu: Callable, comunicacao: Optional[Callable] = None, modo: Optional[str] = None, **kw: Any):
+    """Grafo padrao: `build_graph` com o Retrieval do modo escolhido (ver criar_retrieval) e, se `comunicacao` nao for
+    dada, o Communication Agent LLM (`criar_comunicacao`: COMMUNICATION_MODE, padrao llm)."""
+    if comunicacao is None:
+        from .communication_agent import criar_comunicacao  # noqa: PLC0415
+
+        comunicacao = criar_comunicacao()
     return build_graph(nlu, criar_retrieval(modo, **kw), comunicacao)

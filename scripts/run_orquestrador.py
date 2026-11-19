@@ -15,6 +15,7 @@ consulta (so para testar o fluxo; a ordem dos resultados nao reflete a vibe).
 
 import argparse
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -23,11 +24,11 @@ RAIZ = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(RAIZ))
 
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
-from orchestrator.graph import build_graph, run  # noqa: E402
+from orchestrator.graph import run  # noqa: E402
 from orchestrator.retrieval_common import _pipeline  # noqa: E402
 from orchestrator.observabilidade import descarregar  # noqa: E402
-from orchestrator.retrieval_factory import criar_retrieval, modo_atual  # noqa: E402
-from orchestrator.stubs import stub_communication, stub_nlu  # noqa: E402
+from orchestrator.retrieval_factory import modo_atual, montar_grafo  # noqa: E402
+from orchestrator.stubs import stub_nlu  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
 
 
@@ -65,11 +66,10 @@ def main():
     if args.sem_modelo:
         vetor = _embedding_de_lugar(args.categoria)
         embedder = lambda texto: vetor  # noqa: E731
-    retrieval = criar_retrieval(args.modo, embedder=embedder, validator=validator)
-    print(f"retrieval: {type(retrieval).__name__} (RETRIEVAL_MODE={modo_atual(args.modo)})")
+    print(f"retrieval: RETRIEVAL_MODE={modo_atual(args.modo)}; communication: COMMUNICATION_MODE={os.getenv('COMMUNICATION_MODE') or 'llm'}")
 
-    grafo = build_graph(
-        nlu=stub_nlu(
+    grafo = montar_grafo(
+        stub_nlu(
             target_amenities=[args.categoria],
             activity=args.atividade,
             vibe=args.vibe,
@@ -78,8 +78,9 @@ def main():
             temporal_constraints={"preferred_time_slot": args.horario},
             accessibility_requirements={"wheelchair_required": not args.sem_acessibilidade},
         ),
-        retrieval=retrieval,
-        communication=stub_communication,
+        modo=args.modo,
+        embedder=embedder,
+        validator=validator,
     )
     s = run(grafo, "(texto livre nao usado: NLU e stub)", args.request_id)
 

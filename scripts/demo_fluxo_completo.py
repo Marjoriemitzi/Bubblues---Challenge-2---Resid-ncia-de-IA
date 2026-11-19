@@ -34,14 +34,13 @@ def carregar_envs():
 
 carregar_envs()
 
-from orchestrator.communication_agent import criar_comunicacao  # noqa: E402
 from orchestrator.evidence_store import PostgresEvidenceStore  # noqa: E402
-from orchestrator.graph import build_graph, run  # noqa: E402
+from orchestrator.graph import run  # noqa: E402
 from orchestrator.llm_client import LLMClient, extrair_chamadas  # noqa: E402
 from orchestrator.nlu_agent import NLUAgent  # noqa: E402
 from orchestrator.observabilidade import descarregar  # noqa: E402
 from orchestrator.retrieval_common import _pipeline  # noqa: E402
-from orchestrator.retrieval_factory import criar_retrieval, modo_atual  # noqa: E402
+from orchestrator.retrieval_factory import modo_atual, montar_grafo  # noqa: E402
 from orchestrator.retrieval_gate import RetrievalGate  # noqa: E402
 from orchestrator.retrieval_tools import RetrievalTools, _resumo_tool, aquecer_modelo  # noqa: E402
 from orchestrator.validation_tool import EvidenceValidator  # noqa: E402
@@ -83,7 +82,7 @@ def instrumentar():
 
 def carregar_comunicacao(spec):
     if not spec:
-        return criar_comunicacao(), "Communication Agent (LLM, com fallback deterministico)"
+        return None, "Communication Agent (LLM), do grafo padrao"
     alvo, _, fn = spec.partition(":")
     if alvo.endswith(".py"):
         s = importlib.util.spec_from_file_location("comunicacao_externa", alvo)
@@ -113,9 +112,9 @@ def main():
     busca = _pipeline()[0]
     with busca.conectar() as con:
         categorias = [r[0] for r in con.execute("SELECT DISTINCT categoria FROM places WHERE categoria IS NOT NULL")]
-    comunicacao, nome_com = carregar_comunicacao(a.comunicacao)
+    comunicacao, nome_com = carregar_comunicacao(a.comunicacao)  # None = o do grafo padrao
     validator = EvidenceValidator(store=PostgresEvidenceStore())
-    grafo = build_graph(NLUAgent(LLMClient(), categorias), criar_retrieval(a.modo, validator=validator), comunicacao)
+    grafo = montar_grafo(NLUAgent(LLMClient(), categorias), comunicacao, a.modo, validator=validator)
 
     global T0
     T0 = time.time()
