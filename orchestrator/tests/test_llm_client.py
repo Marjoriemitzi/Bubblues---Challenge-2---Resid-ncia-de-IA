@@ -1,6 +1,7 @@
 """LLMClient: retry, erros definitivos e resposta vazia, com um cliente OpenAI falso."""
 
 import json
+import time
 from types import SimpleNamespace
 
 import pytest
@@ -195,6 +196,37 @@ def test_cada_requisicao_recebe_o_timeout_do_tempo_restante_do_prazo():
     llm.chat([], prazo=160.0)  # 60 s de prazo, bem abaixo do timeout de 90 s
     assert fake.chamadas[0]["timeout"] == 60.0
     assert fake.chamadas[1]["timeout"] == pytest.approx(58.5)  # depois da espera de 1,5 s
+
+
+def test_requisicao_lenta_nao_passa_do_prazo_mesmo_com_o_timeout_do_sdk_frouxo():
+    """O provedor segura a conexao (keep-alive) e o timeout de leitura do SDK nunca dispara: o prazo tem que cortar."""
+    import threading
+    import time
+
+    liberar = threading.Event()
+
+    class Lento:
+        def __init__(self):
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=self._create))
+
+        def _create(self, **kw):
+            liberar.wait(5.0)  # simula a resposta que nao chega
+            return _resp("tarde demais")
+
+    llm = LLMClient(client=Lento(), model="m", timeout=90.0)
+    t0 = time.monotonic()
+    with pytest.raises(LLMError, match="tempo total excedido durante a requisicao"):
+        llm.chat([], prazo=time.monotonic() + 0.3)
+    assert time.monotonic() - t0 < 1.5  # cortou perto de 0,3 s, nao esperou os 5 s
+    liberar.set()
+
+
+def test_excecao_do_sdk_dentro_da_thread_chega_intacta_e_continua_classificada():
+    esperas = []
+    llm = LLMClient(client=FakeOpenAI(ErroHTTP(401)), model="m", sleep=esperas.append)
+    with pytest.raises(LLMError, match="401"):
+        llm.chat([], prazo=time.monotonic() + 10)  # 401: erro definitivo, sem retry
+    assert esperas == [] and llm.chamadas == 1
 
 
 def test_sem_prazo_nao_define_timeout_por_requisicao():

@@ -50,6 +50,7 @@ R = {
   "577":  (1, "tipo", "B", "bar e cafe; sem fonte"),
   "2938": (1, "tipo", "B", "contraste; bar; sem fonte"),
   "903":  (1, "tipo", "B", "contraste; cafe; sem fonte"),
+  "1554": (1, "tipo", "B", "AGENTE LLM: cafe; jogos de tabuleiro e horario sem fonte"),
   "846":  (2, "web", "M", "REFERENCIA: Carcassonne Pub (407 Norte) foca em jogos de tabuleiro (Correio Braziliense); OSM: Ter-Qui 18h-24h"),
  }),
  "TC-03": ("espaco silencioso p/ leitura em grupo e debate de livros (ficcao cientifica), livraria/centro cultural", {
@@ -97,6 +98,9 @@ R = {
   "3313": (0, "osm", "M", "OSM: Ter-Qui 09-17h"),
   "7":    (1, "tipo", "B", "'Feirinha do anexo do Buriti': feira, mas horario/ar livre sem fonte"),
   "4329": (0, "tipo", "B", "11 km: acima do raio de 9 km"),
+  "2875": (0, "osm", "B", "AGENTE LLM: praca 24/7 sem evidencia de gastronomia/feirinha (nucleo do pedido); tipo errado"),
+  "3843": (0, "tipo", "B", "AGENTE LLM: praca sem evidencia de gastronomia/feirinha (nucleo do pedido); tipo errado"),
+  "3726": (0, "tipo", "B", "AGENTE LLM: Torre de TV (park); feirinha/gastronomia noturna sem fonte (a feira conhecida e diurna e nao confirmada)"),
  }),
  "TC-07": ("restaurante vegetariano/vegano, Asa Norte, almoco, espaco arejado", {
   "1661": (2, "web", "M", "Apetit Natural: 100% vegano, buffet por peso, CLN 407 (Spinach/Correio); OSM sem horario"),
@@ -194,6 +198,8 @@ R = {
   "1945": (1, "tipo", "B", "sem fonte"), "1170": (1, "tipo", "B", "sanduiches rapidos; sem fonte"),
   "919":  (1, "tipo", "B", "sanduiches rapidos; sem fonte"), "1420": (1, "tipo", "B", "sem fonte"),
   "1422": (1, "tipo", "B", "contraste; sem fonte"), "1280": (1, "tipo", "B", "contraste; sem fonte"),
+  "1554": (1, "tipo", "B", "AGENTE LLM: cafe; horario ate 22h sem fonte (nao confirmado)"),
+  "1188": (1, "tipo", "B", "AGENTE LLM: cafe; horario ate 22h sem fonte (web: nenhum resultado)"),
   "1489": (0, "osm", "M", "AGENTE LLM: Entre Eixos; OSM abre 09:00-17:00, nao atende 'aberto ate 22h'"),
   "1783": (0, "osm", "M", "AGENTE LLM: Melbourne Cafe; OSM Seg-Sex 08:15-17:30, nao atende 'aberto ate 22h'"),
  }),
@@ -232,6 +238,10 @@ def main():
             if pid in cands:
                 c = cands[pid]; nome = ficha[pid]["nome"]; cat = ficha[pid]["categoria"]; osm = ficha[pid]["osm"]; origem = c["origem"]; dist = c["distancia_km"]
                 posicao = [x["place_id"] for x in pool[tid]["candidatos"] if x["origem"] == "pipeline"].index(pid) + 1 if origem == "pipeline" else None
+            elif pid in ficha and pid not in SEEDS:
+                nome, cat, osm = ficha[pid]["nome"], ficha[pid]["categoria"], ficha[pid]["osm"]
+                la, lo = ficha[pid]["lat"], ficha[pid]["lon"]; origem = "agente_llm"
+                dist = round(km(ponto, (float(la), float(lo))), 2); posicao = None
             else:
                 nome, cat, la, lo, osm = SEEDS[pid]; origem = "agente_llm" if pid in ("3471", "1489", "1783") else "referencia"; dist = round(km(ponto, (la, lo)), 2); posicao = None
             itens.append({"place_id": pid, "osm": osm, "nome": nome, "categoria": cat, "origem": origem, "posicao_pipeline": posicao,
@@ -248,7 +258,7 @@ def main():
     saida["TC-16"] = {"acao_esperada": "clarificar", "nucleo": "pedido ambiguo: a resposta correta e perguntar; candidatos nao rotulados", "labels": []}
     saida["TC-17"] = {"acao_esperada": "abster", "nucleo": "criterio impossivel (patinacao no gelo + 03:30)", "labels": []}
     saida["TC-18"] = {"acao_esperada": "abster", "nucleo": "fora de escopo (frete)", "labels": []}
-    (AV / "rotulos_osm_v1.json").write_text(json.dumps({"anotador": "Claude (unico, nao cego)", "versao": "v1.1 (v1 + 3 lugares entregues pelo agente LLM)", "escala": "0/1/2", "casos": saida, "baseline_pipeline": metr}, ensure_ascii=False, indent=2), encoding="utf-8")
+    (AV / "rotulos_osm_v1.json").write_text(json.dumps({"anotador": "Claude (unico, nao cego)", "versao": "v1.2 (v1 + 9 lugares entregues pelo agente LLM)", "escala": "0/1/2", "casos": saida, "baseline_pipeline": metr}, ensure_ascii=False, indent=2), encoding="utf-8")
     ok = [m for m in metr if m["ndcg3_pipeline"] is not None]
     print(f"{len(metr)} casos rotulados; {sum(len(v['labels']) for v in saida.values())} rotulos")
     print(f"baseline do pipeline atual: P@3 medio={sum(m['p3_pipeline'] for m in metr)/len(metr):.2f} | nDCG@3 medio={sum(m['ndcg3_pipeline'] for m in ok)/len(ok):.2f}")

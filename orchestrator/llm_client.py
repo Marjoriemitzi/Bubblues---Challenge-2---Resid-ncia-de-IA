@@ -13,8 +13,9 @@ Configuracao (variaveis de ambiente; os .env da arvore sao carregados automatica
 
 Erros transitorios (429, 5xx, rede, resposta JSON vazia, `aborted`) sao repetidos com espera crescente.
 Erros definitivos (400, 401, 402, 422, resposta truncada...) falham na hora. A chave nunca entra em mensagens
-de erro. `prazo` (relogio monotonico) limita o tempo total de uma chamada, retries incluidos: cada requisicao recebe
-o timeout `min(timeout, tempo restante)`, entao uma resposta lenta nao passa do prazo.
+de erro. `prazo` (relogio monotonico) limita o tempo total de uma chamada, retries incluidos. E um prazo de VERDADE: o
+timeout do SDK nao basta (keep-alive do provedor zera o timeout de leitura), entao a requisicao roda numa thread
+daemon e deixamos de esperar quando o prazo acaba.
 
 Thinking + tools: a API EXIGE devolver o `reasoning_content` em todas as requisicoes seguintes (senao 400).
 `mensagem_para_dict` preserva esse campo; use-a para montar o historico.
@@ -24,6 +25,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 from dataclasses import asdict, dataclass
 from typing import Any, Callable, Dict, List, Optional
@@ -104,6 +106,35 @@ def mensagem_de_ferramenta(chamada_id: str, resultado: Any) -> Dict[str, Any]:
     """Resposta de uma tool ao modelo (o conteudo precisa ser texto)."""
     conteudo = resultado if isinstance(resultado, str) else json.dumps(resultado, ensure_ascii=False)
     return {"role": "tool", "tool_call_id": chamada_id, "content": conteudo}
+
+
+class _PrazoEsgotado(Exception):
+    pass
+
+
+def _com_prazo(fn: Callable[..., Any], kwargs: Dict[str, Any], restante: float) -> Any:
+    """Roda `fn(**kwargs)` e para de ESPERAR quando `restante` acaba.
+
+    O `timeout` do SDK nao serve de prazo total: o DeepSeek manda linhas vazias de keep-alive enquanto a
+    requisicao espera na fila, o que zera o timeout de leitura (vimos uma resposta levar 99 s com timeout de 60).
+    A requisicao fica numa thread daemon; se estourar o prazo ela e abandonada (o resultado e descartado).
+    """
+    caixa: Dict[str, Any] = {}
+
+    def alvo() -> None:
+        try:
+            caixa["ok"] = fn(**kwargs)
+        except BaseException as exc:  # noqa: BLE001 (repassamos a excecao original para quem chamou)
+            caixa["erro"] = exc
+
+    th = threading.Thread(target=alvo, daemon=True, name="llm-requisicao")
+    th.start()
+    th.join(max(restante, 0.0))
+    if th.is_alive():
+        raise _PrazoEsgotado()
+    if "erro" in caixa:
+        raise caixa["erro"]
+    return caixa["ok"]
 
 
 def _status(exc: BaseException) -> Optional[int]:
@@ -212,7 +243,12 @@ class LLMClient:
             if prazo is not None:  # uma requisicao lenta tambem nao pode estourar o prazo total
                 kwargs["timeout"] = max(1.0, min(self.timeout, prazo - self._relogio()))
             try:
-                resp = self._client.chat.completions.create(**kwargs)
+                if prazo is None:
+                    resp = self._client.chat.completions.create(**kwargs)
+                else:
+                    resp = _com_prazo(self._client.chat.completions.create, kwargs, prazo - self._relogio())
+            except _PrazoEsgotado:
+                raise LLMError("tempo total excedido durante a requisicao ao LLM") from None
             except Exception as exc:  # noqa: BLE001 (classificamos abaixo)
                 status = _status(exc)
                 if status in RETRYAVEL or (status is None and _de_rede(exc)):

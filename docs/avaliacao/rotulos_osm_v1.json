@@ -1,6 +1,6 @@
 {
   "anotador": "Claude (unico, nao cego)",
-  "versao": "v1.1 (v1 + 3 lugares entregues pelo agente LLM)",
+  "versao": "v1.2 (v1 + 9 lugares entregues pelo agente LLM)",
   "escala": "0/1/2",
   "casos": {
     "TC-01": {
@@ -313,6 +313,19 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "contraste; cafe; sem fonte"
+        },
+        {
+          "place_id": "1554",
+          "osm": "node/4908141129",
+          "nome": "Gaudi Café",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.37,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: cafe; jogos de tabuleiro e horario sem fonte"
         },
         {
           "place_id": "846",
@@ -848,6 +861,45 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "11 km: acima do raio de 9 km"
+        },
+        {
+          "place_id": "2875",
+          "osm": "node/13040446322",
+          "nome": "Praça dos artistas",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.9,
+          "grau": 0,
+          "evidencia": "osm",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: praca 24/7 sem evidencia de gastronomia/feirinha (nucleo do pedido); tipo errado"
+        },
+        {
+          "place_id": "3843",
+          "osm": "way/555952785",
+          "nome": "Praça Galeria",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.67,
+          "grau": 0,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: praca sem evidencia de gastronomia/feirinha (nucleo do pedido); tipo errado"
+        },
+        {
+          "place_id": "3726",
+          "osm": "way/469233908",
+          "nome": "Torre de TV",
+          "categoria": "park",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 1.0,
+          "grau": 0,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: Torre de TV (park); feirinha/gastronomia noturna sem fonte (a feira conhecida e diurna e nao confirmada)"
         }
       ]
     },
@@ -2133,6 +2185,32 @@
           "evidencia": "tipo",
           "confianca": "B",
           "motivo": "contraste; sem fonte"
+        },
+        {
+          "place_id": "1554",
+          "osm": "node/4908141129",
+          "nome": "Gaudi Café",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.37,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: cafe; horario ate 22h sem fonte (nao confirmado)"
+        },
+        {
+          "place_id": "1188",
+          "osm": "node/3958863455",
+          "nome": "Tomilla Café",
+          "categoria": "cafe",
+          "origem": "agente_llm",
+          "posicao_pipeline": null,
+          "distancia_km": 0.75,
+          "grau": 1,
+          "evidencia": "tipo",
+          "confianca": "B",
+          "motivo": "AGENTE LLM: cafe; horario ate 22h sem fonte (web: nenhum resultado)"
         },
         {
           "place_id": "1489",
