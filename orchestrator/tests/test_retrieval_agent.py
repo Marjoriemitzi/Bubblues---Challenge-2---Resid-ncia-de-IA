@@ -186,6 +186,18 @@ def test_regiao_resolvida_pelo_resolver_injetado():
     assert (fake.chamadas[0]["lat"], fake.chamadas[0]["lon"]) == (-15.8169, -47.9000)
 
 
+def test_regiao_desconhecida_nem_gera_embedding():
+    def embedder(texto):
+        raise AssertionError("nao deveria gerar embedding")
+
+    r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))
+    agente = RetrievalAgent(
+        conexao_factory=nullcontext, embedder=embedder, buscar_fn=FakeBusca(_registro([])),
+        resolver_local=lambda regiao, con: None,
+    )
+    assert agente(_estado(r))["search_response"]["status"] == "NO_RESULTS"
+
+
 def test_regiao_desconhecida_pede_esclarecimento_sem_buscar():
     fake = FakeBusca(_registro([_linha(1, "A", 1, CAFE_OK)]))
     r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))

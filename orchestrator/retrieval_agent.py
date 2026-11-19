@@ -216,7 +216,6 @@ class RetrievalAgent:
             self._padroes()
 
         params = montar_parametros(req, state.get("validation_feedback"), self.k)
-        embedding = self._embedder(texto_do_embedding(req))
         rejeitados = params.pop("rejeitados")
         regiao = req.spatial_constraints.target_region
 
@@ -225,6 +224,8 @@ class RetrievalAgent:
             if local is None:
                 return self._pedir_esclarecimento(state, req, regiao, params["tipos"])
             lat, lon = local
+            # Depois da regiao: nao carrega o modelo de embeddings a toa quando vai pedir esclarecimento.
+            embedding = self._embedder(texto_do_embedding(req))
             registro = self._buscar_fn(
                 conexao,
                 lat,
