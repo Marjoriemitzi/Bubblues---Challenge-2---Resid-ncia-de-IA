@@ -12,8 +12,9 @@ Pontos de atencao:
     `rejected_place_ids` sao excluidos do resultado.
   - RNF02: o texto livre do usuario nunca chega aqui (o orquestrador zera `raw_query`). O embedding
     vem so de campos estruturados (activity, vibe, search_vector_focus).
-  - Localizacao: `target_region` -> (lat, lon) e injetavel (`resolver_local`). O padrao so conhece
-    "sem regiao" (centro de Brasilia); a resolucao por nome vem na Fase 3.
+  - Localizacao: `target_region` -> (lat, lon) usa a tabela `regioes` (OSM do DF) via `resolver_local`.
+    Regiao nao encontrada NAO e chutada: o agente devolve NO_RESULTS e preenche
+    `structured_request.clarification_needed`, e o Communication_Agent pergunta ao usuario.
 
 Dependencias pesadas (psycopg, sentence-transformers) sao carregadas so quando necessarias, e todas
 podem ser injetadas, entao os testes rodam sem banco.
@@ -33,14 +34,13 @@ CENTRO_BRASILIA = (-15.7939, -47.8828)
 _PIPELINE_DIR = Path(__file__).resolve().parent.parent / "data-pipeline"
 
 
-class LocalizacaoDesconhecida(RuntimeError):
-    """A regiao pedida nao pode ser convertida em coordenadas."""
-
-
-def resolver_local_padrao(regiao: Optional[str]) -> Tuple[float, float]:
+def resolver_local_padrao(regiao: Optional[str], conexao) -> Optional[Tuple[float, float]]:
+    """(lat, lon) da regiao pedida, ou None se nao existir. Sem regiao: centro de Brasilia."""
     if not regiao:
         return CENTRO_BRASILIA
-    raise LocalizacaoDesconhecida("resolucao de regiao por nome ainda nao implementada (Fase 3)")
+    _, _, regioes = _pipeline()
+    achado = regioes.resolver_regiao(conexao, regiao)
+    return (achado[0], achado[1]) if achado else None
 
 
 def _pipeline():
@@ -49,8 +49,9 @@ def _pipeline():
         sys.path.insert(0, str(_PIPELINE_DIR))
     import busca  # noqa: PLC0415
     import gerar_embeddings  # noqa: PLC0415
+    import regioes  # noqa: PLC0415
 
-    return busca, gerar_embeddings
+    return busca, gerar_embeddings, regioes
 
 
 # --------------------------------------------------------------------------
@@ -174,7 +175,7 @@ class RetrievalAgent:
     Todos os colaboradores sao injetaveis (teste sem banco):
       conexao_factory: () -> context manager de conexao (padrao: busca.conectar)
       embedder:        (texto) -> list[float] de 768 dims (padrao: gerar_embedding_consulta)
-      resolver_local:  (target_region) -> (lat, lon)
+      resolver_local:  (target_region, conexao) -> (lat, lon) ou None se a regiao nao existe
       buscar_fn:       (conexao, lat, lon, embedding, **kw) -> registro (padrao: busca.buscar)
     """
 
@@ -182,7 +183,7 @@ class RetrievalAgent:
         self,
         conexao_factory: Optional[Callable[[], Any]] = None,
         embedder: Optional[Callable[[str], List[float]]] = None,
-        resolver_local: Callable[[Optional[str]], Tuple[float, float]] = resolver_local_padrao,
+        resolver_local: Callable[[Optional[str], Any], Optional[Tuple[float, float]]] = resolver_local_padrao,
         buscar_fn: Optional[Callable[..., dict]] = None,
         k: int = K_PADRAO,
     ):
@@ -194,7 +195,7 @@ class RetrievalAgent:
         self.k = k
 
     def _padroes(self):
-        busca, emb = _pipeline()
+        busca, emb, _ = _pipeline()
         self._conexao_factory = self._conexao_factory or busca.conectar
         self._buscar_fn = self._buscar_fn or busca.buscar
         if self._embedder is None:
@@ -214,11 +215,15 @@ class RetrievalAgent:
             self._padroes()
 
         params = montar_parametros(req, state.get("validation_feedback"), self.k)
-        lat, lon = self._resolver_local(req.spatial_constraints.target_region)
         embedding = self._embedder(texto_do_embedding(req))
         rejeitados = params.pop("rejeitados")
+        regiao = req.spatial_constraints.target_region
 
         with self._conexao_factory() as conexao:
+            local = self._resolver_local(regiao, conexao)
+            if local is None:
+                return self._pedir_esclarecimento(state, req, regiao, params["tipos"])
+            lat, lon = local
             registro = self._buscar_fn(
                 conexao,
                 lat,
@@ -236,6 +241,30 @@ class RetrievalAgent:
         return {
             "search_response": resposta,
             "note": f"{n} candidato(s); status={resposta['status']}; consulta_id={registro['consulta_id']}",
+        }
+
+
+    @staticmethod
+    def _pedir_esclarecimento(state, req, regiao, tipos) -> Dict[str, Any]:
+        """Regiao fora da base: nao busca em lugar nenhum e devolve a pergunta ao usuario."""
+        pergunta = (
+            f"Nao encontrei a regiao '{regiao}' no Distrito Federal. "
+            "Pode indicar outra regiao administrativa ou bairro (ex.: Asa Sul, Aguas Claras)?"
+        )
+        return {
+            "structured_request": req.model_copy(update={"clarification_needed": pergunta}),
+            "search_response": {
+                "query_id": state["request_id"],
+                "status": "NO_RESULTS",
+                "applied_filters": {
+                    "radius_km": req.spatial_constraints.max_radius_km,
+                    "expanded_once": False,
+                    "amenities": list(tipos or []),
+                },
+                "results_count": 0,
+                "items": [],
+            },
+            "note": "regiao nao encontrada na tabela regioes: pedindo esclarecimento",
         }
 
 

@@ -56,3 +56,20 @@ CREATE TABLE IF NOT EXISTS evidencias_busca (
     criada_em TIMESTAMPTZ NOT NULL,
     registro JSONB NOT NULL
 );
+
+-- Regioes do DF (RAs, bairros, quadras) para converter "Asa Sul" em coordenadas.
+-- Carregada por load_regioes.py a partir do OSM. Sem FK: independe da curadoria de places.
+CREATE TABLE IF NOT EXISTS regioes (
+    regiao_id BIGSERIAL PRIMARY KEY,
+    nome TEXT NOT NULL,
+    nome_normalizado TEXT NOT NULL,
+    tipo VARCHAR(40) NOT NULL,        -- ex.: place=suburb, admin_level=8
+    prioridade SMALLINT NOT NULL,     -- menor = preferida quando o nome se repete
+    osm_id BIGINT NOT NULL,
+    osm_type VARCHAR(20) NOT NULL,
+    latitude DOUBLE PRECISION NOT NULL,
+    longitude DOUBLE PRECISION NOT NULL,
+    UNIQUE (osm_type, osm_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_regioes_nome ON regioes (nome_normalizado);

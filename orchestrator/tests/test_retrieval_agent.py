@@ -12,7 +12,6 @@ import pytest
 from orchestrator.contracts import SearchResponse, StructuredRequest, ValidationFeedback
 from orchestrator.graph import COMMUNICATION, NLU, RETRIEVAL, VALIDATION, build_graph, run
 from orchestrator.retrieval_agent import (
-    LocalizacaoDesconhecida,
     RetrievalAgent,
     montar_parametros,
     registro_para_search_response,
@@ -25,7 +24,8 @@ from orchestrator.validation_agent import ValidationAgent
 def _score():
     from orchestrator.retrieval_agent import _pipeline
 
-    return _pipeline()[0].__dict__["calcular_score"], _pipeline()[0].__dict__["link_osm"]
+    busca = _pipeline()[0]
+    return busca.calcular_score, busca.link_osm
 
 
 def _linha(place_id, nome, osm_id, tags, distancia_m=800.0, similaridade=0.9):
@@ -172,10 +172,27 @@ def test_agente_chama_busca_com_parametros_e_pede_k_extra_na_reconsulta(req):
     assert out["search_response"]["items"][0]["place_id"] == "2"
 
 
-def test_regiao_desconhecida_falha_alto():
+def test_regiao_resolvida_pelo_resolver_injetado():
+    fake = FakeBusca(_registro([_linha(1, "A", 1, CAFE_OK)]))
     r = StructuredRequest.model_validate(_request("r1"))  # target_region = "Asa Sul"
-    with pytest.raises(LocalizacaoDesconhecida):
-        _agente(FakeBusca(_registro([])))(_estado(r))
+    vistos = []
+
+    def resolver(regiao, conexao):
+        vistos.append(regiao)
+        return (-15.8169, -47.9000)
+
+    _agente(fake, resolver_local=resolver)(_estado(r))
+    assert vistos == ["Asa Sul"]
+    assert (fake.chamadas[0]["lat"], fake.chamadas[0]["lon"]) == (-15.8169, -47.9000)
+
+
+def test_regiao_desconhecida_pede_esclarecimento_sem_buscar():
+    fake = FakeBusca(_registro([_linha(1, "A", 1, CAFE_OK)]))
+    r = StructuredRequest.model_validate(_request("r1", spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}))
+    out = _agente(fake, resolver_local=lambda regiao, con: None)(_estado(r))
+    assert fake.chamadas == []  # nao chutou lugar nenhum
+    assert out["search_response"]["status"] == "NO_RESULTS"
+    assert "Narnia" in out["structured_request"].clarification_needed
 
 
 def test_estado_sem_request_falha_alto():
@@ -218,6 +235,20 @@ def test_grafo_sem_resultados_abstem():
     s = run(_grafo(FakeBusca(_registro([]))), "q", "r-vazio")
     assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, COMMUNICATION]
     assert s["final_response"] == "abstencao"
+
+
+def test_grafo_regiao_desconhecida_pergunta_ao_usuario():
+    fake = FakeBusca(_registro([_linha(1, "A", 111, CAFE_OK)]))
+    g = build_graph(
+        nlu=stub_nlu(spatial_constraints={"target_region": "Narnia", "max_radius_km": 3.0}),
+        retrieval=_agente(fake, resolver_local=lambda regiao, con: None),
+        validation=ValidationAgent(db_path=":memory:"),
+        communication=stub_communication,
+    )
+    s = run(g, "q", "r-narnia")
+    assert [t.agent for t in s["agent_trace"]] == [NLU, RETRIEVAL, COMMUNICATION]
+    assert fake.chamadas == []
+    assert "Narnia" in s["final_response"]  # modo esclarecimento
 
 
 def test_grafo_erro_do_banco_vira_abstencao_segura():

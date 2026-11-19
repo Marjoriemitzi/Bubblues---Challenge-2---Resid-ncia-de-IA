@@ -58,9 +58,17 @@ if [ "$(psql_db -tAc 'SELECT count(*) FROM places WHERE embedding IS NULL' | tr 
   echo ">> Gerando embeddings (baixa o modelo na primeira vez)"; "$PY" gerar_embeddings.py
 fi
 
+if [ "$REEXTRAIR" = 1 ] || [ ! -s data/raw/regioes.json ]; then
+  echo ">> Extraindo regioes do DF (Overpass API)"; "$PY" extract_regioes.py
+fi
+if [ "$RECRIAR" = 1 ] || [ "$(contar regioes)" = 0 ]; then
+  echo ">> Carregando regioes"; "$PY" load_regioes.py
+fi
+
 echo ">> Resumo"
 psql_db -c "SELECT (SELECT count(*) FROM estabelecimentos) AS estabelecimentos,
                    count(*) AS places, count(embedding) AS com_embedding,
-                   count(*) FILTER (WHERE tags->>'wheelchair'='yes') AS wheelchair_yes
+                   count(*) FILTER (WHERE tags->>'wheelchair'='yes') AS wheelchair_yes,
+                   (SELECT count(*) FROM regioes) AS regioes
             FROM places"
 echo ">> Pronto. Teste com: .venv/bin/python -m pytest"
