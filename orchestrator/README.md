@@ -1,5 +1,7 @@
 # Orquestrador Bubbles
 
+> **Documentação:** [arquitetura e responsabilidades dos agentes](../docs/arquitetura_agentes.md) · [demonstração de um fluxo completo](../docs/demo_fluxo_completo.md) · [avaliação do agente LLM](../docs/avaliacao/fase_f_resultados.md)
+
 Grafo LangGraph: `NLU → Retrieval → Communication`. **"Agente" é só o que usa LLM** (NLU e Communication,
 e o Retrieval quando virar agente). O Validation não usa LLM: é uma **ferramenta** do Retrieval.
 
