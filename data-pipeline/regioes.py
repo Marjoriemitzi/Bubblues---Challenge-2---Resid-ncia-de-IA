@@ -97,3 +97,41 @@ def resolver_regiao(conexao, nome):
         if linha:
             return linha[2], linha[3], linha[0]
     return None
+
+
+# ---- varios candidatos (usado pela tool resolver_regiao do agente LLM) ----------------------
+_COLUNAS = "nome, tipo, latitude, longitude, osm_type, osm_id"
+_LISTA = (
+    (f"SELECT {_COLUNAS} FROM regioes WHERE nome_normalizado = %s "
+     "ORDER BY prioridade, osm_type, osm_id LIMIT %s", lambda c: (c,)),
+    (f"SELECT {_COLUNAS} FROM regioes WHERE (' ' || nome_normalizado || ' ') LIKE %s "
+     "ORDER BY prioridade, length(nome_normalizado), osm_type, osm_id LIMIT %s", lambda c: (f"% {c} %",)),
+    (f"SELECT {_COLUNAS} FROM regioes WHERE length(nome_normalizado) >= 4 "
+     "AND %s LIKE ('%% ' || nome_normalizado || ' %%') "
+     "ORDER BY length(nome_normalizado) DESC, prioridade, osm_type, osm_id LIMIT %s", lambda c: (f" {c} ",)),
+)
+
+
+def buscar_regioes(conexao, nome, limite=5):
+    """Ate `limite` regioes que casam com o nome, da mais para a menos especifica.
+
+    Ordem: nome exato, nome contido no da regiao, regiao contida no texto. Sem repeticao.
+    Cada item: {nome, tipo, latitude, longitude, osm_type, osm_id}.
+    """
+    chave = normalizar_nome(nome or "")
+    if not chave or limite < 1:
+        return []
+    achados, vistos = [], set()
+    for sql, montar in _LISTA:
+        for linha in conexao.execute(sql, (*montar(chave), limite)).fetchall():
+            ident = (linha[4], linha[5])
+            if ident in vistos:
+                continue
+            vistos.add(ident)
+            achados.append(
+                {"nome": linha[0], "tipo": linha[1], "latitude": linha[2], "longitude": linha[3],
+                 "osm_type": linha[4], "osm_id": linha[5]}
+            )
+            if len(achados) >= limite:
+                return achados
+    return achados

@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from regioes import elementos_para_linhas, normalizar_nome, resolver_regiao
+from regioes import buscar_regioes, elementos_para_linhas, normalizar_nome, resolver_regiao
 
 ARQUIVO_SCHEMA = Path(__file__).parent.parent / "db" / "schema.sql"
 
@@ -98,3 +98,16 @@ def test_desconhecida_ou_vazia_devolve_none(regioes):
     assert resolver_regiao(regioes, "Narnia") is None
     assert resolver_regiao(regioes, "   ") is None
     assert resolver_regiao(regioes, None) is None
+
+
+def test_buscar_regioes_devolve_varios_sem_repetir(regioes):
+    nomes = [(r["nome"], r["tipo"]) for r in buscar_regioes(regioes, "Guará")]
+    assert nomes == [("Guará", "place=quarter"), ("Guará", "admin_level=8")]  # prioridade
+
+
+def test_buscar_regioes_respeita_limite_e_ordem_de_especificidade(regioes):
+    assert {r["nome"] for r in buscar_regioes(regioes, "asa")} == {"Asa Sul", "Plano Piloto - Asa Norte"}
+    achados = buscar_regioes(regioes, "Asa Norte")
+    assert achados[0]["nome"] == "Plano Piloto - Asa Norte"
+    assert len(buscar_regioes(regioes, "Guará", limite=1)) == 1
+    assert buscar_regioes(regioes, "Narnia") == [] and buscar_regioes(regioes, None) == []
