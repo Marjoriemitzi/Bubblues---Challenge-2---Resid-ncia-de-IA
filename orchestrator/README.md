@@ -29,6 +29,7 @@ pytest orchestrator                              # testes de banco são pulados 
 | Retrieval (hoje) | `retrieval_pipeline.py` | não | busca determinística + gate + reconsulta; devolve `search_response`, `evidence_records` (Contrato 4), `validation_feedback`, `retry_count` |
 | Tools de busca | `retrieval_tools.py` | não | `resolver_regiao`, `listar_categorias`, `buscar_lugares`, `validar_candidatos`; filtros obrigatórios dentro da tool |
 | Gate | `retrieval_gate.py` | não | auditoria **obrigatória** da seleção final; grava a auditoria; recusa lugar que não veio da busca |
+| Cliente LLM | `llm_client.py` (+ `llm_fake.py` para testes) | sim | DeepSeek: retry, tool calling, thinking (`reasoning_content`), `strict`, contagem de tokens e prazo |
 | Validação | `validation_tool.py` (`EvidenceValidator`) | não | RNF01, restrições (acessibilidade, ruído, horário) e integridade matemática do score |
 | Communication | `stubs.py` (stub) | — | em desenvolvimento por outra pessoa |
 
@@ -42,6 +43,11 @@ pytest orchestrator                              # testes de banco são pulados 
   ligadas por `consulta_id`. **Fail-closed:** falha ao gravar a auditoria vira abstenção.
 - **RNF02:** `raw_query` é zerado depois do NLU; nada de texto livre chega ao Retrieval nem ao banco.
 - `retry_count` = reconsultas realizadas (0 = aprovado na primeira busca).
+
+## LLM (DeepSeek)
+
+Variáveis em `.env.example`. Padrão: `deepseek-flash`, thinking desligado. `python scripts/diagnostico_llm.py` roda um loop real de tool use
+e compara configurações; resultados e recomendação em `docs/diagnostico_llm_deepseek.md`.
 
 ## Avaliação
 
