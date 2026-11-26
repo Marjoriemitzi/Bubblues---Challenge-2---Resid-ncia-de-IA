@@ -1,9 +1,17 @@
 import json
 import sqlite3
+import sys
+from pathlib import Path
 import numpy as np
 from sentence_transformers import SentenceTransformer
 from agente_entrada_nlu import IntakeNLUAgent
 from agente_validador import ValidationAgent
+
+_RAIZ = Path(__file__).resolve().parent.parent
+if str(_RAIZ) not in sys.path:
+    sys.path.insert(0, str(_RAIZ))
+
+from orchestrator.audio import AudioSynthesizer  # noqa: E402
 
 print("🤖 Inicializando Sistema Multiagentes (4 Agentes) — Projeto Bubbles\n")
 model = SentenceTransformer("paraphrase-multilingual-mpnet-base-v2")
@@ -80,6 +88,10 @@ class ResearchAgent:
 
 
 class CommunicationAgent:
+    def __init__(self, audio_output_dir: str = "audio_outputs", enable_audio: bool = True):
+        self.enable_audio = enable_audio
+        self.audio_synthesizer = AudioSynthesizer(output_dir=audio_output_dir)
+
     def responder(self, structured_request: dict, relatorio_validacao: dict) -> str:
         print("💬 [4. Communication_Agent] Adaptando resposta ao perfil do usuário...")
         aprovados = relatorio_validacao.get("aprovados", [])
@@ -101,6 +113,20 @@ class CommunicationAgent:
             )
         return "\n".join(linhas)
 
+    def responder_com_audio(self, structured_request: dict, relatorio_validacao: dict) -> dict:
+        """Gera a resposta textual auditada e sintetiza a versao em audio (TTS)."""
+        texto = self.responder(structured_request, relatorio_validacao)
+        req_acess = structured_request.get("accessibility_requirements", {})
+        perfil = "helena" if (req_acess.get("wheelchair_required") or req_acess.get("elder_friendly")) else "neutro"
+        req_id = str(structured_request.get("request_id") or "proto")
+        audio = self.audio_synthesizer.synthesize(
+            text=texto,
+            request_id=req_id,
+            profile=perfil,
+            enabled=self.enable_audio,
+        )
+        return {"texto": texto, "audio": audio.model_dump()}
+
 
 def executar_pipeline_multiagente(pergunta: str):
     print("=" * 75)
@@ -117,7 +143,16 @@ def executar_pipeline_multiagente(pergunta: str):
     req = nlu.processar_solicitacao(pergunta)
     if not req["intent_valid"]:
         motivo = req["out_of_scope_reason"] or req["impossible_criteria_reason"]
-        print(f"🛑 [1. Intake_NLU_Agent] Pedido bloqueado na entrada: {motivo}\n")
+        msg_bloqueio = f"Não foi possível atender ao seu pedido: {motivo}"
+        audio_bloqueio = communicator.audio_synthesizer.synthesize(
+            text=msg_bloqueio,
+            request_id=str(req.get("request_id") or "blocked"),
+            profile="neutro",
+            enabled=communicator.enable_audio,
+        )
+        print(f"🛑 [1. Intake_NLU_Agent] Pedido bloqueado na entrada: {motivo}")
+        if audio_bloqueio.success:
+            print(f"🔊 [4. Communication_Agent] Áudio de abstenção gerado ({audio_bloqueio.provider}): {audio_bloqueio.file_path}\n")
         return
 
     # 2. Agente de Pesquisa (RAG)
@@ -130,9 +165,14 @@ def executar_pipeline_multiagente(pergunta: str):
     for rep in auditoria["reprovados"]:
         print(f"   -> [REPROVADO] {rep['candidate_name']}: {rep['rejection_reasons'][0]}")
 
-    # 4. Agente de Comunicação
-    resposta_final = communicator.responder(req, auditoria)
-    print("\n✅ RESPOSTA ENTREGUE AO USUÁRIO:\n" + resposta_final + "\n")
+    # 4. Agente de Comunicação (Texto + Áudio)
+    saida = communicator.responder_com_audio(req, auditoria)
+    print("\n✅ RESPOSTA ENTREGUE AO USUÁRIO:\n" + saida["texto"])
+    audio_info = saida["audio"]
+    if audio_info.get("success"):
+        print(f"\n🔊 ÁUDIO GERADO ({audio_info['provider']} | voz={audio_info['voice']}): {audio_info['file_path']}\n")
+    else:
+        print(f"\n⚠️ Áudio não gerado: {audio_info.get('error')}\n")
 
 
 if __name__ == "__main__":
