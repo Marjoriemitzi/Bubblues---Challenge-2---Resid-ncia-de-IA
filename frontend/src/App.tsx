@@ -244,6 +244,7 @@ export default function App() {
           activeMeeting={nextUpcomingMeeting}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
+          onNavigate={navigate}
           onProfile={() => navigate('profile')}
           onSubmit={handleSubmitRequest}
           onQuickChoose={(venue) => handleEnterPairingSlot(venue, venue.vibe)}
@@ -275,6 +276,7 @@ export default function App() {
           meeting={activeMeeting}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
+          onNavigate={navigate}
           onProfile={() => navigate('profile')}
           onSimulateMemberJoin={handleSimulateMemberJoin}
           onSimulateLowQuorum={handleSimulateLowQuorum}
@@ -289,6 +291,7 @@ export default function App() {
           meeting={activeMeeting}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
+          onNavigate={navigate}
           onProfile={() => navigate('profile')}
           onToggleCheckin={() => {
             setMeetings((prev) =>
@@ -313,6 +316,7 @@ export default function App() {
           meetings={meetings}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
+          onNavigate={navigate}
           onProfile={() => navigate('profile')}
           openMeeting={(id, status) => {
             setActiveMeetingId(id)
@@ -336,6 +340,7 @@ export default function App() {
           activeMeeting={nextUpcomingMeeting}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
+          onNavigate={navigate}
           onUpdateProfile={setProfile}
           onEditInterests={() => navigate('preferences')}
           onEditStyle={() => navigate('onboarding-style')}

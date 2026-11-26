@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
+  formatWheelchairLabel,
   recommendZeroTurn,
   type InterpretedIntent,
   type MemberProfile,
@@ -7,7 +8,7 @@ import {
   type ScheduledMeeting,
   type VerifiedVenue,
 } from '../data/bubblesData'
-import { Header, Icon, Logo, Stepper, type IconName } from './Icons'
+import { Header, Icon, Logo, Stepper, type IconName, type Screen } from './Icons'
 
 interface SpeechRecognitionLike {
   lang: string
@@ -63,7 +64,7 @@ export function EvidenceModal({
           <div className="verified">
             <Icon name="shield" size={18} />
             <span>
-              <strong>Grounding OpenStreetMap:</strong> {venue.address} · wheelchair={venue.wheelchair} · ruído {venue.noiseLevel} ·{' '}
+              <strong>Grounding OpenStreetMap:</strong> {venue.address} · {formatWheelchairLabel(venue.wheelchair)} · ruído {venue.noiseLevel} ·{' '}
               <a className="osm-link" href={venue.osmUrl} target="_blank" rel="noreferrer">{venue.osmLabel}</a>
             </span>
           </div>
@@ -80,6 +81,7 @@ export function Home({
   activeMeeting,
   showNotifications,
   onToggleNotifications,
+  onNavigate,
   onProfile,
   onSubmit,
   onQuickChoose,
@@ -91,6 +93,7 @@ export function Home({
   activeMeeting: ScheduledMeeting | null
   showNotifications: boolean
   onToggleNotifications: () => void
+  onNavigate: (screen: Screen) => void
   onProfile: () => void
   onSubmit: () => void
   onQuickChoose: (venue: VerifiedVenue) => void
@@ -155,6 +158,8 @@ export function Home({
         activeMeeting={activeMeeting}
         showNotifications={showNotifications}
         onToggleNotifications={onToggleNotifications}
+        current="home"
+        go={onNavigate}
       />
       <main className="page home-page">
         <section className="home-hero">
@@ -215,7 +220,7 @@ export function Home({
                 <span className="venue-badge">{venue.tag}</span>
                 <h3>{venue.name}</h3>
                 <p>{venue.kind} · {venue.time}</p>
-                <small>Acesso {venue.wheelchair} · Ruído {venue.noiseLevel}</small>
+                <small>{formatWheelchairLabel(venue.wheelchair)} · Ruído {venue.noiseLevel}</small>
                 <button type="button" className="secondary-button full" onClick={() => onQuickChoose(venue)}>
                   Entrar no grupo <Icon name="arrow" size={18}/>
                 </button>
@@ -451,7 +456,7 @@ export function Recommendations({
                     <span><Icon name="people" size={17}/>{venue.groupSize} pessoas (3 a 8)</span>
                   </div>
                   <div className="venue-badges">
-                    <span className="venue-badge">Acesso plano (wheelchair={venue.wheelchair})</span>
+                    <span className="venue-badge">{formatWheelchairLabel(venue.wheelchair)}</span>
                     <span className="venue-badge">Ruído {venue.noiseLevel}</span>
                   </div>
                   <div className="verified">

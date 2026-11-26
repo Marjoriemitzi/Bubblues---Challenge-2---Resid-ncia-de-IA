@@ -92,16 +92,35 @@ export function Header({
   activeMeeting,
   showNotifications,
   onToggleNotifications,
+  current,
+  go,
 }: {
   initials: string
   onProfile: () => void
   activeMeeting: ScheduledMeeting | null
   showNotifications: boolean
   onToggleNotifications: () => void
+  current?: Screen
+  go?: (screen: Screen) => void
 }) {
+  const inMeetings = current === 'meetings' || current === 'meeting' || current === 'pairing-slot'
+
   return (
     <header className="topbar">
       <Logo />
+      {go && current && (
+        <nav className="topnav" aria-label="Navegação desktop">
+          <button type="button" className={current === 'home' ? 'active' : ''} onClick={() => go('home')}>
+            <Icon name="home" size={18} /><span>Início</span>
+          </button>
+          <button type="button" className={inMeetings ? 'active' : ''} onClick={() => go('meetings')}>
+            <Icon name="calendar" size={18} /><span>Encontros</span>
+          </button>
+          <button type="button" className={current === 'profile' ? 'active' : ''} onClick={() => go('profile')}>
+            <Icon name="profile" size={18} /><span>Perfil</span>
+          </button>
+        </nav>
+      )}
       <div className="topbar-actions">
         <button
           type="button"

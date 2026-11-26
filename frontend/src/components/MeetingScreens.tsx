@@ -1,12 +1,13 @@
 import { useState } from 'react'
-import type { MemberProfile, ScheduledMeeting } from '../data/bubblesData'
-import { Header, Icon, Logo, Stepper } from './Icons'
+import { formatWheelchairLabel, type MemberProfile, type ScheduledMeeting } from '../data/bubblesData'
+import { Header, Icon, Logo, Stepper, type Screen } from './Icons'
 
 export function PairingSlot({
   profile,
   meeting,
   showNotifications,
   onToggleNotifications,
+  onNavigate,
   onProfile,
   onSimulateMemberJoin,
   onSimulateLowQuorum,
@@ -17,6 +18,7 @@ export function PairingSlot({
   meeting: ScheduledMeeting
   showNotifications: boolean
   onToggleNotifications: () => void
+  onNavigate: (screen: Screen) => void
   onProfile: () => void
   onSimulateMemberJoin: () => void
   onSimulateLowQuorum: () => void
@@ -34,6 +36,8 @@ export function PairingSlot({
         activeMeeting={meeting}
         showNotifications={showNotifications}
         onToggleNotifications={onToggleNotifications}
+        current="pairing-slot"
+        go={onNavigate}
       />
       <main className="page meeting-page">
         <Stepper step={3} />
@@ -118,6 +122,7 @@ export function Meeting({
   meeting,
   showNotifications,
   onToggleNotifications,
+  onNavigate,
   onProfile,
   onToggleCheckin,
   onCancelEarly,
@@ -129,6 +134,7 @@ export function Meeting({
   meeting: ScheduledMeeting
   showNotifications: boolean
   onToggleNotifications: () => void
+  onNavigate: (screen: Screen) => void
   onProfile: () => void
   onToggleCheckin: () => void
   onCancelEarly: () => void
@@ -178,6 +184,8 @@ export function Meeting({
         activeMeeting={meeting}
         showNotifications={showNotifications}
         onToggleNotifications={onToggleNotifications}
+        current="meeting"
+        go={onNavigate}
       />
       <main className="page meeting-page">
         <div className="success-heading">
@@ -239,7 +247,7 @@ export function Meeting({
             <span className="round-icon orange"><Icon name="shield"/></span>
             <div>
               <h3>Encontro seguro</h3>
-              <p>Local público verificado ({venue.osmLabel}), acesso plano ({venue.wheelchair}) e ruído {venue.noiseLevel}.</p>
+              <p>Local público verificado ({venue.osmLabel}), {formatWheelchairLabel(venue.wheelchair).toLowerCase()} e ruído {venue.noiseLevel}.</p>
               <button type="button" onClick={() => setShowSafetyGuide((open) => !open)}>
                 {showSafetyGuide ? 'Ocultar orientações' : 'Ver orientações'} <Icon name="chevron" size={17}/>
               </button>
@@ -283,6 +291,7 @@ export function Meetings({
   meetings,
   showNotifications,
   onToggleNotifications,
+  onNavigate,
   onProfile,
   openMeeting,
   goHome,
@@ -291,6 +300,7 @@ export function Meetings({
   meetings: ScheduledMeeting[]
   showNotifications: boolean
   onToggleNotifications: () => void
+  onNavigate: (screen: Screen) => void
   onProfile: () => void
   openMeeting: (id: string, status: ScheduledMeeting['status']) => void
   goHome: () => void
@@ -311,6 +321,8 @@ export function Meetings({
         activeMeeting={nextActive}
         showNotifications={showNotifications}
         onToggleNotifications={onToggleNotifications}
+        current="meetings"
+        go={onNavigate}
       />
       <main className="page list-page">
         <span className="eyebrow">Sua agenda</span><h1>Meus <em>encontros</em></h1>

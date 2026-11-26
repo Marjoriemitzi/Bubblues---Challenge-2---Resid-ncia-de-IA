@@ -358,6 +358,12 @@ export function makeInitials(fullName: string): string {
   return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
 }
 
+export function formatWheelchairLabel(wheelchair: VerifiedVenue['wheelchair']): string {
+  if (wheelchair === 'yes') return 'Acesso plano (PCD)'
+  if (wheelchair === 'limited') return 'Acesso parcial'
+  return 'Sem acesso plano'
+}
+
 export function interpretRequest(rawText: string, profile: MemberProfile): InterpretedIntent {
   const normalized = rawText.trim().toLowerCase()
 

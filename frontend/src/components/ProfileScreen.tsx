@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { makeInitials, type MemberProfile, type ScheduledMeeting } from '../data/bubblesData'
-import { Header, Icon } from './Icons'
+import { Header, Icon, type Screen } from './Icons'
 
 export function Profile({
   profile,
   activeMeeting,
   showNotifications,
   onToggleNotifications,
+  onNavigate,
   onUpdateProfile,
   onEditInterests,
   onEditStyle,
@@ -16,6 +17,7 @@ export function Profile({
   activeMeeting: ScheduledMeeting | null
   showNotifications: boolean
   onToggleNotifications: () => void
+  onNavigate: (screen: Screen) => void
   onUpdateProfile: (next: MemberProfile) => void
   onEditInterests: () => void
   onEditStyle: () => void
@@ -64,6 +66,8 @@ export function Profile({
         activeMeeting={activeMeeting}
         showNotifications={showNotifications}
         onToggleNotifications={onToggleNotifications}
+        current="profile"
+        go={onNavigate}
       />
       <main className="page profile-page">
         <span className="eyebrow">Seu espaço</span><h1>Perfil e <em>preferências</em></h1>
