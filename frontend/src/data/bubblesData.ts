@@ -1,5 +1,16 @@
 export type NoiseLevel = 'baixo' | 'moderado' | 'alto'
 export type NoiseTolerance = 'baixo' | 'moderado' | 'indiferente'
+export type Sociability = 'introvertido' | 'extrovertido' | 'ambivertido'
+export type ConversationStyle = 'profundas' | 'leves' | 'tanto_faz'
+export type MeetingFrequency = 'semanal' | 'mensal' | 'ocasional'
+
+export interface ScoreDecomposition {
+  vector: number
+  distance: number
+  reputation: number
+  compatibility: number
+  total: number
+}
 
 export interface VerifiedVenue {
   placeId: string
@@ -17,6 +28,8 @@ export interface VerifiedVenue {
   hoursRange: string
   openUntil: string
   rating: string
+  googleRating: number
+  appRating: number
   groupSize: number
   tone: 'orange' | 'yellow' | 'brown'
   tag: string
@@ -29,6 +42,7 @@ export interface VerifiedVenue {
   matchReason: string
   icebreakers: [string, string, string]
   categories: string[]
+  scoreDecomposition: ScoreDecomposition
 }
 
 export interface InterpretedIntent {
@@ -51,20 +65,29 @@ export interface MemberProfile {
   region: string
   maxRadiusKm: number
   interests: string[]
+  sociability: Sociability
+  conversationStyle: ConversationStyle
+  frequency: MeetingFrequency
   wheelchairRequired: boolean
   noiseTolerance: NoiseTolerance
   largeText: boolean
+  commitmentPoints: number
+  noShowCount: number
+  accountStatus: 'ativo' | 'alerta' | 'suspenso_temporario'
 }
 
 export interface ScheduledMeeting {
   id: string
   venue: VerifiedVenue
   activity: string
-  status: 'confirmado' | 'concluido' | 'cancelado'
+  status: 'em_formacao' | 'confirmado' | 'concluido' | 'cancelado' | 'cancelado_quorum'
+  slotMembersCount: number
+  confirmedCheckinCount: number
   checkedIn: boolean
   groupInterests: string[]
   satisfaction?: number
   safety?: number
+  safetyIncident?: string
 }
 
 export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
@@ -84,6 +107,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '15:00 — 17:00',
     openUntil: '19h',
     rating: '4,8',
+    googleRating: 4.6,
+    appRating: 4.9,
     groupSize: 5,
     tone: 'orange',
     tag: 'Mais compatível',
@@ -101,6 +126,13 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'Se pudesse aprender uma nova habilidade este ano, qual seria?',
     ],
     categories: ['cafe', 'leitura', 'conversa', 'tecnologia'],
+    scoreDecomposition: {
+      vector: 0.34,
+      distance: 0.2,
+      reputation: 0.14,
+      compatibility: 0.19,
+      total: 0.87,
+    },
   },
   {
     placeId: 'LOC-01',
@@ -118,6 +150,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '15:30 — 17:30',
     openUntil: '20h',
     rating: '4,8',
+    googleRating: 4.7,
+    appRating: 4.8,
     groupSize: 4,
     tone: 'yellow',
     tag: 'Mais tranquilo',
@@ -135,6 +169,13 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'Qual foi a melhor descoberta recente que você fez pela cidade?',
     ],
     categories: ['cafe', 'leitura', 'conversa', 'tecnologia'],
+    scoreDecomposition: {
+      vector: 0.36,
+      distance: 0.18,
+      reputation: 0.14,
+      compatibility: 0.18,
+      total: 0.86,
+    },
   },
   {
     placeId: 'LOC-02',
@@ -152,6 +193,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '09:30 — 11:30',
     openUntil: '22h',
     rating: '4,7',
+    googleRating: 4.8,
+    appRating: 4.7,
     groupSize: 6,
     tone: 'brown',
     tag: 'Ao ar livre',
@@ -169,6 +212,13 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'O que fez você decidir experimentar um encontro em grupo hoje?',
     ],
     categories: ['parque', 'caminhada', 'natureza', 'ar_livre'],
+    scoreDecomposition: {
+      vector: 0.31,
+      distance: 0.17,
+      reputation: 0.14,
+      compatibility: 0.17,
+      total: 0.79,
+    },
   },
   {
     placeId: 'LOC-04',
@@ -186,6 +236,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '16:00 — 18:00',
     openUntil: '21h',
     rating: '4,7',
+    googleRating: 4.7,
+    appRating: 4.7,
     groupSize: 5,
     tone: 'orange',
     tag: 'Leitura & café',
@@ -203,6 +255,13 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'Qual filme adaptado de livro realmente surpreendeu você?',
     ],
     categories: ['leitura', 'cultura', 'cafe', 'conversa'],
+    scoreDecomposition: {
+      vector: 0.33,
+      distance: 0.15,
+      reputation: 0.14,
+      compatibility: 0.18,
+      total: 0.8,
+    },
   },
   {
     placeId: 'LOC-05',
@@ -220,6 +279,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '14:30 — 16:30',
     openUntil: '21h',
     rating: '4,8',
+    googleRating: 4.8,
+    appRating: 4.8,
     groupSize: 6,
     tone: 'yellow',
     tag: 'Arte & cultura',
@@ -237,11 +298,18 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'Que espaço cultural de Brasília você ainda quer conhecer?',
     ],
     categories: ['cultura', 'arte', 'exposicao', 'cinema'],
+    scoreDecomposition: {
+      vector: 0.32,
+      distance: 0.13,
+      reputation: 0.14,
+      compatibility: 0.18,
+      total: 0.77,
+    },
   },
   {
     placeId: 'LOC-06',
     name: 'Ludoteca BGC Boardgames',
-    amenity: 'cafe',
+    amenity: 'games_cafe',
     kind: 'Café de jogos · Asa Sul',
     region: 'Asa Sul',
     address: 'CLS 310 Bloco D · Asa Sul, Brasília - DF',
@@ -254,6 +322,8 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
     hoursRange: '18:00 — 20:30',
     openUntil: '23h',
     rating: '4,8',
+    googleRating: 4.8,
+    appRating: 4.9,
     groupSize: 5,
     tone: 'brown',
     tag: 'Descontraído',
@@ -271,6 +341,13 @@ export const VERIFIED_VENUES_DF: VerifiedVenue[] = [
       'Se pudesse inventar uma regra nova para quebrar o gelo, qual seria?',
     ],
     categories: ['jogos', 'cafe', 'conversa'],
+    scoreDecomposition: {
+      vector: 0.3,
+      distance: 0.17,
+      reputation: 0.15,
+      compatibility: 0.16,
+      total: 0.78,
+    },
   },
 ]
 
@@ -380,17 +457,21 @@ export function interpretRequest(rawText: string, profile: MemberProfile): Inter
   }
 }
 
+function isVenueEligible(venue: VerifiedVenue, wheelchairRequired: boolean, noiseTolerance: NoiseTolerance): boolean {
+  if (!venue.isPublicVerified) return false
+  if (wheelchairRequired && venue.wheelchair === 'no') return false
+  if ((noiseTolerance === 'baixo' || noiseTolerance === 'moderado') && venue.noiseLevel === 'alto') {
+    return false
+  }
+  return true
+}
+
 export function rankVenues(intent: InterpretedIntent, pageOffset = 0): VerifiedVenue[] {
   if (intent.status !== 'VALID') return []
 
-  const eligible = VERIFIED_VENUES_DF.filter((venue) => {
-    if (!venue.isPublicVerified) return false
-    if (intent.wheelchairRequired && venue.wheelchair === 'no') return false
-    if ((intent.noiseTolerance === 'baixo' || intent.noiseTolerance === 'moderado') && venue.noiseLevel === 'alto') {
-      return false
-    }
-    return true
-  })
+  const eligible = VERIFIED_VENUES_DF.filter((venue) =>
+    isVenueEligible(venue, intent.wheelchairRequired, intent.noiseTolerance),
+  )
 
   const scored = [...eligible].sort((a, b) => {
     const scoreOf = (venue: VerifiedVenue) => {
@@ -409,6 +490,23 @@ export function rankVenues(intent: InterpretedIntent, pageOffset = 0): VerifiedV
   const picked: VerifiedVenue[] = []
   for (let i = 0; i < 3; i += 1) {
     picked.push(scored[(start + i) % scored.length])
+  }
+  return picked
+}
+
+/** Recomendação proativa Zero-Turn (ADR-0003): 3 locais de categorias distintas para o Perfil Base. */
+export function recommendZeroTurn(profile: MemberProfile): VerifiedVenue[] {
+  const eligible = VERIFIED_VENUES_DF.filter((venue) =>
+    isVenueEligible(venue, profile.wheelchairRequired, profile.noiseTolerance),
+  )
+  const picked: VerifiedVenue[] = []
+  const seenAmenities = new Set<string>()
+  for (const venue of eligible) {
+    if (!seenAmenities.has(venue.amenity)) {
+      picked.push(venue)
+      seenAmenities.add(venue.amenity)
+      if (picked.length === 3) break
+    }
   }
   return picked
 }
