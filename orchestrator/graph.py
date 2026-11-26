@@ -1,3 +1,4 @@
+
 """Orquestrador LangGraph do Bubbles.
 
 Fluxo:
@@ -42,8 +43,8 @@ FALLBACK_MESSAGE = (
     "Nao consegui processar seu pedido agora. Tente novamente em instantes."
 )
 
-# Um agente e qualquer callable estado -> dict parcial. Ele pode devolver
-# dicts "crus" (ex.: JSON do LLM); o orquestrador valida com os modelos Pydantic.
+
+# Um agente e qualquer callable estado -> dict parcial.
 Agent = Callable[[AgentState], dict]
 
 
@@ -54,8 +55,7 @@ class Decision:
 
 
 # --------------------------------------------------------------------------
-# Roteamento: funcoes PURAS (so leem o estado). Ficam fora do grafo para
-# serem testaveis sem executar nada.
+# Roteamento
 # --------------------------------------------------------------------------
 def route_after_nlu(state: AgentState) -> Decision:
     req = state["structured_request"]
@@ -72,13 +72,12 @@ def route_after_nlu(state: AgentState) -> Decision:
 def route_after_retrieval(state: AgentState) -> Decision:
     resp = state["search_response"]
     if resp.status in ("NO_RESULTS", "OUT_OF_SCOPE") or resp.results_count == 0:
-        # O Retrieval ja expande o raio sozinho; auditar lista vazia so geraria reconsultas inuteis.
         return Decision(COMMUNICATION, f"busca sem candidatos ({resp.status}): abstencao")
     return Decision(VALIDATION, "candidatos prontos para auditoria")
 
 
 def _guard(route: Callable[[AgentState], Decision]) -> Callable[[AgentState], Decision]:
-    """Se qualquer agente falhou (state['error']), desvia para abstencao segura."""
+    """Se qualquer agente falhou, desvia para abstencao segura."""
 
     def guarded(state: AgentState) -> Decision:
         if state.get("error"):
@@ -93,7 +92,6 @@ def make_route_after_validation(max_retries: int) -> Callable[[AgentState], Deci
         fb = state["validation_feedback"]
         if fb.approved:
             return Decision(COMMUNICATION, "Top-3 aprovado pela auditoria")
-        # retry_count ja foi incrementado pelo no de validacao ao reprovar.
         if state.get("retry_count", 0) <= max_retries:
             return Decision(
                 RETRIEVAL,
@@ -105,10 +103,10 @@ def make_route_after_validation(max_retries: int) -> Callable[[AgentState], Deci
 
 
 # --------------------------------------------------------------------------
-# Instrumentacao: embrulha cada agente com validacao + trace + regras de estado.
+# Instrumentacao
 # --------------------------------------------------------------------------
 def _coerce(update: dict) -> dict:
-    """Converte dicts em modelos Pydantic. Payload invalido -> ValidationError."""
+    """Converte dicts em modelos Pydantic."""
     models = {
         "structured_request": StructuredRequest,
         "search_response": SearchResponse,
@@ -119,7 +117,10 @@ def _coerce(update: dict) -> dict:
         if out.get(key) is not None:
             out[key] = model.model_validate(out[key])
     if "evidence_records" in out:
-        out["evidence_records"] = [EvidenceRecord.model_validate(e) for e in out["evidence_records"]]
+        out["evidence_records"] = [
+            EvidenceRecord.model_validate(e)
+            for e in out["evidence_records"]
+        ]
     return out
 
 
@@ -132,20 +133,17 @@ def _node(
     def run(state: AgentState) -> dict:
         try:
             raw = agent(state)
-        except Exception as exc:  # falha de runtime do agente (LLM fora do ar, banco, timeout...)
-            # Guardamos so o NOME da excecao: a mensagem pode conter texto do usuario (RNF02).
+        except Exception as exc:
             kind = type(exc).__name__
             update: dict = {"error": f"{name}: {kind}"}
             note = f"falha do agente ({kind})"
             if name == NLU:
-                update["raw_query"] = None  # RNF02 vale mesmo quando o NLU falha
+                update["raw_query"] = None
             if name == COMMUNICATION:
                 update["final_response"] = FALLBACK_MESSAGE
         else:
-            # Payload fora do contrato continua levantando ValidationError: e bug de
-            # implementacao do agente, nao falha transitoria, e deve aparecer alto.
             update = _coerce(raw)
-            note = update.pop("note", "")  # agentes podem anexar um resumo livre (sem PII)
+            note = update.pop("note", "")
             if post:
                 update = post(state, update)
 
@@ -155,7 +153,10 @@ def _node(
             TraceEntry(
                 timestamp=datetime.now(timezone.utc),
                 agent=name,
-                input_keys=sorted(k for k, v in state.items() if v not in (None, [], "") and k != "agent_trace"),
+                input_keys=sorted(
+                    k for k, v in state.items()
+                    if v not in (None, [], "") and k != "agent_trace"
+                ),
                 output_keys=sorted(k for k in update if k != "agent_trace"),
                 note=note,
                 next_agent=decision.next,
@@ -168,8 +169,10 @@ def _node(
 
 
 def _scrub_raw_query(state: AgentState, update: dict) -> dict:
-    """RNF02: descarta o texto livre assim que o NLU termina."""
+    """Descarta o texto livre assim que o NLU termina."""
     update["raw_query"] = None
+    if state.get("transcription") is not None:
+        update["transcription"] = None
     req = update.get("structured_request")
     if req is not None:
         update["structured_request"] = req.model_copy(update={"raw_query": None})
@@ -193,8 +196,7 @@ def build_graph(
     communication: Agent,
     max_retries: int = MAX_RETRIES,
 ):
-    """Monta e compila o grafo. Os agentes entram por injecao de dependencia:
-    hoje sao stubs; nas issues #7-#10 trocamos pelos reais sem mexer aqui."""
+    """Monta e compila o grafo."""
     r_nlu = _guard(route_after_nlu)
     r_retrieval = _guard(route_after_retrieval)
     r_validation = _guard(make_route_after_validation(max_retries))
@@ -215,6 +217,35 @@ def build_graph(
     return g.compile()
 
 
-def run(graph, raw_query: str, request_id: str) -> AgentState:
-    """Ponto de entrada: monta o estado inicial e executa o grafo."""
-    return graph.invoke({"request_id": request_id, "raw_query": raw_query, "retry_count": 0, "agent_trace": []})
+# --------------------------------------------------------------------------
+# Entrada: texto ou áudio
+# --------------------------------------------------------------------------
+def run(
+    graph,
+    raw_query: str = None,
+    request_id: str = None,
+    audio_path: str = None,
+    generate_audio: bool = True,
+) -> AgentState:
+    """Executa o grafo recebendo texto ou áudio."""
+
+    if audio_path and not raw_query:
+        from .communication import transcribe_audio
+        raw_query = transcribe_audio(audio_path)
+
+    if not raw_query or not raw_query.strip():
+        raise ValueError(
+            "É necessário fornecer um texto ou arquivo de áudio."
+        )
+
+    if not request_id:
+        raise ValueError("request_id é obrigatório.")
+
+    return graph.invoke({
+        "request_id": request_id,
+        "raw_query": raw_query.strip(),
+        "audio_path": audio_path,
+        "generate_audio": generate_audio,
+        "retry_count": 0,
+        "agent_trace": [],
+    })

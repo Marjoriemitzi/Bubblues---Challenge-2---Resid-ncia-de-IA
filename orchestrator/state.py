@@ -37,6 +37,11 @@ class TraceEntry(BaseModel):
 class AgentState(TypedDict, total=False):
     request_id: str
     raw_query: str | None  # RNF02: vira None apos o NLU
+    audio_path: str | None  # Caminho do arquivo de áudio (entrada ou resposta)
+    final_audio_path: str | None  # Caminho do áudio da resposta gerada pelo agente de comunicação
+    transcription: str | None  # Transcrição do áudio de entrada
+    generate_audio: bool | None  # Controle de síntese de voz (TTS)
+    user_profile: str | None  # Perfil do usuário (ex: helena, carla, neutro)
     structured_request: StructuredRequest | None
     search_response: SearchResponse | None
     validation_feedback: ValidationFeedback | None

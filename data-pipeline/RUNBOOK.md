@@ -155,6 +155,10 @@ python extract.py
 
 Realiza a coleta de estabelecimentos e locais de interesse do Distrito Federal por meio da API Overpass do OpenStreetMap.
 
+Por padrão, a conexão HTTPS valida o certificado do servidor. Em uma rede que intercepta TLS com um certificado autoassinado, configure `OVERPASS_VERIFY_SSL=false` no `.env` usado para executar o pipeline. Isso desativa a validação do certificado nas duas chamadas à Overpass; use essa opção apenas em uma rede confiável. Para voltar ao padrão, defina `OVERPASS_VERIFY_SSL=true` ou remova a variável.
+
+Para transcrição de áudio com Whisper, o download inicial do modelo também valida o certificado. Se esse download falhar pelo mesmo motivo, `WHISPER_VERIFY_SSL=false` desativa a validação apenas durante o carregamento do modelo; mantenha `true` (padrão) em condições normais.
+
 Os dados brutos são armazenados em `data/raw/`.
 
 A coleta considera locais identificados por nome e pertencentes às categorias selecionadas no projeto.

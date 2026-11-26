@@ -1,7 +1,21 @@
 
 import json
+import os
 from pathlib import Path
 import requests
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def verificar_ssl() -> bool:
+    """Mantém TLS verificado por padrão; permite desativar em redes com proxy local."""
+    valor = os.getenv("OVERPASS_VERIFY_SSL", "true").strip().lower()
+    if valor in {"1", "true", "yes", "sim", "on"}:
+        return True
+    if valor in {"0", "false", "no", "nao", "não", "off"}:
+        return False
+    raise ValueError("OVERPASS_VERIFY_SSL deve ser true ou false")
 
 # 1. Configuração da coleta
 cidade = "Brasília"
@@ -44,6 +58,7 @@ out geom;
 headers = {
     "User-Agent": "pipeline-brasilia/1.0 (projeto-estudo)"
 }
+ssl_verificado = verificar_ssl()
 
 # 4. Realizar a coleta
 print(f"Iniciando coleta de dados em {cidade}...")
@@ -52,7 +67,8 @@ resposta = requests.post(
     url,
     data={"data": consulta},
     headers=headers,
-    timeout=150
+    timeout=150,
+    verify=ssl_verificado,
 )
 
 resposta.raise_for_status()
@@ -65,7 +81,8 @@ resposta_limite = requests.post(
     url,
     data={"data": consulta_limite},
     headers=headers,
-    timeout=150
+    timeout=150,
+    verify=ssl_verificado,
 )
 
 resposta_limite.raise_for_status()

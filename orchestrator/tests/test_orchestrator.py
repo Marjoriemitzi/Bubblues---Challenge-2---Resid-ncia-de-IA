@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 from pydantic import ValidationError
 
@@ -190,3 +192,14 @@ def test_falha_da_propria_communication_usa_mensagem_fixa():
     s = run(build_graph(stub_nlu(), stub_retrieval, stub_validation(1), comm_quebrada), QUERY, "req-11")
     assert s["final_response"] == FALLBACK_MESSAGE
     assert s["agent_trace"][-1].next_agent == "__end__"
+
+
+def test_run_com_audio_path(tmp_path):
+    audio_file = tmp_path / "audio_input.wav"
+    audio_file.write_bytes(b"RIFF....WAVE")
+    with patch("orchestrator.communication.transcribe_audio", return_value="Quero um cafe na Asa Sul"):
+        s = run(make(), audio_path=str(audio_file), request_id="req-audio-1")
+        assert path(s) == [NLU, RETRIEVAL, VALIDATION, COMMUNICATION]
+        assert s["final_response"] == "top-3 auditado"
+        assert s["raw_query"] is None
+

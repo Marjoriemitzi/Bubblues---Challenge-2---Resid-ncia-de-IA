@@ -3,3 +3,4 @@ pandas
 psycopg[binary]
 shapely
 python-dotenv
+openai
