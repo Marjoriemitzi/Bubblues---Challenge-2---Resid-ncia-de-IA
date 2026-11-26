@@ -6,58 +6,33 @@ import { Feedback, Meeting, Meetings, PairingSlot } from './components/MeetingSc
 import { OnboardingStyle, Preferences } from './components/OnboardingScreens'
 import { Profile } from './components/ProfileScreen'
 import {
-  VERIFIED_VENUES_DF,
-  interpretRequest,
+  EMPTY_MEMBER_PROFILE,
   makeInitials,
-  rankVenues,
   type InterpretedIntent,
   type MemberProfile,
   type ScheduledMeeting,
   type VerifiedVenue,
 } from './data/bubblesData'
-
-const INITIAL_PROFILE: MemberProfile = {
-  name: 'Carla Mendes',
-  initials: 'CM',
-  since: 'Membro em Brasília · DF',
-  region: 'Asa Sul',
-  maxRadiusKm: 5,
-  interests: ['Cafés & conversas', 'Tecnologia', 'Livros & leitura'],
-  sociability: 'ambivertido',
-  conversationStyle: 'leves',
-  frequency: 'semanal',
-  wheelchairRequired: false,
-  noiseTolerance: 'baixo',
-  largeText: false,
-  commitmentPoints: 82,
-  noShowCount: 0,
-  accountStatus: 'ativo',
-}
+import {
+  cancelEarly,
+  confirmCheckin,
+  fetchRecommendations,
+  fetchZeroTurnRecommendations,
+  interpretIntent,
+  joinPairingSlot,
+  submitFeedback,
+} from './services/api'
 
 export default function App() {
   const [screen, setScreen] = useState<Screen>('welcome')
-  const [profile, setProfile] = useState<MemberProfile>(INITIAL_PROFILE)
+  const [profile, setProfile] = useState<MemberProfile>(EMPTY_MEMBER_PROFILE)
   const [requestText, setRequestText] = useState('')
-  const [intent, setIntent] = useState<InterpretedIntent>(() =>
-    interpretRequest(
-      'Quero um café tranquilo na Asa Sul no sábado à tarde para conversar sobre tecnologia.',
-      INITIAL_PROFILE,
-    ),
-  )
+  const [intent, setIntent] = useState<InterpretedIntent | null>(null)
+  const [recommendedVenues, setRecommendedVenues] = useState<VerifiedVenue[]>([])
+  const [zeroTurnVenues, setZeroTurnVenues] = useState<VerifiedVenue[]>([])
   const [venuePageOffset, setVenuePageOffset] = useState(0)
-  const [meetings, setMeetings] = useState<ScheduledMeeting[]>([
-    {
-      id: 'enc-inicial',
-      venue: VERIFIED_VENUES_DF[0],
-      activity: 'Café e conversa',
-      status: 'confirmado',
-      slotMembersCount: 5,
-      confirmedCheckinCount: 4,
-      checkedIn: false,
-      groupInterests: ['Tecnologia', 'Livros & leitura', 'Cafés'],
-    },
-  ])
-  const [activeMeetingId, setActiveMeetingId] = useState<string>('enc-inicial')
+  const [meetings, setMeetings] = useState<ScheduledMeeting[]>([])
+  const [activeMeetingId, setActiveMeetingId] = useState<string | null>(null)
   const [legalTab, setLegalTab] = useState<'terms' | 'privacy' | null>(null)
   const [showNotifications, setShowNotifications] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
@@ -70,6 +45,21 @@ export default function App() {
     return () => window.clearTimeout(timer)
   }, [toast])
 
+  useEffect(() => {
+    if (screen !== 'home') return
+    let active = true
+    fetchZeroTurnRecommendations(profile)
+      .then((venues) => {
+        if (active) setZeroTurnVenues(venues)
+      })
+      .catch(() => {
+        if (active) setZeroTurnVenues([])
+      })
+    return () => {
+      active = false
+    }
+  }, [screen, profile])
+
   const showNav = ['home', 'pairing-slot', 'meeting', 'meetings', 'profile'].includes(screen)
   const navigate = (next: Screen) => {
     setShowNotifications(false)
@@ -77,97 +67,100 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const activeMeeting = meetings.find((m) => m.id === activeMeetingId) ?? meetings[0]
+  const activeMeeting = meetings.find((m) => m.id === activeMeetingId) ?? meetings[0] ?? null
   const nextUpcomingMeeting =
     meetings.find((m) => m.status === 'confirmado' || m.status === 'em_formacao') ?? null
 
-  const recommendedVenues = rankVenues(intent, venuePageOffset)
-
-  const handleSubmitRequest = () => {
-    const parsed = interpretRequest(requestText, profile)
-    setIntent(parsed)
-    setVenuePageOffset(0)
-    navigate('confirm')
+  const handleSubmitRequest = async () => {
+    try {
+      const parsed = await interpretIntent(requestText, profile)
+      setIntent(parsed)
+      setVenuePageOffset(0)
+      navigate('confirm')
+    } catch {
+      notify('Não foi possível interpretar o pedido: conecte o backend em /api.')
+    }
   }
 
-  const handleEnterPairingSlot = (venue: VerifiedVenue, activityLabel?: string) => {
+  const handleLoadRecommendations = async (offset = 0) => {
+    if (!intent) return
+    try {
+      const venues = await fetchRecommendations(intent, offset)
+      setRecommendedVenues(venues)
+      setVenuePageOffset(offset)
+      navigate('recommendations')
+    } catch {
+      setRecommendedVenues([])
+      navigate('recommendations')
+      notify('Não foi possível buscar recomendações: conecte o backend em /api.')
+    }
+  }
+
+  const handleEnterPairingSlot = async (venue: VerifiedVenue, activityLabel?: string) => {
     if (profile.accountStatus === 'suspenso_temporario') {
-      notify('Sua conta está pausada por No-Show. Reative ou verifique o status na aba Perfil.')
+      notify('Sua conta está pausada por No-Show. Verifique seu status na aba Perfil.')
       navigate('profile')
       return
     }
-    const newId = `enc-${Date.now()}`
-    const created: ScheduledMeeting = {
-      id: newId,
-      venue,
-      activity: activityLabel || intent.activity,
-      status: 'em_formacao',
-      slotMembersCount: 2,
-      confirmedCheckinCount: 2,
-      checkedIn: false,
-      groupInterests: profile.interests.length ? profile.interests : ['Cafés', 'Conversa', 'Cultura'],
-    }
-    setMeetings((prev) => [created, ...prev])
-    setActiveMeetingId(newId)
-    navigate('pairing-slot')
-  }
-
-  const handleSimulateMemberJoin = () => {
-    if (!activeMeeting) return
-    const nextCount = Math.min(8, activeMeeting.slotMembersCount + 1)
-    const reachedQuorum = nextCount >= 3
-    setMeetings((prev) =>
-      prev.map((m) =>
-        m.id === activeMeeting.id
-          ? {
-              ...m,
-              slotMembersCount: nextCount,
-              confirmedCheckinCount: nextCount,
-              status: reachedQuorum ? 'confirmado' : 'em_formacao',
-            }
-          : m,
-      ),
-    )
-    if (reachedQuorum) {
-      notify('Quórum mínimo atingido! Encontro confirmado e Pauta Quebra-Gelo pronta.')
-      navigate('meeting')
+    try {
+      const created = await joinPairingSlot(
+        venue.placeId,
+        activityLabel || intent?.activity || venue.vibe,
+      )
+      setMeetings((prev) => [created, ...prev])
+      setActiveMeetingId(created.id)
+      navigate(created.status === 'confirmado' ? 'meeting' : 'pairing-slot')
+    } catch {
+      notify('Não foi possível entrar no Slot de Pareamento: conecte o backend em /api.')
     }
   }
 
-  const handleSimulateLowQuorum = () => {
+  const handleToggleCheckin = async () => {
     if (!activeMeeting) return
-    setMeetings((prev) =>
-      prev.map((m) =>
-        m.id === activeMeeting.id
-          ? { ...m, status: 'cancelado_quorum', confirmedCheckinCount: 2 }
-          : m,
-      ),
-    )
-    notify('Encontro cancelado preventivamente para evitar encontro 1-a-1 (sem penalidade).')
+    try {
+      const updated = await confirmCheckin(activeMeeting.id)
+      setMeetings((prev) => prev.map((m) => (m.id === updated.id ? updated : m)))
+      notify('Check-in Final atualizado!')
+    } catch {
+      notify('Não foi possível confirmar o Check-in Final: conecte o backend em /api.')
+    }
   }
 
-  const handleCompleteFeedback = (satisfaction: number, safety: number, incident?: string) => {
-    setMeetings((prev) =>
-      prev.map((m) =>
-        m.id === activeMeeting.id
-          ? { ...m, status: 'concluido', satisfaction, safety, safetyIncident: incident }
-          : m,
-      ),
-    )
-    notify(
-      incident
-        ? 'Avaliação e reporte de incidente enviados para moderação.'
-        : 'Avaliação enviada! Obrigado por contribuir com a reputação da comunidade.',
-    )
-    navigate('meetings')
+  const handleCompleteFeedback = async (
+    satisfaction: number,
+    safety: number,
+    attendedCount: number,
+    incident?: string,
+  ) => {
+    if (!activeMeeting) return
+    try {
+      await submitFeedback(activeMeeting.id, { satisfaction, safety, attendedCount, incident })
+      setMeetings((prev) =>
+        prev.map((m) =>
+          m.id === activeMeeting.id
+            ? { ...m, status: 'concluido', satisfaction, safety, safetyIncident: incident }
+            : m,
+        ),
+      )
+      notify('Avaliação enviada! Obrigado por contribuir com a comunidade.')
+      navigate('meetings')
+    } catch {
+      notify('Não foi possível enviar a avaliação: conecte o backend em /api.')
+    }
   }
 
-  const handleCancelEarly = () => {
-    setMeetings((prev) =>
-      prev.map((m) => (m.id === activeMeeting.id ? { ...m, status: 'cancelado' } : m)),
-    )
-    notify('Desistência prévia registrada sem penalidade de compromisso.')
-    navigate('meetings')
+  const handleCancelEarly = async () => {
+    if (!activeMeeting) return
+    try {
+      await cancelEarly(activeMeeting.id)
+      setMeetings((prev) =>
+        prev.map((m) => (m.id === activeMeeting.id ? { ...m, status: 'cancelado' } : m)),
+      )
+      notify('Desistência prévia registrada sem penalidade de compromisso.')
+      navigate('meetings')
+    } catch {
+      notify('Não foi possível registrar a desistência prévia: conecte o backend em /api.')
+    }
   }
 
   return (
@@ -189,9 +182,8 @@ export default function App() {
           goSignup={() => navigate('signup')}
           goForgot={() => navigate('forgot-password')}
           done={(email) => {
-            const localName = email.split('@')[0] || 'Carla'
-            setProfile((curr) => ({ ...curr, initials: makeInitials(localName) }))
-            notify('Bem-vindo(a) de volta ao Bubbles!')
+            const localName = email.split('@')[0] || ''
+            setProfile((curr) => ({ ...curr, name: localName, initials: makeInitials(localName) }))
             navigate('home')
           }}
         />
@@ -241,6 +233,7 @@ export default function App() {
           profile={profile}
           request={requestText}
           onChangeRequest={setRequestText}
+          zeroTurnVenues={zeroTurnVenues}
           activeMeeting={nextUpcomingMeeting}
           showNotifications={showNotifications}
           onToggleNotifications={() => setShowNotifications((o) => !o)}
@@ -257,7 +250,7 @@ export default function App() {
           intent={intent}
           onUpdateIntent={setIntent}
           back={() => navigate('home')}
-          next={() => navigate('recommendations')}
+          next={() => handleLoadRecommendations(0)}
         />
       )}
 
@@ -266,7 +259,7 @@ export default function App() {
           venues={recommendedVenues}
           back={() => navigate('confirm')}
           choose={(venue) => handleEnterPairingSlot(venue)}
-          onMoreOptions={() => setVenuePageOffset((offset) => offset + 1)}
+          onMoreOptions={() => handleLoadRecommendations(venuePageOffset + 1)}
         />
       )}
 
@@ -278,8 +271,6 @@ export default function App() {
           onToggleNotifications={() => setShowNotifications((o) => !o)}
           onNavigate={navigate}
           onProfile={() => navigate('profile')}
-          onSimulateMemberJoin={handleSimulateMemberJoin}
-          onSimulateLowQuorum={handleSimulateLowQuorum}
           onChooseOtherVenue={() => navigate('recommendations')}
           onCancelEarly={handleCancelEarly}
         />
@@ -293,16 +284,7 @@ export default function App() {
           onToggleNotifications={() => setShowNotifications((o) => !o)}
           onNavigate={navigate}
           onProfile={() => navigate('profile')}
-          onToggleCheckin={() => {
-            setMeetings((prev) =>
-              prev.map((m) => (m.id === activeMeeting.id ? { ...m, checkedIn: !m.checkedIn } : m)),
-            )
-            notify(
-              activeMeeting.checkedIn
-                ? 'Check-in Final desmarcado.'
-                : 'Check-in Final confirmado! Sua presença conta para o quórum mínimo.',
-            )
-          }}
+          onToggleCheckin={handleToggleCheckin}
           onCancelEarly={handleCancelEarly}
           goMeetings={() => navigate('meetings')}
           feedback={() => navigate('feedback')}

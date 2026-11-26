@@ -81,26 +81,15 @@ export function Profile({
             <p>
               Você acumulou {profile.noShowCount} faltas após confirmar presença no Check-in Final. Para proteger os grupos, novos pareamentos ficam pausados por 7 dias. Lembre-se: cancelar antes do Check-in Final (Desistência Prévia) nunca gera penalidade.
             </p>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={() =>
-                onUpdateProfile({
-                  ...profile,
-                  accountStatus: 'ativo',
-                  noShowCount: 0,
-                  commitmentPoints: 82,
-                })
-              }
-            >
-              Simular reativação da conta
-            </button>
           </section>
         )}
 
         <section className="profile-summary">
           <div className="profile-avatar">{profile.initials}</div>
-          <div><h2>{profile.name}</h2><p>{profile.since}</p></div>
+          <div>
+            <h2>{profile.name || 'Membro Bubbles'}</h2>
+            <p>{profile.since}</p>
+          </div>
           <button type="button" onClick={() => setOpenSection((s) => (s === 'name' ? null : 'name'))}>
             <Icon name="edit" size={18}/> Editar
           </button>
@@ -114,6 +103,7 @@ export function Profile({
               <input
                 type="text"
                 value={profile.name}
+                placeholder="Digite seu nome"
                 onChange={(e) =>
                   onUpdateProfile({
                     ...profile,
@@ -142,23 +132,6 @@ export function Profile({
             Desistência prévia antes do Check-in Final é isenta de punição. Apenas faltas após confirmação final descontam pontos.
           </p>
           <div className="progress"><i style={{ width: `${profile.commitmentPoints}%` }}/></div>
-          {profile.accountStatus !== 'suspenso_temporario' && (
-            <button
-              type="button"
-              className="text-button"
-              style={{ color: 'var(--cream)', marginTop: '.75rem', fontSize: '.75rem' }}
-              onClick={() =>
-                onUpdateProfile({
-                  ...profile,
-                  accountStatus: 'suspenso_temporario',
-                  noShowCount: 2,
-                  commitmentPoints: 35,
-                })
-              }
-            >
-              Simular alerta de suspensão por No-Show
-            </button>
-          )}
         </section>
 
         <div className="settings-list">

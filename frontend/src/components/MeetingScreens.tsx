@@ -9,8 +9,6 @@ export function PairingSlot({
   onToggleNotifications,
   onNavigate,
   onProfile,
-  onSimulateMemberJoin,
-  onSimulateLowQuorum,
   onChooseOtherVenue,
   onCancelEarly,
 }: {
@@ -20,8 +18,6 @@ export function PairingSlot({
   onToggleNotifications: () => void
   onNavigate: (screen: Screen) => void
   onProfile: () => void
-  onSimulateMemberJoin: () => void
-  onSimulateLowQuorum: () => void
   onChooseOtherVenue: () => void
   onCancelEarly: () => void
 }) {
@@ -83,7 +79,7 @@ export function PairingSlot({
               </div>
               <div className="ticket-group">
                 <strong>{meeting.slotMembersCount} de 3 mínimos (até 8)</strong>
-                <span>Afinidades: {meeting.groupInterests.slice(0, 3).join(' · ')}</span>
+                <span>Afinidades: {meeting.groupInterests.slice(0, 3).join(' · ') || 'Compatíveis'}</span>
                 <div className="progress" style={{ marginTop: '.75rem' }}>
                   <i style={{ width: `${Math.min(100, Math.round((meeting.slotMembersCount / 3) * 100))}%` }} />
                 </div>
@@ -96,14 +92,6 @@ export function PairingSlot({
                 <small>
                   Não abrimos chat antes do encontro para evitar fadiga de decisão. A Pauta Quebra-Gelo será liberada 30 min antes, após o Check-in Final.
                 </small>
-              </div>
-              <div style={{ display: 'flex', gap: '.6rem', flexWrap: 'wrap' }}>
-                <button type="button" className="primary-button" onClick={onSimulateMemberJoin}>
-                  Simular adesão de Membro (+1)
-                </button>
-                <button type="button" className="secondary-button" onClick={onSimulateLowQuorum}>
-                  Simular quórum &lt; 3
-                </button>
               </div>
             </section>
 
@@ -204,9 +192,8 @@ export function Meeting({
             <p><Icon name="location" size={18}/> {venue.address}</p>
           </div>
           <div className="ticket-group">
-            <div className="avatar-stack"><i>MA</i><i>LS</i><i>JR</i><i>+{Math.max(0, meeting.slotMembersCount - 3)}</i></div>
             <strong>Seu grupo tem {meeting.slotMembersCount} pessoas</strong>
-            <span>{meeting.groupInterests.slice(0, 3).join(' · ')}</span>
+            <span>{meeting.groupInterests.slice(0, 3).join(' · ') || 'Afinidades em comum'}</span>
           </div>
         </section>
 
@@ -276,7 +263,7 @@ export function Meeting({
 
         <div className="demo-links">
           <button type="button" onClick={goMeetings}>Ver meus encontros</button>
-          <button type="button" onClick={feedback}>Simular avaliação pós-encontro</button>
+          <button type="button" onClick={feedback}>Avaliar encontro</button>
           {meeting.status === 'confirmado' && (
             <button type="button" onClick={onCancelEarly}>Desistência prévia (sem penalidade)</button>
           )}
@@ -366,7 +353,6 @@ export function Meetings({
                     </span>
                     <h2>{item.activity}</h2>
                     <p>{item.venue.name} · {item.venue.time}</p>
-                    <div className="avatar-stack small"><i>MA</i><i>LS</i><i>JR</i><i>+{Math.max(0, item.slotMembersCount - 3)}</i></div>
                   </div>
                   <Icon name="chevron"/>
                 </article>
@@ -400,7 +386,7 @@ export function Feedback({
 }: {
   venueName: string
   groupSize: number
-  done: (satisfaction: number, safety: number, incident?: string) => void
+  done: (satisfaction: number, safety: number, attendedCount: number, incident?: string) => void
 }) {
   const [satisfaction, setSatisfaction] = useState(0)
   const [safety, setSafety] = useState(0)
@@ -451,7 +437,7 @@ export function Feedback({
           type="button"
           className="primary-button full"
           disabled={!satisfaction || !safety}
-          onClick={() => done(satisfaction, safety, incident === 'nenhum' ? undefined : incident)}
+          onClick={() => done(satisfaction, safety, attendedCount, incident === 'nenhum' ? undefined : incident)}
         >
           Enviar avaliação <Icon name="arrow"/>
         </button>
