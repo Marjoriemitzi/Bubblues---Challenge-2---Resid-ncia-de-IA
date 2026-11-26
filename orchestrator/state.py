@@ -37,11 +37,14 @@ class TraceEntry(BaseModel):
 class AgentState(TypedDict, total=False):
     request_id: str
     raw_query: str | None  # RNF02: vira None apos o NLU
+    user_profile: str | None  # Perfil/persona opcional para adaptar tom e cadencia
+    audio_enabled: bool | None  # Flag opcional para habilitar/desabilitar TTS
     structured_request: StructuredRequest | None
     search_response: SearchResponse | None
     validation_feedback: ValidationFeedback | None
     evidence_records: list[EvidenceRecord]
     retry_count: int  # quantas reconsultas ja foram feitas
     final_response: str | None
+    audio_output: dict | None  # Metadados do audio gerado pelo Communication_Agent
     error: str | None  # "<agente>: <TipoDaExcecao>" quando um agente falha
     agent_trace: Annotated[list[TraceEntry], operator.add]

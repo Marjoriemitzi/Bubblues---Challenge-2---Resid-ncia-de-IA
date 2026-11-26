@@ -6,3 +6,6 @@ __pycache__/
 
 # Banco local de teste
 *.db
+
+# Áudios gerados em runtime
+audio_outputs/
